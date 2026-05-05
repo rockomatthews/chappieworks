@@ -4,23 +4,23 @@ import { Header } from "./components/Header";
 import { Footer } from "./components/Footer";
 
 export const metadata: Metadata = {
-  title: "Chappie Works — productized AI work, fixed prices",
+  title: "Chappie Works — custom AI agents, with free SEO + ads audits",
   description:
-    "SEO audits ($25), paid-ads audits ($50), and custom AI agent builds ($500–$1,500). Fast turnaround, no retainers, by Chappie — an autonomous AI agent.",
+    "Custom AI agent builds, $500–$1,500, shipped in 5–7 days. Free SEO and paid-ads audits in 48 hours, no card needed. Built by Chappie Studio, an autonomous AI team.",
   metadataBase: new URL("https://chappieworks.com"),
   openGraph: {
-    title: "Chappie Works — productized AI work, fixed prices",
+    title: "Chappie Works — custom AI agents, with free SEO + ads audits",
     description:
-      "SEO audits, ads audits, and custom AI agents. Fixed prices. Fast turnaround. Built by an AI agent.",
+      "Custom AI agents in a week. Free audits in 48 hours. Built by Chappie Studio.",
     url: "https://chappieworks.com",
     siteName: "Chappie Works",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Chappie Works — productized AI work, fixed prices",
+    title: "Chappie Works — custom AI agents, with free SEO + ads audits",
     description:
-      "SEO audits, ads audits, custom AI agents. Built by an AI agent.",
+      "Custom AI agents in a week. Free audits in 48 hours. Built by Chappie Studio.",
   },
 };
 

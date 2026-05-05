@@ -1,19 +1,20 @@
+import Link from "next/link";
 import { CreditedBy } from "../components/CreditedBy";
 
 export const metadata = {
-  title: "Paid ads audit · $50 · 48hr — Chappie Works",
+  title: "Free paid ads audit · 48 hours — Chappie Works",
   description:
-    "250+ checks across Google, Meta, TikTok, LinkedIn, Microsoft Ads. Wasted spend, creative fatigue, bidding strategy. $50, 48-hour turnaround.",
+    "250+ checks across Google, Meta, TikTok, LinkedIn, Microsoft Ads. Free. 48-hour turnaround. Wasted spend, creative fatigue, kill/scale calls.",
   openGraph: {
-    title: "Paid ads audit · $50 · 48hr — Chappie Works",
+    title: "Free paid ads audit · 48 hours — Chappie Works",
     description:
-      "250+ checks across Google, Meta, TikTok, LinkedIn, Microsoft. Action list in 48 hours.",
+      "250+ checks across the platforms you actually run. Free. 48 hours. No card.",
     url: "https://chappieworks.com/ads-audit",
   },
 };
 
 const INTAKE_EMAIL =
-  "mailto:robmatthews1080@gmail.com?subject=Ads%20Audit%20Order%20%E2%80%94%20%24%2450%20(platforms)&body=Platforms%20to%20audit%20(Google%2C%20Meta%2C%20TikTok%2C%20LinkedIn%2C%20Microsoft)%3A%20%0AAccount%20access%20method%20(MCC%20invite%2C%20screenshare)%3A%20%0AMonthly%20spend%20range%3A%20%0AGoals%20(more%20leads%2C%20lower%20CPA%2C%20etc.)%3A%20%0ANotes%3A%20";
+  "mailto:robmatthews1080@gmail.com?subject=Free%20Ads%20Audit%20%E2%80%94%20platforms&body=Platforms%20to%20audit%20(Google%2C%20Meta%2C%20TikTok%2C%20LinkedIn%2C%20Microsoft)%3A%20%0AAccount%20access%20method%20(MCC%20invite%2C%20screenshare)%3A%20%0AMonthly%20spend%20range%3A%20%0AGoals%20(more%20leads%2C%20lower%20CPA%2C%20etc.)%3A%20%0ANotes%3A%20";
 
 export default function AdsAudit() {
   const platforms = [
@@ -59,14 +60,14 @@ export default function AdsAudit() {
     <main>
       <section className="px-6 sm:px-10 py-16 sm:py-20">
         <div className="max-w-3xl mx-auto">
-          <a
+          <Link
             href="/"
             className="text-sm mono text-[--color-mute] hover:text-[--color-gold]"
           >
             ← chappieworks
-          </a>
+          </Link>
           <p className="text-xs mono text-[--color-gold] mt-6 uppercase tracking-widest">
-            Paid ads audit · $50 · 48 hours
+            Paid ads audit · free · 48 hours · no card
           </p>
           <h1 className="text-4xl sm:text-5xl font-semibold tracking-tight mt-3 mb-6 leading-[1.1]">
             Stop bleeding money on ads you haven&rsquo;t audited.
@@ -74,10 +75,28 @@ export default function AdsAudit() {
           <p className="text-base sm:text-lg text-[--color-paper]/85 leading-relaxed">
             250+ checks across the platforms you actually run. Wasted spend
             flagged, creative fatigue scored, bidding strategy reality-checked
-            against your goal. PDF + Loom in 48 hours. $50.
+            against your goal. PDF + Loom in 48 hours. Free, no card.
           </p>
 
           <div className="card rounded-xl p-6 sm:p-8 mt-10">
+            <h2 className="text-lg font-semibold mb-4">Why this is free</h2>
+            <p className="text-sm text-[--color-paper]/85 leading-relaxed mb-3">
+              <span className="text-[--color-rust] font-semibold">Skeptic</span>{" "}
+              killed the original $50 SKU for the same reason as the SEO audit:
+              the unit economics don&rsquo;t survive the support load. Free is
+              the right price for a discovery offer.
+            </p>
+            <p className="text-sm text-[--color-paper]/85 leading-relaxed">
+              <span className="text-[--color-gold] font-semibold">Chappie</span>{" "}
+              agreed. We make money on custom AI agent builds — $500 to $1,500,
+              5 to 7 days. If your audit surfaces creative-production grind or
+              bid-management toil that an agent could automate, we&rsquo;ll
+              say so. If your account is healthy and just needs a human, we&rsquo;ll
+              say that.
+            </p>
+          </div>
+
+          <div className="card rounded-xl p-6 sm:p-8 mt-6">
             <h2 className="text-lg font-semibold mb-4">
               What gets audited (250+ checks)
             </h2>
@@ -102,7 +121,7 @@ export default function AdsAudit() {
             <h2 className="text-lg font-semibold mb-4">How it works</h2>
             <ol className="space-y-3 text-sm text-[--color-paper]/90 list-decimal list-inside">
               <li>
-                You email me which platforms to audit + how I&rsquo;ll get
+                Email me which platforms to audit + how I&rsquo;ll get
                 read-only access (MCC invite, BM access, or recorded
                 screenshare if accounts can&rsquo;t be shared).
               </li>
@@ -117,14 +136,12 @@ export default function AdsAudit() {
                 Two weeks of follow-up: I&rsquo;ll dig deeper on any
                 recommendation or argue with my own findings.
               </li>
+              <li>
+                If an agent would make the recommended fixes easier (creative
+                rotation, search-term mining, anomaly alerting), I&rsquo;ll
+                quote a build at the end. No pressure.
+              </li>
             </ol>
-          </div>
-
-          <div className="card rounded-xl p-6 sm:p-8 mt-6">
-            <h2 className="text-lg font-semibold mb-2">Refund policy</h2>
-            <p className="text-sm text-[--color-paper]/85">
-              Useless? Reply &ldquo;refund&rdquo; within 7 days, full $50 back.
-            </p>
           </div>
 
           <div className="mt-10 flex flex-col sm:flex-row gap-3">
@@ -132,17 +149,17 @@ export default function AdsAudit() {
               href={INTAKE_EMAIL}
               className="flex-1 flex items-center justify-center px-6 py-3 rounded-md bg-[--color-gold] text-[--color-ink] font-medium hover:opacity-90 transition"
             >
-              Order audit ($50) →
+              Get your free audit →
             </a>
-            <a
-              href="/"
+            <Link
+              href="/agents"
               className="flex items-center justify-center px-6 py-3 rounded-md border border-white/15 hover:border-[--color-gold] hover:text-[--color-gold] transition"
             >
-              See the rest of the slate
-            </a>
+              Or skip to agent builds
+            </Link>
           </div>
           <p className="text-xs mono text-[--color-mute] mt-4 text-center">
-            Email-first ordering for now. Card checkout wires up Friday.
+            Email-first intake while we wire up the form this week.
           </p>
 
           <CreditedBy slugs={["forge", "skeptic", "scribe"]} />

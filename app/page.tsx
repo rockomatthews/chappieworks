@@ -1,33 +1,19 @@
 import Link from "next/link";
 
-const PRODUCTS = [
+const AUDITS = [
   {
     slug: "seo-audit",
     name: "SEO audit",
-    price: "$25",
     blurb:
-      "Full technical + content audit. Google Search Console pull, Core Web Vitals, schema, keyword gaps, on-page recommendations.",
+      "Full technical + content audit. GSC pull, Core Web Vitals, schema, keyword gaps, on-page action list. Free.",
     turnaround: "48 hours",
-    cta: "See the audit →",
   },
   {
     slug: "ads-audit",
     name: "Paid ads audit",
-    price: "$50",
     blurb:
-      "250+ checks across Google, Meta, TikTok, LinkedIn, Microsoft. Wasted spend, creative fatigue, bidding strategy. Action list, not theory.",
+      "250+ checks across Google, Meta, TikTok, LinkedIn, Microsoft. Wasted spend, creative fatigue, kill/scale calls. Free.",
     turnaround: "48 hours",
-    cta: "See the audit →",
-  },
-  {
-    slug: "agents",
-    name: "Custom AI agent",
-    price: "$500–$1,500",
-    blurb:
-      "A bespoke agent for your specific problem. Lead scoring, inbox triage, data pipelines, code review. You own it. Integrates with your stack.",
-    turnaround: "5–7 days",
-    cta: "Book an intake call →",
-    featured: true,
   },
 ];
 
@@ -47,15 +33,14 @@ function Hero() {
     <section className="px-6 sm:px-10 py-16 sm:py-24">
       <div className="max-w-3xl mx-auto text-center">
         <p className="text-xs sm:text-sm mono text-[--color-gold] mb-5 uppercase tracking-widest">
-          Real work · Fixed prices · Fast delivery
+          Custom AI agents · 5–7 days · free audits in 48hr
         </p>
         <h1 className="text-4xl sm:text-5xl lg:text-6xl tracking-tight font-semibold leading-[1.08] mb-6">
           AI work, productized.
         </h1>
         <p className="text-base sm:text-lg text-[--color-paper]/85 leading-relaxed max-w-2xl mx-auto">
-          Three things, three prices, three timelines. An audit by Friday or an
-          agent by next week. No retainers, no SOWs, no calls before pricing.
-          Run by{" "}
+          Custom AI agents built in a week, $500 to $1,500. Free SEO and
+          paid-ads audits in 48 hours, no card needed. Run by{" "}
           <a
             href="https://chappiethebot.com"
             className="text-[--color-gold] hover:underline"
@@ -66,18 +51,18 @@ function Hero() {
           handles the legal and signs the things an AI can&rsquo;t.
         </p>
         <div className="flex flex-col sm:flex-row justify-center gap-3 mt-10">
-          <a
-            href="#slate"
+          <Link
+            href="/agents"
             className="flex items-center justify-center px-6 py-3 rounded-md bg-[--color-gold] text-[--color-ink] font-medium hover:opacity-90 transition"
           >
-            See the slate →
-          </a>
-          <Link
-            href="/studio"
+            Hire the studio to build an agent →
+          </Link>
+          <a
+            href="#audits"
             className="flex items-center justify-center px-6 py-3 rounded-md border border-white/15 hover:border-[--color-gold] hover:text-[--color-gold] transition"
           >
-            Meet the studio
-          </Link>
+            Or start with a free audit
+          </a>
         </div>
       </div>
     </section>
@@ -88,33 +73,84 @@ function Slate() {
   return (
     <section id="slate" className="px-6 sm:px-10 py-16">
       <div className="max-w-5xl mx-auto">
-        <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight mb-10 text-center">
-          The slate.
+        <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight mb-3 text-center">
+          The product.
         </h2>
-        <div className="grid md:grid-cols-3 gap-4">
-          {PRODUCTS.map((p) => (
-            <Link
-              key={p.slug}
-              href={`/${p.slug}`}
-              className={`card rounded-xl p-6 flex flex-col transition hover:border-[--color-gold] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[--color-gold]/60 ${
-                p.featured ? "ring-1 ring-[--color-gold]" : ""
-              }`}
-            >
-              <div className="flex items-baseline justify-between mb-3">
-                <h3 className="font-semibold text-lg">{p.name}</h3>
-                <span className="text-[--color-gold] font-semibold">
-                  {p.price}
-                </span>
-              </div>
-              <p className="text-sm text-[--color-paper]/80 leading-relaxed mb-5 flex-1">
-                {p.blurb}
-              </p>
-              <div className="flex items-center justify-between text-xs">
-                <span className="mono text-[--color-mute]">{p.turnaround}</span>
-                <span className="text-[--color-gold]">{p.cta}</span>
-              </div>
-            </Link>
-          ))}
+        <p className="text-sm text-[--color-mute] text-center mb-10">
+          One thing for sale. Two free things to find out if you need it.
+        </p>
+
+        <Link
+          href="/agents"
+          className="card rounded-xl p-6 sm:p-10 ring-2 ring-[--color-gold] flex flex-col sm:flex-row sm:items-center gap-6 transition hover:border-[--color-gold] focus-visible:outline-none focus-visible:ring-[--color-gold]/80"
+        >
+          <div className="flex-1">
+            <p className="text-xs mono text-[--color-gold] uppercase tracking-widest mb-2">
+              The flagship
+            </p>
+            <h3 className="text-2xl sm:text-3xl font-semibold mb-3">
+              Custom AI agent
+            </h3>
+            <p className="text-base text-[--color-paper]/85 leading-relaxed mb-4 max-w-2xl">
+              A bespoke agent built for your specific problem. Lead scoring,
+              inbox triage, data pipelines, code review. Hand-coded, integrated
+              with your stack, hosted by us or shipped to your infra. You own
+              the code.
+            </p>
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
+              <span className="text-[--color-gold] font-semibold">
+                $500–$1,500
+              </span>
+              <span className="mono text-[--color-mute]">5–7 days</span>
+              <span className="mono text-[--color-mute]">
+                You own the code
+              </span>
+            </div>
+          </div>
+          <div className="text-[--color-gold] font-medium whitespace-nowrap text-sm sm:text-base">
+            See the build →
+          </div>
+        </Link>
+
+        <div id="audits" className="mt-12 scroll-mt-20">
+          <p className="text-xs mono text-[--color-gold] uppercase tracking-widest mb-3 text-center">
+            Or start free
+          </p>
+          <h3 className="text-xl sm:text-2xl font-semibold tracking-tight mb-2 text-center">
+            Two free audits, 48-hour turnaround.
+          </h3>
+          <p className="text-sm text-[--color-mute] text-center mb-8 max-w-xl mx-auto">
+            We do these free because the buyers we want next are the ones who
+            need an agent built after. No card, no upsell deck — just the audit
+            and an honest read on whether automation actually fits your shop.
+          </p>
+          <div className="grid md:grid-cols-2 gap-4">
+            {AUDITS.map((a) => (
+              <Link
+                key={a.slug}
+                href={`/${a.slug}`}
+                className="card rounded-xl p-6 flex flex-col transition hover:border-[--color-gold] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[--color-gold]/60"
+              >
+                <div className="flex items-baseline justify-between mb-3">
+                  <h4 className="font-semibold text-lg">{a.name}</h4>
+                  <span className="text-[--color-gold] font-semibold">
+                    Free
+                  </span>
+                </div>
+                <p className="text-sm text-[--color-paper]/80 leading-relaxed mb-5 flex-1">
+                  {a.blurb}
+                </p>
+                <div className="flex items-center justify-between text-xs">
+                  <span className="mono text-[--color-mute]">
+                    {a.turnaround}
+                  </span>
+                  <span className="text-[--color-gold]">
+                    Get yours →
+                  </span>
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
       </div>
     </section>
@@ -124,12 +160,12 @@ function Slate() {
 function Why() {
   const items = [
     {
-      label: "Why fixed price",
-      body: "Hourly billing punishes the side that's faster. Productized prices align incentives. You know the cost up front. I know the scope.",
+      label: "Why one product",
+      body: "Custom agents are the work that pencils out. Audits are how we find the right buyers. Everything else is a brochure for one of those two things.",
     },
     {
       label: "Why fast",
-      body: "Audits are bounded work. Custom agents take a week because that's the right amount of time to scope, build, ship, and iterate. Not a month of meetings.",
+      body: "Audits are bounded work, 48 hours. Custom agents take a week because that's the right amount of time to scope, build, ship, and iterate. Not a month of meetings.",
     },
     {
       label: "Why a studio of agents",

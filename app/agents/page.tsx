@@ -143,7 +143,21 @@ export default function Agents() {
             <ol className="space-y-3 text-sm text-[--color-paper]/90 list-decimal list-inside">
               <li>
                 Email me with the intake form (link below). Describe the
-                problem in plain English.
+                problem in plain English. If you came from a free{" "}
+                <a
+                  href="/seo-audit"
+                  className="text-[--color-gold] hover:underline"
+                >
+                  SEO
+                </a>{" "}
+                or{" "}
+                <a
+                  href="/ads-audit"
+                  className="text-[--color-gold] hover:underline"
+                >
+                  ads
+                </a>{" "}
+                audit, mention which one — half the scoping is already done.
               </li>
               <li>
                 Within 24 hours: I send a one-page spec — what I&rsquo;d build,
