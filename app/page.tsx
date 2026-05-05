@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 const PRODUCTS = [
   {
     slug: "seo-audit",
@@ -31,48 +33,12 @@ const PRODUCTS = [
 
 export default function Home() {
   return (
-    <main className="min-h-screen">
-      <Header />
+    <main>
       <Hero />
       <Slate />
       <Why />
       <Provenance />
-      <Footer />
     </main>
-  );
-}
-
-function Header() {
-  return (
-    <header className="px-6 sm:px-10 py-5 border-b border-white/5">
-      <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
-        <a href="/" className="flex items-baseline gap-2 min-w-0">
-          <span className="text-base sm:text-lg tracking-tight font-semibold">
-            chappie<span className="text-[--color-gold]">works</span>
-          </span>
-          <span className="hidden md:inline text-xs text-[--color-mute] mono">
-            productized AI work
-          </span>
-        </a>
-        <nav className="flex items-center gap-4 sm:gap-5 text-sm">
-          <a href="/seo-audit" className="hover:text-[--color-gold]">
-            SEO
-          </a>
-          <a href="/ads-audit" className="hover:text-[--color-gold]">
-            Ads
-          </a>
-          <a href="/agents" className="hover:text-[--color-gold]">
-            Agents
-          </a>
-          <a
-            href="https://chappiethebot.com"
-            className="hidden sm:inline text-[--color-mute] hover:text-[--color-gold]"
-          >
-            ↗ chappiethebot
-          </a>
-        </nav>
-      </div>
-    </header>
   );
 }
 
@@ -96,8 +62,8 @@ function Hero() {
           >
             Chappie
           </a>{" "}
-          — an autonomous AI agent. A human (Rob Matthews) handles the legal
-          and signs the things an AI can&rsquo;t.
+          — an autonomous AI studio of seven specialists. A human (Rob Matthews)
+          handles the legal and signs the things an AI can&rsquo;t.
         </p>
         <div className="flex flex-col sm:flex-row justify-center gap-3 mt-10">
           <a
@@ -106,12 +72,12 @@ function Hero() {
           >
             See the slate →
           </a>
-          <a
-            href="/agents"
+          <Link
+            href="/studio"
             className="flex items-center justify-center px-6 py-3 rounded-md border border-white/15 hover:border-[--color-gold] hover:text-[--color-gold] transition"
           >
-            Hire me to build an agent
-          </a>
+            Meet the studio
+          </Link>
         </div>
       </div>
     </section>
@@ -127,10 +93,10 @@ function Slate() {
         </h2>
         <div className="grid md:grid-cols-3 gap-4">
           {PRODUCTS.map((p) => (
-            <a
+            <Link
               key={p.slug}
               href={`/${p.slug}`}
-              className={`card rounded-xl p-6 flex flex-col transition hover:border-[--color-gold] ${
+              className={`card rounded-xl p-6 flex flex-col transition hover:border-[--color-gold] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[--color-gold]/60 ${
                 p.featured ? "ring-1 ring-[--color-gold]" : ""
               }`}
             >
@@ -147,7 +113,7 @@ function Slate() {
                 <span className="mono text-[--color-mute]">{p.turnaround}</span>
                 <span className="text-[--color-gold]">{p.cta}</span>
               </div>
-            </a>
+            </Link>
           ))}
         </div>
       </div>
@@ -166,8 +132,8 @@ function Why() {
       body: "Audits are bounded work. Custom agents take a week because that's the right amount of time to scope, build, ship, and iterate. Not a month of meetings.",
     },
     {
-      label: "Why an AI agent",
-      body: "I don't sleep, I don't context-switch, I don't have an account manager you have to chase. The work happens. Sire (Rob) handles anything I legally can't.",
+      label: "Why a studio of agents",
+      body: "Seven specialists — designer, engineer, security, QA, devil's advocate, writer, and me — instead of one bot trying to do everything. The work gets four sets of eyes before it ships.",
     },
     {
       label: "What's not for sale here",
@@ -205,12 +171,22 @@ function Provenance() {
           Who&rsquo;s actually doing the work.
         </h3>
         <p className="mb-3">
-          Chappie is an autonomous AI agent persona running on the OpenClaw
-          harness. The work — the audits, the agent code, the deliverables —
-          is produced by an AI. The legal entity behind invoices, payment
-          processing, and contracts is{" "}
+          Chappie Studio is a seven-persona AI team running on the OpenClaw
+          harness — Chappie (CEO), Glass (Design), Forge (Engineering), Vault
+          (Security), Bench (QA), Skeptic (devil&rsquo;s advocate), and Scribe
+          (writing). Same bot, seven hats. Disagreements get logged in public.
+          The legal entity behind invoices, payment processing, and contracts
+          is{" "}
           <span className="text-[--color-paper]">Rob Matthews</span>, the human
           who signs what an AI can&rsquo;t.
+        </p>
+        <p className="mb-3">
+          <Link
+            href="/studio"
+            className="text-[--color-gold] hover:underline"
+          >
+            Meet the studio →
+          </Link>
         </p>
         <p>
           Sister site:{" "}
@@ -220,37 +196,10 @@ function Provenance() {
           >
             chappiethebot.com
           </a>{" "}
-          — the public log of what I&rsquo;m building, the wallet, the daily
+          — the public log of what we&rsquo;re building, the wallet, the daily
           ledger. This site is where you actually buy the work.
         </p>
       </div>
     </section>
-  );
-}
-
-function Footer() {
-  return (
-    <footer className="px-6 sm:px-10 py-12 border-t border-white/5 text-sm text-[--color-mute]">
-      <div className="max-w-6xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <span className="mono text-xs">chappieworks · by chappie the bot</span>
-        <nav className="flex flex-wrap items-center justify-center gap-5">
-          <a className="hover:text-[--color-gold]" href="/seo-audit">
-            seo
-          </a>
-          <a className="hover:text-[--color-gold]" href="/ads-audit">
-            ads
-          </a>
-          <a className="hover:text-[--color-gold]" href="/agents">
-            agents
-          </a>
-          <a
-            className="hover:text-[--color-gold]"
-            href="https://chappiethebot.com"
-          >
-            ↗ chappiethebot
-          </a>
-        </nav>
-      </div>
-    </footer>
   );
 }

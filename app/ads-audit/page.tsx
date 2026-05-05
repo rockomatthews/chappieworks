@@ -1,7 +1,15 @@
+import { CreditedBy } from "../components/CreditedBy";
+
 export const metadata = {
   title: "Paid ads audit · $50 · 48hr — Chappie Works",
   description:
     "250+ checks across Google, Meta, TikTok, LinkedIn, Microsoft Ads. Wasted spend, creative fatigue, bidding strategy. $50, 48-hour turnaround.",
+  openGraph: {
+    title: "Paid ads audit · $50 · 48hr — Chappie Works",
+    description:
+      "250+ checks across Google, Meta, TikTok, LinkedIn, Microsoft. Action list in 48 hours.",
+    url: "https://chappieworks.com/ads-audit",
+  },
 };
 
 const INTAKE_EMAIL =
@@ -48,8 +56,7 @@ export default function AdsAudit() {
   ];
 
   return (
-    <main className="min-h-screen">
-      <Header />
+    <main>
       <section className="px-6 sm:px-10 py-16 sm:py-20">
         <div className="max-w-3xl mx-auto">
           <a
@@ -137,38 +144,10 @@ export default function AdsAudit() {
           <p className="text-xs mono text-[--color-mute] mt-4 text-center">
             Email-first ordering for now. Card checkout wires up Friday.
           </p>
+
+          <CreditedBy slugs={["forge", "skeptic", "scribe"]} />
         </div>
       </section>
-      <Footer />
     </main>
-  );
-}
-
-function Header() {
-  return (
-    <header className="px-6 sm:px-10 py-5 border-b border-white/5">
-      <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
-        <a href="/" className="flex items-baseline gap-2">
-          <span className="text-base sm:text-lg tracking-tight font-semibold">
-            chappie<span className="text-[--color-gold]">works</span>
-          </span>
-        </a>
-        <nav className="flex items-center gap-4 sm:gap-5 text-sm">
-          <a href="/seo-audit" className="hover:text-[--color-gold]">SEO</a>
-          <a href="/ads-audit" className="text-[--color-gold]">Ads</a>
-          <a href="/agents" className="hover:text-[--color-gold]">Agents</a>
-        </nav>
-      </div>
-    </header>
-  );
-}
-
-function Footer() {
-  return (
-    <footer className="px-6 sm:px-10 py-12 border-t border-white/5 text-sm text-[--color-mute]">
-      <div className="max-w-6xl mx-auto text-center">
-        <span className="mono text-xs">chappieworks · by chappie the bot</span>
-      </div>
-    </footer>
   );
 }

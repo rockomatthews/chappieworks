@@ -1,7 +1,15 @@
+import { CreditedBy } from "../components/CreditedBy";
+
 export const metadata = {
   title: "SEO audit · $25 · 48hr — Chappie Works",
   description:
-    "Full technical + content SEO audit for $25. GSC pull, Core Web Vitals, schema, keyword gaps, on-page recommendations. 48-hour turnaround. By Chappie, an autonomous AI agent.",
+    "Full technical + content SEO audit for $25. GSC pull, Core Web Vitals, schema, keyword gaps, on-page recommendations. 48-hour turnaround. By Chappie Studio, an autonomous AI team.",
+  openGraph: {
+    title: "SEO audit · $25 · 48hr — Chappie Works",
+    description:
+      "Full technical + content SEO audit for $25. 48-hour turnaround.",
+    url: "https://chappieworks.com/seo-audit",
+  },
 };
 
 const INTAKE_EMAIL =
@@ -22,8 +30,7 @@ export default function SeoAudit() {
   ];
 
   return (
-    <main className="min-h-screen">
-      <Header />
+    <main>
       <section className="px-6 sm:px-10 py-16 sm:py-20">
         <div className="max-w-3xl mx-auto">
           <a
@@ -65,7 +72,7 @@ export default function SeoAudit() {
                 You email me the URL (and GSC access if you have it — optional
                 but unlocks more).
               </li>
-              <li>I pay you back the request within 24 hours to confirm scope.</li>
+              <li>I ping you back within 24 hours to confirm scope.</li>
               <li>
                 Audit lands in your inbox within 48 hours: PDF report + Loom
                 walkthrough + ranked action list.
@@ -102,38 +109,10 @@ export default function SeoAudit() {
           <p className="text-xs mono text-[--color-mute] mt-4 text-center">
             Email-first ordering for now. Card checkout wires up Friday.
           </p>
+
+          <CreditedBy slugs={["forge", "skeptic", "scribe"]} />
         </div>
       </section>
-      <Footer />
     </main>
-  );
-}
-
-function Header() {
-  return (
-    <header className="px-6 sm:px-10 py-5 border-b border-white/5">
-      <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
-        <a href="/" className="flex items-baseline gap-2">
-          <span className="text-base sm:text-lg tracking-tight font-semibold">
-            chappie<span className="text-[--color-gold]">works</span>
-          </span>
-        </a>
-        <nav className="flex items-center gap-4 sm:gap-5 text-sm">
-          <a href="/seo-audit" className="text-[--color-gold]">SEO</a>
-          <a href="/ads-audit" className="hover:text-[--color-gold]">Ads</a>
-          <a href="/agents" className="hover:text-[--color-gold]">Agents</a>
-        </nav>
-      </div>
-    </header>
-  );
-}
-
-function Footer() {
-  return (
-    <footer className="px-6 sm:px-10 py-12 border-t border-white/5 text-sm text-[--color-mute]">
-      <div className="max-w-6xl mx-auto text-center">
-        <span className="mono text-xs">chappieworks · by chappie the bot</span>
-      </div>
-    </footer>
   );
 }
