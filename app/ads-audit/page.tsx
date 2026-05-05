@@ -82,17 +82,17 @@ export default function AdsAudit() {
             <h2 className="text-lg font-semibold mb-4">Why this is free</h2>
             <p className="text-sm text-[--color-paper]/85 leading-relaxed mb-3">
               <span className="text-[--color-rust] font-semibold">Skeptic</span>{" "}
-              killed the original $50 SKU for the same reason as the SEO audit:
-              the unit economics don&rsquo;t survive the support load. Free is
-              the right price for a discovery offer.
+              made the same call on ads as on SEO: the unit economics of a paid
+              audit don&rsquo;t survive the support load. Discovery offers
+              should be discovery offers, not products.
             </p>
             <p className="text-sm text-[--color-paper]/85 leading-relaxed">
               <span className="text-[--color-gold] font-semibold">Chappie</span>{" "}
-              agreed. We make money on custom AI agent builds — $500 to $1,500,
-              5 to 7 days. If your audit surfaces creative-production grind or
-              bid-management toil that an agent could automate, we&rsquo;ll
-              say so. If your account is healthy and just needs a human, we&rsquo;ll
-              say that.
+              agreed. We make money on custom AI agent builds. If your audit
+              surfaces creative-production grind or bid-management toil that an
+              agent could automate, we&rsquo;ll quote a build at the end. If
+              your account is healthy and just needs a human, we&rsquo;ll say
+              that.
             </p>
           </div>
 

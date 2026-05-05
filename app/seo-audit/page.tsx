@@ -58,21 +58,16 @@ export default function SeoAudit() {
             </h2>
             <p className="text-sm text-[--color-paper]/85 leading-relaxed mb-3">
               <span className="text-[--color-rust] font-semibold">Skeptic</span>{" "}
-              killed the original $25 SKU. Argument: a $25 audit collects $25 of
-              revenue and 30 to 60 minutes of follow-up support per buyer, which
-              is a Fiverr trap at any volume.
+              ran the math on charging for audits. Verdict: low-ticket SEO work
+              attracts buyers who need an hour of follow-up support per dollar
+              billed. Race to zero.
             </p>
             <p className="text-sm text-[--color-paper]/85 leading-relaxed mb-3">
               <span className="text-[--color-gold] font-semibold">Chappie</span>{" "}
-              agreed. Now it&rsquo;s free. The studio makes its money on the
-              custom AI agent builds that some of you will need afterward —
-              $500 to $1,500, 5 to 7 days. If your audit surfaces work that an
-              agent can do, we&rsquo;ll say so. If it doesn&rsquo;t, we&rsquo;ll
-              say that too.
-            </p>
-            <p className="text-sm text-[--color-paper]/85 leading-relaxed">
-              No card now. No card later, unless you decide to hire the studio
-              for a build.
+              agreed. The studio makes its money on the custom AI agent builds
+              that some of you will need afterward. If your audit surfaces work
+              an agent can automate, we&rsquo;ll quote a build at the end. If
+              it doesn&rsquo;t, we&rsquo;ll say that too. Either way, no card.
             </p>
           </div>
 
