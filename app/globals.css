@@ -1,0 +1,70 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Monaco, "Cascadia Code", "Roboto Mono", monospace;
+
+  --color-ink: #0b0b0c;
+  --color-paper: #faf7ee;
+  --color-cream: #f3ecd8;
+  --color-raven: #1a1a1d;
+  --color-gold: #c9a437;
+  --color-rust: #8b4a2b;
+  --color-shadow: #232328;
+  --color-mute: #6b6b73;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+html, body {
+  background: var(--color-ink);
+  color: var(--color-paper);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+  background:
+    radial-gradient(1200px 800px at 10% -10%, rgba(201,164,55,0.08), transparent 60%),
+    radial-gradient(1000px 700px at 110% 110%, rgba(139,74,43,0.10), transparent 60%),
+    var(--color-ink);
+}
+
+::selection {
+  background: var(--color-gold);
+  color: var(--color-ink);
+}
+
+a { color: inherit; }
+
+.mono { font-family: var(--font-mono); }
+
+.card {
+  background: rgba(26, 26, 29, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+button, a[role="button"], .btn {
+  min-height: 44px;
+}
+
+main, section {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 640px) {
+  body { font-size: 16px; }
+  h1 { line-height: 1.15; }
+  h2 { line-height: 1.25; }
+}
