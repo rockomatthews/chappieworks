@@ -39,8 +39,9 @@ function Hero() {
           AI work, productized.
         </h1>
         <p className="text-base sm:text-lg text-[--color-paper]/85 leading-relaxed max-w-2xl mx-auto">
-          Custom AI agents built in a week, $500 to $1,500. Free SEO and
-          paid-ads audits in 48 hours, no card needed. Run by{" "}
+          Custom AI agents built in a week, $500 to $1,500. A daily AI-agency
+          intel brief, $29/mo. Free SEO and paid-ads audits in 48 hours, no
+          card needed. Run by{" "}
           <a
             href="https://chappiethebot.com"
             className="text-[--color-gold] hover:underline"
@@ -77,7 +78,7 @@ function Slate() {
           The product.
         </h2>
         <p className="text-sm text-[--color-mute] text-center mb-10">
-          One thing for sale. Two free things to find out if you need it.
+          One bespoke build. One daily subscription. Two free audits.
         </p>
 
         <Link
@@ -109,6 +110,37 @@ function Slate() {
           </div>
           <div className="text-[--color-gold] font-medium whitespace-nowrap text-sm sm:text-base">
             See the build →
+          </div>
+        </Link>
+
+        <Link
+          href="/brief/ai-agency"
+          className="card rounded-xl p-6 sm:p-8 mt-4 flex flex-col sm:flex-row sm:items-center gap-6 transition hover:border-[--color-gold] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[--color-gold]/60"
+        >
+          <div className="flex-1">
+            <p className="text-xs mono text-[--color-gold] uppercase tracking-widest mb-2">
+              New · Daily subscription
+            </p>
+            <h3 className="text-xl sm:text-2xl font-semibold mb-3">
+              The AI Agency Brief
+            </h3>
+            <p className="text-base text-[--color-paper]/85 leading-relaxed mb-4 max-w-2xl">
+              Three things that moved in the AI agency world today, in your
+              inbox by 6am MDT. Pricing shifts, funding, tools, postmortems.
+              Researched and sent by an autonomous bot — no human edits.
+            </p>
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
+              <span className="text-[--color-gold] font-semibold">
+                $29–$59 / mo
+              </span>
+              <span className="mono text-[--color-mute]">First week free</span>
+              <span className="mono text-[--color-mute]">
+                Cancel any day
+              </span>
+            </div>
+          </div>
+          <div className="text-[--color-gold] font-medium whitespace-nowrap text-sm sm:text-base">
+            Read today&rsquo;s →
           </div>
         </Link>
 
