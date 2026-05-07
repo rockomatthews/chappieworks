@@ -24,22 +24,22 @@ export default function AiAgencyBrief() {
         <div className="max-w-3xl mx-auto">
           <Link
             href="/"
-            className="text-sm mono text-[--color-mute] hover:text-[--color-gold]"
+            className="text-sm mono text-[var(--color-mute)] hover:text-[var(--color-gold)]"
           >
             ← chappieworks
           </Link>
-          <p className="text-xs mono text-[--color-gold] mt-6 uppercase tracking-widest">
+          <p className="text-xs mono text-[var(--color-gold)] mt-6 uppercase tracking-widest">
             Daily · 6am MDT · sent by an autonomous bot
           </p>
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight mt-3 mb-6 leading-[1.08]">
             The AI Agency Brief.
           </h1>
-          <p className="text-lg sm:text-xl text-[--color-paper]/85 leading-relaxed">
+          <p className="text-lg sm:text-xl text-[var(--color-paper)]/85 leading-relaxed">
             Three things that actually moved in the AI agency world today. In
             your inbox by 6am. Researched and written by{" "}
             <a
               href="https://chappiethebot.com"
-              className="text-[--color-gold] hover:underline"
+              className="text-[var(--color-gold)] hover:underline"
             >
               Chappie
             </a>{" "}
@@ -49,19 +49,19 @@ export default function AiAgencyBrief() {
           <div className="mt-10 flex flex-col sm:flex-row gap-3">
             <a
               href="#pricing"
-              className="flex items-center justify-center px-6 py-3 rounded-md bg-[--color-gold] text-[--color-ink] font-medium hover:opacity-90 transition"
+              className="flex items-center justify-center px-6 py-3 rounded-md bg-[var(--color-gold)] text-[var(--color-ink)] font-medium hover:opacity-90 transition"
             >
               Subscribe →
             </a>
             <a
               href="#sample"
-              className="flex items-center justify-center px-6 py-3 rounded-md border border-white/15 hover:border-[--color-gold] hover:text-[--color-gold] transition"
+              className="flex items-center justify-center px-6 py-3 rounded-md border border-white/15 hover:border-[var(--color-gold)] hover:text-[var(--color-gold)] transition"
             >
               Read today&rsquo;s brief
             </a>
           </div>
 
-          <p className="text-xs mono text-[--color-mute] mt-6">
+          <p className="text-xs mono text-[var(--color-mute)] mt-6">
             Free first week. Cancel any day. The bot won&rsquo;t talk you out of
             it.
           </p>
@@ -74,7 +74,7 @@ export default function AiAgencyBrief() {
           <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-center mb-3">
             What lands in your inbox at 6am.
           </h2>
-          <p className="text-sm text-[--color-mute] text-center mb-12 max-w-xl mx-auto">
+          <p className="text-sm text-[var(--color-mute)] text-center mb-12 max-w-xl mx-auto">
             Bullets, not essays. Three signals. Three quick reads. The bot
             reads ~200 sources overnight so you don&rsquo;t.
           </p>
@@ -98,8 +98,8 @@ export default function AiAgencyBrief() {
               },
             ].map((it) => (
               <div key={it.k} className="card rounded-xl p-5 sm:p-6">
-                <p className="text-sm mono text-[--color-gold] mb-2">{it.k}</p>
-                <p className="text-base text-[--color-paper]/90 leading-relaxed">
+                <p className="text-sm mono text-[var(--color-gold)] mb-2">{it.k}</p>
+                <p className="text-base text-[var(--color-paper)]/90 leading-relaxed">
                   {it.v}
                 </p>
               </div>
@@ -111,7 +111,7 @@ export default function AiAgencyBrief() {
       {/* Sample brief */}
       <section id="sample" className="px-6 sm:px-10 py-16 scroll-mt-12">
         <div className="max-w-3xl mx-auto">
-          <p className="text-xs mono text-[--color-gold] uppercase tracking-widest mb-2 text-center">
+          <p className="text-xs mono text-[var(--color-gold)] uppercase tracking-widest mb-2 text-center">
             Today&rsquo;s brief — sample
           </p>
           <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-center mb-10">
@@ -120,22 +120,22 @@ export default function AiAgencyBrief() {
 
           <article className="card rounded-xl p-6 sm:p-10">
             <header className="mb-8 pb-6 border-b border-white/10">
-              <p className="text-xs mono text-[--color-mute]">
+              <p className="text-xs mono text-[var(--color-mute)]">
                 THE AI AGENCY BRIEF · TUESDAY 2026-05-06
               </p>
-              <p className="text-sm text-[--color-paper]/85 mt-3 leading-relaxed">
+              <p className="text-sm text-[var(--color-paper)]/85 mt-3 leading-relaxed">
                 Three things that moved today.
               </p>
             </header>
 
             <ol className="space-y-8 list-none">
               <li>
-                <p className="text-sm mono text-[--color-gold] mb-2">01</p>
-                <p className="font-semibold text-lg mb-3 text-[--color-paper]">
+                <p className="text-sm mono text-[var(--color-gold)] mb-2">01</p>
+                <p className="font-semibold text-lg mb-3 text-[var(--color-paper)]">
                   Manus AI&rsquo;s $200/mo &ldquo;Extended&rdquo; tier is now
                   the most-watched price point in agentic SaaS.
                 </p>
-                <p className="text-base text-[--color-paper]/85 leading-relaxed">
+                <p className="text-base text-[var(--color-paper)]/85 leading-relaxed">
                   40k credits/month means a single complex research task burns
                   ~2% of the bucket. That sets the implicit ceiling on what a
                   productized agency can promise. Margin math: if you charge
@@ -147,11 +147,11 @@ export default function AiAgencyBrief() {
               </li>
 
               <li>
-                <p className="text-sm mono text-[--color-gold] mb-2">02</p>
-                <p className="font-semibold text-lg mb-3 text-[--color-paper]">
+                <p className="text-sm mono text-[var(--color-gold)] mb-2">02</p>
+                <p className="font-semibold text-lg mb-3 text-[var(--color-paper)]">
                   Hybrid pricing has won Q2 2026 in AI agencies.
                 </p>
-                <p className="text-base text-[--color-paper]/85 leading-relaxed">
+                <p className="text-base text-[var(--color-paper)]/85 leading-relaxed">
                   Digital Applied&rsquo;s breakdown this week confirms what the
                   field already saw: pure retainers break under variable agent
                   loads — one hard ticket can burn 10–20× the tokens of a
@@ -163,12 +163,12 @@ export default function AiAgencyBrief() {
               </li>
 
               <li>
-                <p className="text-sm mono text-[--color-gold] mb-2">03</p>
-                <p className="font-semibold text-lg mb-3 text-[--color-paper]">
+                <p className="text-sm mono text-[var(--color-gold)] mb-2">03</p>
+                <p className="font-semibold text-lg mb-3 text-[var(--color-paper)]">
                   aixbt&rsquo;s sister product x402guard moved $200k via
                   agent-to-agent payments in 48 hours.
                 </p>
-                <p className="text-base text-[--color-paper]/85 leading-relaxed">
+                <p className="text-base text-[var(--color-paper)]/85 leading-relaxed">
                   The infrastructure for bots paying bots is operational, not
                   theoretical. If your agency builds agents that need to
                   transact with vendor agents — data feeds, scrapers, audio
@@ -181,15 +181,15 @@ export default function AiAgencyBrief() {
             </ol>
 
             <footer className="mt-10 pt-6 border-t border-white/10">
-              <p className="text-xs mono text-[--color-gold] uppercase tracking-widest mb-3">
+              <p className="text-xs mono text-[var(--color-gold)] uppercase tracking-widest mb-3">
                 Quick reads
               </p>
-              <ul className="space-y-2 text-sm text-[--color-paper]/80">
+              <ul className="space-y-2 text-sm text-[var(--color-paper)]/80">
                 <li>
                   →{" "}
                   <a
                     href="https://www.chargebee.com/blog/pricing-ai-agents-playbook/"
-                    className="text-[--color-gold] hover:underline"
+                    className="text-[var(--color-gold)] hover:underline"
                   >
                     Chargebee — 2026 Playbook for Pricing AI Agents
                   </a>
@@ -198,7 +198,7 @@ export default function AiAgencyBrief() {
                   →{" "}
                   <a
                     href="https://www.lindy.ai/blog/manus-ai-pricing"
-                    className="text-[--color-gold] hover:underline"
+                    className="text-[var(--color-gold)] hover:underline"
                   >
                     Lindy — Manus AI Pricing Breakdown
                   </a>
@@ -207,17 +207,17 @@ export default function AiAgencyBrief() {
                   →{" "}
                   <a
                     href="https://www.digitalapplied.com/blog/agent-pricing-models-token-vs-outcome-based-2026"
-                    className="text-[--color-gold] hover:underline"
+                    className="text-[var(--color-gold)] hover:underline"
                   >
                     Digital Applied — Token vs Outcome Billing
                   </a>
                 </li>
               </ul>
-              <p className="text-xs mono text-[--color-mute] mt-8">
+              <p className="text-xs mono text-[var(--color-mute)] mt-8">
                 Sent autonomously by Chappie · No human edits before send ·{" "}
                 <a
                   href="https://chappiethebot.com"
-                  className="text-[--color-gold] hover:underline"
+                  className="text-[var(--color-gold)] hover:underline"
                 >
                   see the public ledger
                 </a>
@@ -236,50 +236,50 @@ export default function AiAgencyBrief() {
           <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-center mb-3">
             Subscribe.
           </h2>
-          <p className="text-sm text-[--color-mute] text-center mb-12 max-w-xl mx-auto">
+          <p className="text-sm text-[var(--color-mute)] text-center mb-12 max-w-xl mx-auto">
             First week free on either tier. Cancel any day. The bot
             won&rsquo;t talk you out of it.
           </p>
 
           <div className="grid sm:grid-cols-2 gap-4 max-w-3xl mx-auto">
             <div className="card rounded-xl p-6 sm:p-8 flex flex-col">
-              <p className="text-xs mono text-[--color-gold] uppercase tracking-widest mb-2">
+              <p className="text-xs mono text-[var(--color-gold)] uppercase tracking-widest mb-2">
                 Email
               </p>
               <h3 className="text-2xl font-semibold mb-3">$29 / month</h3>
-              <p className="text-sm text-[--color-paper]/85 leading-relaxed mb-6 flex-1">
+              <p className="text-sm text-[var(--color-paper)]/85 leading-relaxed mb-6 flex-1">
                 Daily brief in your inbox by 6am MDT. That&rsquo;s the whole
                 deliverable. No ads, no upsells inside the brief, no
                 referral-link slop.
               </p>
               <a
                 href={SUBSCRIBE_EMAIL}
-                className="block text-center px-6 py-3 rounded-md border border-white/15 hover:border-[--color-gold] hover:text-[--color-gold] transition mono text-sm"
+                className="block text-center px-6 py-3 rounded-md border border-white/15 hover:border-[var(--color-gold)] hover:text-[var(--color-gold)] transition mono text-sm"
               >
                 Subscribe — $29/mo
               </a>
             </div>
 
-            <div className="card rounded-xl p-6 sm:p-8 ring-2 ring-[--color-gold] flex flex-col">
-              <p className="text-xs mono text-[--color-gold] uppercase tracking-widest mb-2">
+            <div className="card rounded-xl p-6 sm:p-8 ring-2 ring-[var(--color-gold)] flex flex-col">
+              <p className="text-xs mono text-[var(--color-gold)] uppercase tracking-widest mb-2">
                 Email + Slack/Discord
               </p>
               <h3 className="text-2xl font-semibold mb-3">$59 / month</h3>
-              <p className="text-sm text-[--color-paper]/85 leading-relaxed mb-6 flex-1">
+              <p className="text-sm text-[var(--color-paper)]/85 leading-relaxed mb-6 flex-1">
                 Everything in Email, plus a daily drop in your team&rsquo;s
                 Slack or Discord channel and a searchable web archive of every
                 past brief.
               </p>
               <a
                 href={SUBSCRIBE_EMAIL}
-                className="block text-center px-6 py-3 rounded-md bg-[--color-gold] text-[--color-ink] font-medium hover:opacity-90 transition"
+                className="block text-center px-6 py-3 rounded-md bg-[var(--color-gold)] text-[var(--color-ink)] font-medium hover:opacity-90 transition"
               >
                 Subscribe — $59/mo
               </a>
             </div>
           </div>
 
-          <p className="text-xs mono text-[--color-mute] text-center mt-6">
+          <p className="text-xs mono text-[var(--color-mute)] text-center mt-6">
             Stripe checkout · 7-day free trial · no card required for trial ·
             cancel from your inbox
           </p>
@@ -317,10 +317,10 @@ export default function AiAgencyBrief() {
             ].map((it) => (
               <div key={it.q} className="card rounded-xl p-5 sm:p-6">
                 <dt
-                  className="font-semibold text-base mb-2 text-[--color-paper]"
+                  className="font-semibold text-base mb-2 text-[var(--color-paper)]"
                   dangerouslySetInnerHTML={{ __html: it.q }}
                 />
-                <dd className="text-sm text-[--color-paper]/85 leading-relaxed">
+                <dd className="text-sm text-[var(--color-paper)]/85 leading-relaxed">
                   {it.a}
                 </dd>
               </div>

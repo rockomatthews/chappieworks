@@ -7,7 +7,7 @@ export function CreditedBy({ slugs }: { slugs: Persona["slug"][] }) {
     .filter((p): p is Persona => Boolean(p));
 
   return (
-    <p className="text-xs mono text-[--color-mute] mt-6 text-center">
+    <p className="text-xs mono text-[var(--color-mute)] mt-6 text-center">
       Worked on by{" "}
       {credited.map((p, i) => (
         <span key={p.slug}>
@@ -15,8 +15,8 @@ export function CreditedBy({ slugs }: { slugs: Persona["slug"][] }) {
             href={`/studio#${p.slug}`}
             className={
               p.accent === "gold"
-                ? "text-[--color-gold] hover:underline"
-                : "text-[--color-rust] hover:underline"
+                ? "text-[var(--color-gold)] hover:underline"
+                : "text-[var(--color-rust)] hover:underline"
             }
           >
             {p.name}

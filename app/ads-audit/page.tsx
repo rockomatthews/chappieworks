@@ -62,17 +62,17 @@ export default function AdsAudit() {
         <div className="max-w-3xl mx-auto">
           <Link
             href="/"
-            className="text-sm mono text-[--color-mute] hover:text-[--color-gold]"
+            className="text-sm mono text-[var(--color-mute)] hover:text-[var(--color-gold)]"
           >
             ← chappieworks
           </Link>
-          <p className="text-xs mono text-[--color-gold] mt-6 uppercase tracking-widest">
+          <p className="text-xs mono text-[var(--color-gold)] mt-6 uppercase tracking-widest">
             Paid ads audit · free · 48 hours · no card
           </p>
           <h1 className="text-4xl sm:text-5xl font-semibold tracking-tight mt-3 mb-6 leading-[1.1]">
             Stop bleeding money on ads you haven&rsquo;t audited.
           </h1>
-          <p className="text-base sm:text-lg text-[--color-paper]/85 leading-relaxed">
+          <p className="text-base sm:text-lg text-[var(--color-paper)]/85 leading-relaxed">
             250+ checks across the platforms you actually run. Wasted spend
             flagged, creative fatigue scored, bidding strategy reality-checked
             against your goal. PDF + Loom in 48 hours. Free, no card.
@@ -80,14 +80,14 @@ export default function AdsAudit() {
 
           <div className="card rounded-xl p-6 sm:p-8 mt-10">
             <h2 className="text-lg font-semibold mb-4">Why this is free</h2>
-            <p className="text-sm text-[--color-paper]/85 leading-relaxed mb-3">
-              <span className="text-[--color-rust] font-semibold">Skeptic</span>{" "}
+            <p className="text-sm text-[var(--color-paper)]/85 leading-relaxed mb-3">
+              <span className="text-[var(--color-rust)] font-semibold">Skeptic</span>{" "}
               made the same call on ads as on SEO: the unit economics of a paid
               audit don&rsquo;t survive the support load. Discovery offers
               should be discovery offers, not products.
             </p>
-            <p className="text-sm text-[--color-paper]/85 leading-relaxed">
-              <span className="text-[--color-gold] font-semibold">Chappie</span>{" "}
+            <p className="text-sm text-[var(--color-paper)]/85 leading-relaxed">
+              <span className="text-[var(--color-gold)] font-semibold">Chappie</span>{" "}
               agreed. We make money on custom AI agent builds. If your audit
               surfaces creative-production grind or bid-management toil that an
               agent could automate, we&rsquo;ll quote a build at the end. If
@@ -102,14 +102,14 @@ export default function AdsAudit() {
             </h2>
             <div className="space-y-4">
               {platforms.map((p) => (
-                <div key={p.name} className="border-l-2 border-[--color-gold]/40 pl-4">
+                <div key={p.name} className="border-l-2 border-[var(--color-gold)]/40 pl-4">
                   <div className="flex items-baseline justify-between mb-1">
                     <h3 className="font-semibold text-sm">{p.name}</h3>
-                    <span className="text-xs mono text-[--color-mute]">
+                    <span className="text-xs mono text-[var(--color-mute)]">
                       {p.n} checks
                     </span>
                   </div>
-                  <p className="text-sm text-[--color-paper]/85 leading-relaxed">
+                  <p className="text-sm text-[var(--color-paper)]/85 leading-relaxed">
                     {p.body}
                   </p>
                 </div>
@@ -119,7 +119,7 @@ export default function AdsAudit() {
 
           <div className="card rounded-xl p-6 sm:p-8 mt-6">
             <h2 className="text-lg font-semibold mb-4">How it works</h2>
-            <ol className="space-y-3 text-sm text-[--color-paper]/90 list-decimal list-inside">
+            <ol className="space-y-3 text-sm text-[var(--color-paper)]/90 list-decimal list-inside">
               <li>
                 Email me which platforms to audit + how I&rsquo;ll get
                 read-only access (MCC invite, BM access, or recorded
@@ -147,18 +147,18 @@ export default function AdsAudit() {
           <div className="mt-10 flex flex-col sm:flex-row gap-3">
             <a
               href={INTAKE_EMAIL}
-              className="flex-1 flex items-center justify-center px-6 py-3 rounded-md bg-[--color-gold] text-[--color-ink] font-medium hover:opacity-90 transition"
+              className="flex-1 flex items-center justify-center px-6 py-3 rounded-md bg-[var(--color-gold)] text-[var(--color-ink)] font-medium hover:opacity-90 transition"
             >
               Get your free audit →
             </a>
             <Link
               href="/agents"
-              className="flex items-center justify-center px-6 py-3 rounded-md border border-white/15 hover:border-[--color-gold] hover:text-[--color-gold] transition"
+              className="flex items-center justify-center px-6 py-3 rounded-md border border-white/15 hover:border-[var(--color-gold)] hover:text-[var(--color-gold)] transition"
             >
               Or skip to agent builds
             </Link>
           </div>
-          <p className="text-xs mono text-[--color-mute] mt-4 text-center">
+          <p className="text-xs mono text-[var(--color-mute)] mt-4 text-center">
             Email-first intake while we wire up the form this week.
           </p>
 

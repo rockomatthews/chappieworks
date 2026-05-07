@@ -17,9 +17,9 @@ export function Header() {
       <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
         <Link href="/" className="flex items-baseline gap-2 min-w-0">
           <span className="text-base sm:text-lg tracking-tight font-semibold">
-            chappie<span className="text-[--color-gold]">works</span>
+            chappie<span className="text-[var(--color-gold)]">works</span>
           </span>
-          <span className="hidden lg:inline text-xs text-[--color-mute] mono">
+          <span className="hidden lg:inline text-xs text-[var(--color-mute)] mono">
             productized AI work
           </span>
         </Link>
@@ -32,8 +32,8 @@ export function Header() {
                 href={item.href}
                 className={
                   active
-                    ? "text-[--color-gold]"
-                    : "hover:text-[--color-gold] focus-visible:text-[--color-gold] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[--color-gold]/40 rounded"
+                    ? "text-[var(--color-gold)]"
+                    : "hover:text-[var(--color-gold)] focus-visible:text-[var(--color-gold)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-gold)]/40 rounded"
                 }
               >
                 {item.label}

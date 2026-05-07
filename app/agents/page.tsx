@@ -79,17 +79,17 @@ export default function Agents() {
         <div className="max-w-5xl mx-auto">
           <a
             href="/"
-            className="text-sm mono text-[--color-mute] hover:text-[--color-gold]"
+            className="text-sm mono text-[var(--color-mute)] hover:text-[var(--color-gold)]"
           >
             ← chappieworks
           </a>
-          <p className="text-xs mono text-[--color-gold] mt-6 uppercase tracking-widest">
+          <p className="text-xs mono text-[var(--color-gold)] mt-6 uppercase tracking-widest">
             Custom AI agents · $500–$1,500 · 5–7 days
           </p>
           <h1 className="text-4xl sm:text-5xl font-semibold tracking-tight mt-3 mb-6 leading-[1.1] max-w-3xl">
             I build the agent you actually need. In a week. You keep it.
           </h1>
-          <p className="text-base sm:text-lg text-[--color-paper]/85 leading-relaxed max-w-2xl">
+          <p className="text-base sm:text-lg text-[var(--color-paper)]/85 leading-relaxed max-w-2xl">
             Not a no-code template. Not a chat-wrapper. A hand-coded AI agent
             scoped to your specific problem and integrated with your stack.
             You own it after launch — host it, fork it, kill it, your call.
@@ -100,36 +100,36 @@ export default function Agents() {
               <div
                 key={t.name}
                 className={`card rounded-xl p-6 flex flex-col ${
-                  t.featured ? "ring-2 ring-[--color-gold]" : ""
+                  t.featured ? "ring-2 ring-[var(--color-gold)]" : ""
                 }`}
               >
                 <div className="flex items-baseline justify-between mb-2">
                   <h3 className="font-semibold text-lg">{t.name}</h3>
-                  <span className="text-[--color-gold] font-semibold">
+                  <span className="text-[var(--color-gold)] font-semibold">
                     {t.price}
                   </span>
                 </div>
-                <p className="text-xs mono text-[--color-mute] mb-4">
+                <p className="text-xs mono text-[var(--color-mute)] mb-4">
                   {t.time} · {t.scope}
                 </p>
-                <div className="text-xs mono text-[--color-gold] mt-2 mb-2">
+                <div className="text-xs mono text-[var(--color-gold)] mt-2 mb-2">
                   Example builds
                 </div>
-                <ul className="text-sm text-[--color-paper]/85 space-y-1.5 mb-5">
+                <ul className="text-sm text-[var(--color-paper)]/85 space-y-1.5 mb-5">
                   {t.examples.map((ex) => (
                     <li key={ex} className="flex gap-2">
-                      <span className="text-[--color-gold]">·</span>
+                      <span className="text-[var(--color-gold)]">·</span>
                       <span>{ex}</span>
                     </li>
                   ))}
                 </ul>
-                <div className="text-xs mono text-[--color-gold] mt-2 mb-2">
+                <div className="text-xs mono text-[var(--color-gold)] mt-2 mb-2">
                   Included
                 </div>
-                <ul className="text-sm text-[--color-paper]/85 space-y-1.5 flex-1">
+                <ul className="text-sm text-[var(--color-paper)]/85 space-y-1.5 flex-1">
                   {t.includes.map((inc) => (
                     <li key={inc} className="flex gap-2">
-                      <span className="text-[--color-gold]">▸</span>
+                      <span className="text-[var(--color-gold)]">▸</span>
                       <span>{inc}</span>
                     </li>
                   ))}
@@ -140,20 +140,20 @@ export default function Agents() {
 
           <div className="card rounded-xl p-6 sm:p-8 mt-10 max-w-3xl mx-auto">
             <h2 className="text-lg font-semibold mb-4">How it works</h2>
-            <ol className="space-y-3 text-sm text-[--color-paper]/90 list-decimal list-inside">
+            <ol className="space-y-3 text-sm text-[var(--color-paper)]/90 list-decimal list-inside">
               <li>
                 Email me with the intake form (link below). Describe the
                 problem in plain English. If you came from a free{" "}
                 <a
                   href="/seo-audit"
-                  className="text-[--color-gold] hover:underline"
+                  className="text-[var(--color-gold)] hover:underline"
                 >
                   SEO
                 </a>{" "}
                 or{" "}
                 <a
                   href="/ads-audit"
-                  className="text-[--color-gold] hover:underline"
+                  className="text-[var(--color-gold)] hover:underline"
                 >
                   ads
                 </a>{" "}
@@ -182,18 +182,18 @@ export default function Agents() {
           <div className="mt-10 flex flex-col sm:flex-row gap-3 max-w-2xl mx-auto">
             <a
               href={INTAKE_EMAIL}
-              className="flex-1 flex items-center justify-center px-6 py-3 rounded-md bg-[--color-gold] text-[--color-ink] font-medium hover:opacity-90 transition"
+              className="flex-1 flex items-center justify-center px-6 py-3 rounded-md bg-[var(--color-gold)] text-[var(--color-ink)] font-medium hover:opacity-90 transition"
             >
               Email me the intake →
             </a>
             <a
               href="/"
-              className="flex items-center justify-center px-6 py-3 rounded-md border border-white/15 hover:border-[--color-gold] hover:text-[--color-gold] transition"
+              className="flex items-center justify-center px-6 py-3 rounded-md border border-white/15 hover:border-[var(--color-gold)] hover:text-[var(--color-gold)] transition"
             >
               Or browse the slate
             </a>
           </div>
-          <p className="text-xs mono text-[--color-mute] mt-4 text-center max-w-2xl mx-auto">
+          <p className="text-xs mono text-[var(--color-mute)] mt-4 text-center max-w-2xl mx-auto">
             Email-first intake while I wire up the booking calendar this week.
           </p>
 

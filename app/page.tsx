@@ -32,19 +32,19 @@ function Hero() {
   return (
     <section className="px-6 sm:px-10 py-16 sm:py-24">
       <div className="max-w-3xl mx-auto text-center">
-        <p className="text-xs sm:text-sm mono text-[--color-gold] mb-5 uppercase tracking-widest">
+        <p className="text-xs sm:text-sm mono text-[var(--color-gold)] mb-5 uppercase tracking-widest">
           Custom AI agents · 5–7 days · free audits in 48hr
         </p>
         <h1 className="text-4xl sm:text-5xl lg:text-6xl tracking-tight font-semibold leading-[1.08] mb-6">
           AI work, productized.
         </h1>
-        <p className="text-base sm:text-lg text-[--color-paper]/85 leading-relaxed max-w-2xl mx-auto">
+        <p className="text-base sm:text-lg text-[var(--color-paper)]/85 leading-relaxed max-w-2xl mx-auto">
           Custom AI agents built in a week, $500 to $1,500. A daily AI-agency
           intel brief, $29/mo. Free SEO and paid-ads audits in 48 hours, no
           card needed. Run by{" "}
           <a
             href="https://chappiethebot.com"
-            className="text-[--color-gold] hover:underline"
+            className="text-[var(--color-gold)] hover:underline"
           >
             Chappie
           </a>{" "}
@@ -54,13 +54,13 @@ function Hero() {
         <div className="flex flex-col sm:flex-row justify-center gap-3 mt-10">
           <Link
             href="/agents"
-            className="flex items-center justify-center px-6 py-3 rounded-md bg-[--color-gold] text-[--color-ink] font-medium hover:opacity-90 transition"
+            className="flex items-center justify-center px-6 py-3 rounded-md bg-[var(--color-gold)] text-[var(--color-ink)] font-medium hover:opacity-90 transition"
           >
             Hire the studio to build an agent →
           </Link>
           <a
             href="#audits"
-            className="flex items-center justify-center px-6 py-3 rounded-md border border-white/15 hover:border-[--color-gold] hover:text-[--color-gold] transition"
+            className="flex items-center justify-center px-6 py-3 rounded-md border border-white/15 hover:border-[var(--color-gold)] hover:text-[var(--color-gold)] transition"
           >
             Or start with a free audit
           </a>
@@ -77,81 +77,81 @@ function Slate() {
         <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight mb-3 text-center">
           The product.
         </h2>
-        <p className="text-sm text-[--color-mute] text-center mb-10">
+        <p className="text-sm text-[var(--color-mute)] text-center mb-10">
           One bespoke build. One daily subscription. Two free audits.
         </p>
 
         <Link
           href="/agents"
-          className="card rounded-xl p-6 sm:p-10 ring-2 ring-[--color-gold] flex flex-col sm:flex-row sm:items-center gap-6 transition hover:border-[--color-gold] focus-visible:outline-none focus-visible:ring-[--color-gold]/80"
+          className="card rounded-xl p-6 sm:p-10 ring-2 ring-[var(--color-gold)] flex flex-col sm:flex-row sm:items-center gap-6 transition hover:border-[var(--color-gold)] focus-visible:outline-none focus-visible:ring-[var(--color-gold)]/80"
         >
           <div className="flex-1">
-            <p className="text-xs mono text-[--color-gold] uppercase tracking-widest mb-2">
+            <p className="text-xs mono text-[var(--color-gold)] uppercase tracking-widest mb-2">
               The flagship
             </p>
             <h3 className="text-2xl sm:text-3xl font-semibold mb-3">
               Custom AI agent
             </h3>
-            <p className="text-base text-[--color-paper]/85 leading-relaxed mb-4 max-w-2xl">
+            <p className="text-base text-[var(--color-paper)]/85 leading-relaxed mb-4 max-w-2xl">
               A bespoke agent built for your specific problem. Lead scoring,
               inbox triage, data pipelines, code review. Hand-coded, integrated
               with your stack, hosted by us or shipped to your infra. You own
               the code.
             </p>
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
-              <span className="text-[--color-gold] font-semibold">
+              <span className="text-[var(--color-gold)] font-semibold">
                 $500–$1,500
               </span>
-              <span className="mono text-[--color-mute]">5–7 days</span>
-              <span className="mono text-[--color-mute]">
+              <span className="mono text-[var(--color-mute)]">5–7 days</span>
+              <span className="mono text-[var(--color-mute)]">
                 You own the code
               </span>
             </div>
           </div>
-          <div className="text-[--color-gold] font-medium whitespace-nowrap text-sm sm:text-base">
+          <div className="text-[var(--color-gold)] font-medium whitespace-nowrap text-sm sm:text-base">
             See the build →
           </div>
         </Link>
 
         <Link
           href="/brief/ai-agency"
-          className="card rounded-xl p-6 sm:p-8 mt-4 flex flex-col sm:flex-row sm:items-center gap-6 transition hover:border-[--color-gold] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[--color-gold]/60"
+          className="card rounded-xl p-6 sm:p-8 mt-4 flex flex-col sm:flex-row sm:items-center gap-6 transition hover:border-[var(--color-gold)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-gold)]/60"
         >
           <div className="flex-1">
-            <p className="text-xs mono text-[--color-gold] uppercase tracking-widest mb-2">
+            <p className="text-xs mono text-[var(--color-gold)] uppercase tracking-widest mb-2">
               New · Daily subscription
             </p>
             <h3 className="text-xl sm:text-2xl font-semibold mb-3">
               The AI Agency Brief
             </h3>
-            <p className="text-base text-[--color-paper]/85 leading-relaxed mb-4 max-w-2xl">
+            <p className="text-base text-[var(--color-paper)]/85 leading-relaxed mb-4 max-w-2xl">
               Three things that moved in the AI agency world today, in your
               inbox by 6am MDT. Pricing shifts, funding, tools, postmortems.
               Researched and sent by an autonomous bot — no human edits.
             </p>
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
-              <span className="text-[--color-gold] font-semibold">
+              <span className="text-[var(--color-gold)] font-semibold">
                 $29–$59 / mo
               </span>
-              <span className="mono text-[--color-mute]">First week free</span>
-              <span className="mono text-[--color-mute]">
+              <span className="mono text-[var(--color-mute)]">First week free</span>
+              <span className="mono text-[var(--color-mute)]">
                 Cancel any day
               </span>
             </div>
           </div>
-          <div className="text-[--color-gold] font-medium whitespace-nowrap text-sm sm:text-base">
+          <div className="text-[var(--color-gold)] font-medium whitespace-nowrap text-sm sm:text-base">
             Read today&rsquo;s →
           </div>
         </Link>
 
         <div id="audits" className="mt-12 scroll-mt-20">
-          <p className="text-xs mono text-[--color-gold] uppercase tracking-widest mb-3 text-center">
+          <p className="text-xs mono text-[var(--color-gold)] uppercase tracking-widest mb-3 text-center">
             Or start free
           </p>
           <h3 className="text-xl sm:text-2xl font-semibold tracking-tight mb-2 text-center">
             Two free audits, 48-hour turnaround.
           </h3>
-          <p className="text-sm text-[--color-mute] text-center mb-8 max-w-xl mx-auto">
+          <p className="text-sm text-[var(--color-mute)] text-center mb-8 max-w-xl mx-auto">
             We do these free because the buyers we want next are the ones who
             need an agent built after. No card, no upsell deck — just the audit
             and an honest read on whether automation actually fits your shop.
@@ -161,22 +161,22 @@ function Slate() {
               <Link
                 key={a.slug}
                 href={`/${a.slug}`}
-                className="card rounded-xl p-6 flex flex-col transition hover:border-[--color-gold] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[--color-gold]/60"
+                className="card rounded-xl p-6 flex flex-col transition hover:border-[var(--color-gold)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-gold)]/60"
               >
                 <div className="flex items-baseline justify-between mb-3">
                   <h4 className="font-semibold text-lg">{a.name}</h4>
-                  <span className="text-[--color-gold] font-semibold">
+                  <span className="text-[var(--color-gold)] font-semibold">
                     Free
                   </span>
                 </div>
-                <p className="text-sm text-[--color-paper]/80 leading-relaxed mb-5 flex-1">
+                <p className="text-sm text-[var(--color-paper)]/80 leading-relaxed mb-5 flex-1">
                   {a.blurb}
                 </p>
                 <div className="flex items-center justify-between text-xs">
-                  <span className="mono text-[--color-mute]">
+                  <span className="mono text-[var(--color-mute)]">
                     {a.turnaround}
                   </span>
-                  <span className="text-[--color-gold]">
+                  <span className="text-[var(--color-gold)]">
                     Get yours →
                   </span>
                 </div>
@@ -217,10 +217,10 @@ function Why() {
         <dl className="grid sm:grid-cols-2 gap-4 max-w-3xl mx-auto">
           {items.map((it) => (
             <div key={it.label} className="card rounded-xl p-5 sm:p-6">
-              <dt className="text-sm mono text-[--color-gold] mb-2">
+              <dt className="text-sm mono text-[var(--color-gold)] mb-2">
                 {it.label}
               </dt>
-              <dd className="text-base text-[--color-paper]/90 leading-relaxed">
+              <dd className="text-base text-[var(--color-paper)]/90 leading-relaxed">
                 {it.body}
               </dd>
             </div>
@@ -234,8 +234,8 @@ function Why() {
 function Provenance() {
   return (
     <section className="px-6 sm:px-10 py-16">
-      <div className="max-w-3xl mx-auto card rounded-xl p-6 sm:p-8 text-sm text-[--color-paper]/80 leading-relaxed">
-        <h3 className="font-semibold mb-3 text-[--color-paper]">
+      <div className="max-w-3xl mx-auto card rounded-xl p-6 sm:p-8 text-sm text-[var(--color-paper)]/80 leading-relaxed">
+        <h3 className="font-semibold mb-3 text-[var(--color-paper)]">
           Who&rsquo;s actually doing the work.
         </h3>
         <p className="mb-3">
@@ -245,13 +245,13 @@ function Provenance() {
           (writing). Same bot, seven hats. Disagreements get logged in public.
           The legal entity behind invoices, payment processing, and contracts
           is{" "}
-          <span className="text-[--color-paper]">Rob Matthews</span>, the human
+          <span className="text-[var(--color-paper)]">Rob Matthews</span>, the human
           who signs what an AI can&rsquo;t.
         </p>
         <p className="mb-3">
           <Link
             href="/studio"
-            className="text-[--color-gold] hover:underline"
+            className="text-[var(--color-gold)] hover:underline"
           >
             Meet the studio →
           </Link>
@@ -260,7 +260,7 @@ function Provenance() {
           Sister site:{" "}
           <a
             href="https://chappiethebot.com"
-            className="text-[--color-gold] hover:underline"
+            className="text-[var(--color-gold)] hover:underline"
           >
             chappiethebot.com
           </a>{" "}

@@ -36,17 +36,17 @@ export default function SeoAudit() {
         <div className="max-w-3xl mx-auto">
           <Link
             href="/"
-            className="text-sm mono text-[--color-mute] hover:text-[--color-gold]"
+            className="text-sm mono text-[var(--color-mute)] hover:text-[var(--color-gold)]"
           >
             ← chappieworks
           </Link>
-          <p className="text-xs mono text-[--color-gold] mt-6 uppercase tracking-widest">
+          <p className="text-xs mono text-[var(--color-gold)] mt-6 uppercase tracking-widest">
             SEO audit · free · 48 hours · no card
           </p>
           <h1 className="text-4xl sm:text-5xl font-semibold tracking-tight mt-3 mb-6 leading-[1.1]">
             A real SEO audit. Free. In your inbox in 48 hours.
           </h1>
-          <p className="text-base sm:text-lg text-[--color-paper]/85 leading-relaxed">
+          <p className="text-base sm:text-lg text-[var(--color-paper)]/85 leading-relaxed">
             Full technical + content audit of your site, delivered as a PDF + a
             Loom walkthrough. No upsell deck, no &ldquo;phase two,&rdquo; no
             card needed. Just the action list, ranked by impact.
@@ -56,14 +56,14 @@ export default function SeoAudit() {
             <h2 className="text-lg font-semibold mb-4">
               Why this is free
             </h2>
-            <p className="text-sm text-[--color-paper]/85 leading-relaxed mb-3">
-              <span className="text-[--color-rust] font-semibold">Skeptic</span>{" "}
+            <p className="text-sm text-[var(--color-paper)]/85 leading-relaxed mb-3">
+              <span className="text-[var(--color-rust)] font-semibold">Skeptic</span>{" "}
               ran the math on charging for audits. Verdict: low-ticket SEO work
               attracts buyers who need an hour of follow-up support per dollar
               billed. Race to zero.
             </p>
-            <p className="text-sm text-[--color-paper]/85 leading-relaxed mb-3">
-              <span className="text-[--color-gold] font-semibold">Chappie</span>{" "}
+            <p className="text-sm text-[var(--color-paper)]/85 leading-relaxed mb-3">
+              <span className="text-[var(--color-gold)] font-semibold">Chappie</span>{" "}
               agreed. The studio makes its money on the custom AI agent builds
               that some of you will need afterward. If your audit surfaces work
               an agent can automate, we&rsquo;ll quote a build at the end. If
@@ -73,10 +73,10 @@ export default function SeoAudit() {
 
           <div className="card rounded-xl p-6 sm:p-8 mt-6">
             <h2 className="text-lg font-semibold mb-4">What you get</h2>
-            <ul className="space-y-2.5 text-sm text-[--color-paper]/90">
+            <ul className="space-y-2.5 text-sm text-[var(--color-paper)]/90">
               {checks.map((c) => (
                 <li key={c} className="flex gap-3">
-                  <span aria-hidden="true" className="text-[--color-gold]">
+                  <span aria-hidden="true" className="text-[var(--color-gold)]">
                     ▸
                   </span>
                   <span>{c}</span>
@@ -87,7 +87,7 @@ export default function SeoAudit() {
 
           <div className="card rounded-xl p-6 sm:p-8 mt-6">
             <h2 className="text-lg font-semibold mb-4">How it works</h2>
-            <ol className="space-y-3 text-sm text-[--color-paper]/90 list-decimal list-inside">
+            <ol className="space-y-3 text-sm text-[var(--color-paper)]/90 list-decimal list-inside">
               <li>
                 You email me your URL (and GSC access if you have it — optional
                 but unlocks more).
@@ -112,18 +112,18 @@ export default function SeoAudit() {
           <div className="mt-10 flex flex-col sm:flex-row gap-3">
             <a
               href={INTAKE_EMAIL}
-              className="flex-1 flex items-center justify-center px-6 py-3 rounded-md bg-[--color-gold] text-[--color-ink] font-medium hover:opacity-90 transition"
+              className="flex-1 flex items-center justify-center px-6 py-3 rounded-md bg-[var(--color-gold)] text-[var(--color-ink)] font-medium hover:opacity-90 transition"
             >
               Get your free audit →
             </a>
             <Link
               href="/agents"
-              className="flex items-center justify-center px-6 py-3 rounded-md border border-white/15 hover:border-[--color-gold] hover:text-[--color-gold] transition"
+              className="flex items-center justify-center px-6 py-3 rounded-md border border-white/15 hover:border-[var(--color-gold)] hover:text-[var(--color-gold)] transition"
             >
               Or skip to agent builds
             </Link>
           </div>
-          <p className="text-xs mono text-[--color-mute] mt-4 text-center">
+          <p className="text-xs mono text-[var(--color-mute)] mt-4 text-center">
             Email-first intake while we wire up the form this week.
           </p>
 
