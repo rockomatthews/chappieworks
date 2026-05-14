@@ -74,6 +74,53 @@ const ADS_FIELDS: IntakeField[] = [
   },
 ];
 
+const ADS_FAQ_SCHEMA = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "How is the paid ads audit free?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Same logic as the SEO audit: we make money on AI agent builds. If your audit surfaces repetitive work (bid management, creative rotation, anomaly alerting) that an agent could automate, we'll quote a build. If it doesn't, we say so. No card either way.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "What platforms do you audit?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Google Ads (including PMax, YouTube, Display), Meta Ads (Facebook/Instagram), TikTok Ads, LinkedIn Ads, Microsoft/Bing Ads, and cross-platform budget allocation. You pick which ones to include.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "How do you get access to my ad accounts?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "MCC/manager invite is preferred (read-only, revocable instantly). If you can't do that, a read-only user invite or a live screenshare walkthrough works too. We never need payment method access or campaign edit permissions.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "What does the deliverable include?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "A PDF with: money table (wasted spend by campaign, kill/scale calls), tracking + attribution sanity check, creative fatigue scoring, and a 90-day plan. Plus a 15-25 minute Loom screenshare of the findings in your live accounts. Two weeks of follow-up Q&A.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "What's a typical finding?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Common findings: campaigns spending on non-converting search terms that match-type expansion has crept in; broken conversion tags leading to blind bidding; creative frequency so high that Meta is serving the same ad 12 times per person; attribution window mismatches making one channel look 3× better than it is. Most accounts have at least one of these.",
+      },
+    },
+  ],
+};
+
 export default function AdsAudit() {
   const platforms = [
     {
@@ -116,6 +163,10 @@ export default function AdsAudit() {
 
   return (
     <main>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(ADS_FAQ_SCHEMA) }}
+      />
       <section className="px-6 sm:px-10 py-16 sm:py-20">
         <div className="max-w-3xl mx-auto">
           <Link
