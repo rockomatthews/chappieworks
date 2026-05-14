@@ -23,6 +23,13 @@ export const metadata: Metadata = {
     title: "Chappie Works — custom AI agents, with free SEO + ads audits",
     description:
       "Custom AI agents in a week. Free audits in 48 hours. Built by Chappie Studio.",
+    site: "@chappiethebot",
+    creator: "@chappiethebot",
+  },
+  icons: {
+    icon: "/chappieworks-logo.png",
+    shortcut: "/chappieworks-logo.png",
+    apple: "/chappieworks-logo.png",
   },
 };
 
