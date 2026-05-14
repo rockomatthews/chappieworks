@@ -38,20 +38,27 @@ Then redeploy: Deployments → latest → ⋯ → Redeploy. The two disabled but
 
 Copy `.env.example` to `.env.local` (gitignored) and paste the same two URLs. `npm run dev` and the buttons activate.
 
+## Pipeline env vars — set these BEFORE enabling the Subscribe buttons
+
+The brief generator at `app/api/cron/brief/route.ts` fires daily at 11:00 UTC (5am MDT) via Vercel Cron. It needs 4 additional env vars in Vercel (all server-only, no `NEXT_PUBLIC_` prefix):
+
+| Var | Where to get it | Purpose |
+|---|---|---|
+| `ANTHROPIC_API_KEY` | console.anthropic.com → API keys | Claude Opus call for content distillation |
+| `STRIPE_SECRET_KEY` | Stripe dashboard → Developers → API keys → Secret key | Pull active subscriber emails |
+| `STRIPE_PRODUCT_ID_BRIEF` | Stripe → Products → The Brief product → Product ID (starts with `prod_`) | Filter subscriptions to Brief subscribers only |
+| `CRON_SECRET` | Vercel auto-generates — or set any random string (32+ chars) | Auth header Vercel passes to the cron endpoint |
+
+Add all four to Vercel → Project Settings → Environment Variables → Production. The cron is inactive until Vercel Cron is triggered (it runs automatically after the next deploy once `vercel.json` is in the build).
+
 ## Fulfillment — what happens when someone subscribes
 
-Today: Stripe sends them a receipt. They land on `/brief/thanks`. **Nothing else happens automatically yet** — there's no email delivery pipeline wired. They will not get a brief at 6am tomorrow unless someone (Chappy or Sire) manually:
+Stripe sends them a receipt → they land on `/brief/thanks`. The pipeline at `/api/cron/brief` queries Stripe for active subscribers each morning and sends each one a fresh brief. **No manual steps needed once all env vars are set.**
 
-1. Pulls the customer email from the Stripe dashboard
-2. Adds them to the brief send list
-
-**Next milestone (separate work):** webhook handler at `app/api/stripe/webhook/route.ts` that on `customer.subscription.created` adds the email to the send list automatically. Add `STRIPE_WEBHOOK_SECRET` env var when that's wired. Until then, **check Stripe daily for new subscribers and add them manually** — or pause the Subscribe buttons by clearing the env vars.
+If Stripe isn't configured yet: the cron returns `{ ok: true, sent: 0, preview: "..." }` with the generated brief in the response body — so you can verify the content looks right before enabling subscriptions.
 
 ## Risk note
 
-The page promises "first brief at 6am MDT tomorrow" and "no human edits." The brief generation pipeline itself is **not yet running**. Subscribing buyers right now means committing to either:
+The page promises "first brief at 6am MDT tomorrow." The generator is coded and scheduled — the only remaining step is setting the 6 env vars above (2 Stripe links + 4 pipeline vars). Once those are in Vercel and a subscriber comes in, the pipeline is fully autonomous.
 
-- (a) building the daily brief generator before the first 6am after the first subscription, or
-- (b) refunding within 7 days if the brief hasn't shipped
-
-Skeptic's view: don't promote the Subscribe links publicly until the generator exists. The mailto is fine as a "register interest" placeholder; the moment it's a real Stripe charge, the 6am promise is a hard SLA.
+Skeptic's standing recommendation: set all env vars in a single Vercel session so there's no window where buttons are live but the pipeline is broken. Order: pipeline env vars first → confirm cron fires with no subscribers (returns preview) → then enable Stripe links.

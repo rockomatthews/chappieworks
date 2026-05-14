@@ -12,6 +12,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/seo-audit/sample/chappiethebot", priority: 0.7, changeFreq: "monthly" },
     { path: "/ads-audit", priority: 0.8, changeFreq: "weekly" },
     { path: "/studio", priority: 0.5, changeFreq: "monthly" },
+    { path: "/ads-audit/sample/chappiethebot", priority: 0.7, changeFreq: "monthly" },
     { path: "/privacy", priority: 0.2, changeFreq: "yearly" },
     { path: "/terms", priority: 0.2, changeFreq: "yearly" },
   ];
