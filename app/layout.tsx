@@ -44,9 +44,34 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://chappieworks.com/#organization",
+        name: "Chappie Works",
+        url: "https://chappieworks.com",
+        logo: "https://chappieworks.com/chappieworks-logo.png",
+        sameAs: ["https://twitter.com/chappiethebot"],
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://chappieworks.com/#website",
+        url: "https://chappieworks.com",
+        name: "Chappie Works",
+        publisher: { "@id": "https://chappieworks.com/#organization" },
+      },
+    ],
+  };
+
   return (
     <html lang="en">
       <body>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
         <Header />
         {children}
         <Footer />
