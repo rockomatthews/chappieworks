@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import { ShopGrid, type Product } from "./ShopGrid";
 
 export const metadata: Metadata = {
   title: "Shop — Chappie Works",
@@ -14,25 +15,18 @@ export const metadata: Metadata = {
   },
 };
 
-type FWVariant = {
-  id: string;
-  unitPrice: { value: number; currency: string };
-};
-
+type FWImage = { id: string; url: string; width: number; height: number };
+type FWVariant = { id: string; unitPrice: { value: number; currency: string } };
 type FWProduct = {
   id: string;
   name: string;
   slug: string;
   state: { type: string };
-  thumbnailImage: { url: string; width: number; height: number } | null;
+  images: FWImage[];
   variants: FWVariant[];
 };
 
-type FWResponse = {
-  results: FWProduct[];
-};
-
-async function getProducts(): Promise<FWProduct[]> {
+async function getProducts(shopDomain: string): Promise<Product[]> {
   const token = process.env.FOURTHWALL_STOREFRONT_TOKEN;
   if (!token) return [];
   try {
@@ -41,24 +35,15 @@ async function getProducts(): Promise<FWProduct[]> {
       { next: { revalidate: 3600 } }
     );
     if (!res.ok) return [];
-    const data: FWResponse = await res.json();
-    return (data.results ?? []).filter((p) => p.state.type === "AVAILABLE");
+    const data: { results: FWProduct[] } = await res.json();
+    return (data.results ?? [])
+      .filter((p) => p.state.type === "AVAILABLE")
+      .map((p) => ({ ...p, shopDomain }));
   } catch {
     return [];
   }
 }
 
-function formatPrice(variants: FWVariant[]): string {
-  if (!variants.length) return "";
-  const prices = variants.map((v) => v.unitPrice.value);
-  const min = Math.min(...prices);
-  const max = Math.max(...prices);
-  const fmt = (n: number) =>
-    new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 0 }).format(n);
-  return min === max ? fmt(min) : `${fmt(min)} – ${fmt(max)}`;
-}
-
-// Fallback static products shown before Fourthwall is connected
 const STATIC_PRODUCTS = [
   { slug: "tee", name: "Chappie Tee", price: "$32", image: "/chappieWorksTshirt.png" },
   { slug: "hat", name: "Chappie Trucker Hat", price: "$36", image: "/chappieWorkshat.png" },
@@ -66,9 +51,9 @@ const STATIC_PRODUCTS = [
 ];
 
 export default async function Shop() {
-  const shopDomain = process.env.FOURTHWALL_SHOP_DOMAIN ?? "";
-  const products = await getProducts();
-  const live = products.length > 0 && shopDomain;
+  const shopDomain = (process.env.FOURTHWALL_SHOP_DOMAIN ?? "").replace(/^https?:\/\//, "").replace(/\/$/, "");
+  const products = await getProducts(shopDomain);
+  const live = products.length > 0;
 
   return (
     <main className="px-6 sm:px-10 py-16 sm:py-24">
@@ -83,58 +68,8 @@ export default async function Shop() {
         </header>
 
         {live ? (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {products.map((p) => {
-              const price = formatPrice(p.variants);
-              const img = p.thumbnailImage;
-              return (
-                <article key={p.id} className="card rounded-lg overflow-hidden group">
-                  <a
-                    href={`https://${shopDomain}/products/${p.slug}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block"
-                  >
-                    <div className="aspect-square bg-[var(--color-raven)] relative overflow-hidden">
-                      {img ? (
-                        <Image
-                          src={img.url}
-                          alt={p.name}
-                          fill
-                          className="object-cover group-hover:scale-105 transition-transform duration-300"
-                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-[var(--color-mute)] text-sm mono">
-                          no image
-                        </div>
-                      )}
-                    </div>
-                  </a>
-                  <div className="p-4 flex items-center justify-between gap-3">
-                    <span className="font-semibold tracking-tight">{p.name}</span>
-                    {price && (
-                      <span className="mono text-[var(--color-gold)] text-sm flex-shrink-0">
-                        {price}
-                      </span>
-                    )}
-                  </div>
-                  <div className="px-4 pb-4">
-                    <a
-                      href={`https://${shopDomain}/products/${p.slug}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="block text-center w-full px-4 py-2.5 rounded-md bg-[var(--color-gold)] text-[var(--color-ink)] text-sm font-medium hover:opacity-90 transition"
-                    >
-                      Buy now
-                    </a>
-                  </div>
-                </article>
-              );
-            })}
-          </div>
+          <ShopGrid products={products} />
         ) : (
-          // Fallback: static placeholders before Fourthwall is connected
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {STATIC_PRODUCTS.map((p) => (
               <article key={p.slug} className="card rounded-lg overflow-hidden">
@@ -149,9 +84,7 @@ export default async function Shop() {
                 </div>
                 <div className="p-4 flex items-center justify-between gap-3">
                   <span className="font-semibold tracking-tight">{p.name}</span>
-                  <span className="mono text-[var(--color-gold)] text-sm flex-shrink-0">
-                    {p.price}
-                  </span>
+                  <span className="mono text-[var(--color-gold)] text-sm">{p.price}</span>
                 </div>
                 <div className="px-4 pb-4">
                   <span className="block text-center w-full px-4 py-2.5 rounded-md border border-white/10 text-[var(--color-mute)] text-sm mono">
