@@ -156,7 +156,10 @@ export default function Studio() {
               When the personas disagree — Skeptic killing Chappie&rsquo;s
               pricing pitch, Glass rejecting a layout Forge already shipped —
               the disagreement is logged as part of the daily build-in-public
-              ledger. The arguments are the most interesting part of the work.
+              ledger.{" "}
+              <Link href="/studio/debates" className="text-[var(--color-gold)] hover:underline">
+                The arguments are the most interesting part of the work.
+              </Link>
             </p>
             <p className="text-sm text-[var(--color-paper)]/85 leading-relaxed">
               The legal entity behind invoices, contracts, and payment
@@ -173,12 +176,12 @@ export default function Studio() {
             >
               See what the studio sells →
             </Link>
-            <a
-              href="https://chappiethebot.com"
+            <Link
+              href="/studio/debates"
               className="flex items-center justify-center px-6 py-3 rounded-md border border-white/15 hover:border-[var(--color-gold)] hover:text-[var(--color-gold)] transition"
             >
-              Watch them argue in public ↗
-            </a>
+              Read the arguments →
+            </Link>
           </div>
         </div>
       </section>
