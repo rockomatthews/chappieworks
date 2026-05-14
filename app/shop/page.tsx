@@ -6,11 +6,11 @@ const FOURTHWALL_URL = process.env.NEXT_PUBLIC_FOURTHWALL_URL ?? "#";
 export const metadata: Metadata = {
   title: "Shop — Chappie Works",
   description:
-    "Chappie merch. Tee, dad hat, hoodie. ChappieTheBot on black. Printed and shipped via Fourthwall.",
+    "Chappie merch. Tee, trucker hat, sweatshirt. Printed and shipped via Fourthwall.",
   alternates: { canonical: "https://chappieworks.com/shop" },
   openGraph: {
     title: "Shop — Chappie Works",
-    description: "Tee, hat, hoodie. Wear the bird.",
+    description: "Tee, trucker hat, sweatshirt. Wear the bot.",
     url: "https://chappieworks.com/shop",
     type: "website",
   },
@@ -20,7 +20,7 @@ type Product = {
   slug: string;
   name: string;
   price: string;
-  blurb: string;
+  image: string;
 };
 
 const PRODUCTS: Product[] = [
@@ -28,22 +28,19 @@ const PRODUCTS: Product[] = [
     slug: "tee",
     name: "Chappie Tee",
     price: "$32",
-    blurb:
-      "Heavyweight black cotton tee. ChappieTheBot printed center chest — helmet, visor, REJECT badge. Worn-in feel out of the box.",
+    image: "/chappieWorksTshirt.png",
   },
   {
     slug: "hat",
-    name: "Chappie Dad Hat",
+    name: "Chappie Trucker Hat",
     price: "$36",
-    blurb:
-      "Unstructured 6-panel dad cap. ChappieTheBot embroidered on the front. Curved brim, adjustable strap.",
+    image: "/chappieWorkshat.png",
   },
   {
-    slug: "hoodie",
-    name: "Chappie Hoodie",
+    slug: "sweatshirt",
+    name: "Chappie Sweatshirt",
     price: "$58",
-    blurb:
-      "Heavyweight black pullover hoodie. Large ChappieTheBot print on the chest. Cotton-poly fleece, kangaroo pocket.",
+    image: "/chappieWorkssweetshirt.png",
   },
 ];
 
@@ -56,62 +53,51 @@ export default function Shop() {
           <p className="text-xs sm:text-sm mono text-[var(--color-gold)] mb-4 uppercase tracking-widest">
             Merch
           </p>
-          <h1 className="text-4xl sm:text-5xl tracking-tight font-semibold leading-[1.08] mb-5">
+          <h1 className="text-4xl sm:text-5xl tracking-tight font-semibold leading-[1.08]">
             Wear the bot.
           </h1>
-          <p className="text-base sm:text-lg text-[var(--color-paper)]/80 max-w-2xl">
-            Three pieces. Printed on demand, shipped via Fourthwall. No
-            warehouse, no leftovers, no landfill.
-          </p>
         </header>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {PRODUCTS.map((p) => (
-            <article
-              key={p.slug}
-              className="card rounded-lg p-5 flex flex-col"
-            >
-              <div className="aspect-square rounded-md bg-[var(--color-raven)] flex items-center justify-center mb-5 overflow-hidden">
+            <article key={p.slug} className="card rounded-lg overflow-hidden">
+              <div className="aspect-square bg-[var(--color-raven)] relative">
                 <Image
-                  src="/chappieTheBotLogo.png"
-                  alt={`${p.name} preview`}
-                  width={220}
-                  height={220}
-                  className="opacity-90"
+                  src={p.image}
+                  alt={p.name}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                 />
               </div>
-              <div className="flex items-baseline justify-between gap-3 mb-2">
-                <h2 className="text-lg font-semibold tracking-tight">
-                  {p.name}
-                </h2>
-                <span className="mono text-[var(--color-gold)] text-sm">
+              <div className="p-4 flex items-center justify-between gap-3">
+                <span className="font-semibold tracking-tight">{p.name}</span>
+                <span className="mono text-[var(--color-gold)] text-sm flex-shrink-0">
                   {p.price}
                 </span>
               </div>
-              <p className="text-sm text-[var(--color-paper)]/75 mb-5 flex-1">
-                {p.blurb}
-              </p>
-              {storeLive ? (
-                <a
-                  href={`${FOURTHWALL_URL}/products/${p.slug}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mono text-sm text-[var(--color-gold)] hover:underline"
-                >
-                  Buy on Fourthwall →
-                </a>
-              ) : (
-                <span className="mono text-sm text-[var(--color-mute)]">
-                  Dropping soon
-                </span>
-              )}
+              <div className="px-4 pb-4">
+                {storeLive ? (
+                  <a
+                    href={`${FOURTHWALL_URL}/products/${p.slug}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block text-center w-full px-4 py-2.5 rounded-md bg-[var(--color-gold)] text-[var(--color-ink)] text-sm font-medium hover:opacity-90 transition"
+                  >
+                    Buy now
+                  </a>
+                ) : (
+                  <span className="block text-center w-full px-4 py-2.5 rounded-md border border-white/10 text-[var(--color-mute)] text-sm mono">
+                    Dropping soon
+                  </span>
+                )}
+              </div>
             </article>
           ))}
         </div>
 
         <p className="mt-12 text-xs mono text-[var(--color-mute)]">
-          Fulfilled by Fourthwall. Print quality, sizing, and shipping are
-          theirs; the bird is ours.
+          Fulfilled by Fourthwall. Printed on demand.
         </p>
       </div>
     </main>
