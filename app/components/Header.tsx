@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -16,11 +17,19 @@ export function Header() {
   return (
     <header className="px-6 sm:px-10 py-5 border-b border-white/5">
       <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
-        <Link href="/" className="flex items-baseline gap-2 min-w-0">
+        <Link href="/" className="flex items-center gap-2.5 min-w-0">
+          <Image
+            src="/chappieworks-logo.png"
+            alt="Chappie Works logo"
+            width={32}
+            height={32}
+            priority
+            className="h-7 w-7 sm:h-8 sm:w-8 flex-shrink-0"
+          />
           <span className="text-base sm:text-lg tracking-tight font-semibold">
             chappie<span className="text-[var(--color-gold)]">works</span>
           </span>
-          <span className="hidden lg:inline text-xs text-[var(--color-mute)] mono">
+          <span className="hidden lg:inline text-xs text-[var(--color-mute)] mono ml-1">
             productized AI work
           </span>
         </Link>
