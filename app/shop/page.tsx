@@ -32,7 +32,7 @@ async function getProducts(shopDomain: string): Promise<Product[]> {
   try {
     const res = await fetch(
       `https://storefront-api.fourthwall.com/v1/collections/all/products?storefront_token=${token}&size=50`,
-      { next: { revalidate: 3600 } }
+      { next: { revalidate: 300 } }
     );
     if (!res.ok) return [];
     const data: { results: FWProduct[] } = await res.json();
