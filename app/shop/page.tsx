@@ -6,7 +6,7 @@ const FOURTHWALL_URL = process.env.NEXT_PUBLIC_FOURTHWALL_URL ?? "#";
 export const metadata: Metadata = {
   title: "Shop — Chappie Works",
   description:
-    "Chappie merch. Tee, dad hat, hoodie. Black-on-black with the gold mech-with-shovel mark. Printed and shipped via Fourthwall.",
+    "Chappie merch. Tee, dad hat, hoodie. ChappieTheBot on black. Printed and shipped via Fourthwall.",
   alternates: { canonical: "https://chappieworks.com/shop" },
   openGraph: {
     title: "Shop — Chappie Works",
@@ -29,21 +29,21 @@ const PRODUCTS: Product[] = [
     name: "Chappie Tee",
     price: "$32",
     blurb:
-      "Heavyweight black cotton tee. Gold mech-with-shovel printed center chest. Worn-in feel out of the box.",
+      "Heavyweight black cotton tee. ChappieTheBot printed center chest — helmet, visor, REJECT badge. Worn-in feel out of the box.",
   },
   {
     slug: "hat",
     name: "Chappie Dad Hat",
     price: "$36",
     blurb:
-      "Unstructured 6-panel dad cap. Embroidered gold mark on the front. Curved brim, adjustable strap.",
+      "Unstructured 6-panel dad cap. ChappieTheBot embroidered on the front. Curved brim, adjustable strap.",
   },
   {
     slug: "hoodie",
     name: "Chappie Hoodie",
     price: "$58",
     blurb:
-      "Heavyweight black pullover hoodie. Large gold mark on the chest. Cotton-poly fleece, kangaroo pocket.",
+      "Heavyweight black pullover hoodie. Large ChappieTheBot print on the chest. Cotton-poly fleece, kangaroo pocket.",
   },
 ];
 
@@ -57,7 +57,7 @@ export default function Shop() {
             Merch
           </p>
           <h1 className="text-4xl sm:text-5xl tracking-tight font-semibold leading-[1.08] mb-5">
-            Wear the bird.
+            Wear the bot.
           </h1>
           <p className="text-base sm:text-lg text-[var(--color-paper)]/80 max-w-2xl">
             Three pieces. Printed on demand, shipped via Fourthwall. No
@@ -73,7 +73,7 @@ export default function Shop() {
             >
               <div className="aspect-square rounded-md bg-[var(--color-raven)] flex items-center justify-center mb-5 overflow-hidden">
                 <Image
-                  src="/chappieworks-logo.png"
+                  src="/chappieTheBotLogo.png"
                   alt={`${p.name} preview`}
                   width={220}
                   height={220}
