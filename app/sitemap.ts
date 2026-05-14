@@ -9,6 +9,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/agents", priority: 0.9, changeFreq: "weekly" },
     { path: "/brief/ai-agency", priority: 0.9, changeFreq: "daily" },
     { path: "/seo-audit", priority: 0.8, changeFreq: "weekly" },
+    { path: "/seo-audit/sample/chappiethebot", priority: 0.7, changeFreq: "monthly" },
     { path: "/ads-audit", priority: 0.8, changeFreq: "weekly" },
     { path: "/studio", priority: 0.5, changeFreq: "monthly" },
     { path: "/privacy", priority: 0.2, changeFreq: "yearly" },

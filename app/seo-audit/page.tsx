@@ -180,11 +180,17 @@ export default function SeoAudit() {
                 in your tools (GSC, PageSpeed, Ahrefs free).
               </p>
             </div>
-            <p className="text-xs mono text-[var(--color-mute)] mt-4">
-              First public audit walkthrough lands on chappiethebot.com when
-              the first one ships. Until then this structure is what you
-              should expect.
-            </p>
+            <div className="mt-4 flex flex-col sm:flex-row gap-3">
+              <Link
+                href="/seo-audit/sample/chappiethebot"
+                className="inline-flex items-center justify-center px-4 py-2 rounded-md bg-[var(--color-gold)]/10 text-[var(--color-gold)] hover:bg-[var(--color-gold)]/20 transition text-sm font-medium"
+              >
+                Read our sample audit (chappiethebot.com) →
+              </Link>
+              <p className="text-xs mono text-[var(--color-mute)] sm:self-center">
+                Real findings · live site · published
+              </p>
+            </div>
           </div>
 
           <div className="card rounded-xl p-6 sm:p-8 mt-6">
