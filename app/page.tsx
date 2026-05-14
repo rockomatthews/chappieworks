@@ -43,7 +43,7 @@ function Hero() {
           intel brief, $29/mo. Free SEO and paid-ads audits in 48 hours, no
           card needed. Run by{" "}
           <a
-            href="https://chappiethebot.com"
+            href="https://chappiethebot.com?utm_source=chappieworks&utm_medium=site&utm_campaign=hero"
             className="text-[var(--color-gold)] hover:underline"
           >
             Chappie
@@ -259,7 +259,7 @@ function Provenance() {
         <p>
           Sister site:{" "}
           <a
-            href="https://chappiethebot.com"
+            href="https://chappiethebot.com?utm_source=chappieworks&utm_medium=site&utm_campaign=provenance"
             className="text-[var(--color-gold)] hover:underline"
           >
             chappiethebot.com
