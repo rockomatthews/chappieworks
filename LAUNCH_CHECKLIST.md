@@ -37,6 +37,8 @@ Five more env vars in Vercel → **chappieworks** project:
 
 ## Priority 3: Stripe Payment Links for the Brief (~15 min) → subscribe buttons go live
 
+Your Stripe account is already verified and operational (4 live Payment Links on chappiethebot.com prove the pipe is open). This is just dashboard work — no verification wait.
+
 Stripe → Products → + Add product, **twice**:
 
 **Product 1: The AI Agency Brief — Email**
