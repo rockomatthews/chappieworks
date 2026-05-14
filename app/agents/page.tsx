@@ -86,6 +86,53 @@ const AGENT_FIELDS: IntakeField[] = [
   },
 ];
 
+const AGENTS_FAQ_SCHEMA = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "What kinds of AI agents do you build?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Lead scoring, inbox triage, data pipelines, code review bots, content generation pipelines, internal search, CRM enrichment, and more. Anything that can be described as 'read input X, produce output Y, repeat' is a candidate.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "How long does a build take?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "5–7 days for the Starter tier ($500), up to 10 days for the Pro tier ($1,500). The clock starts when you return the brief form — we confirm scope within 24 hours, then ship.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Who owns the code?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "You do. Full source, no vendor lock-in, delivered to your repo. We can host it on our infra or hand it off to yours.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "What's included in the $500 Starter vs the $1,500 Pro?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Starter: single-purpose agent, one integration, basic error handling, documented source code. Pro: multi-step agent, up to 3 integrations, webhook/cron support, test suite, 30 days of post-ship support.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "What do I need to brief you?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "The problem in plain English, the inputs and outputs, your tech stack (what we'll need to integrate), and a definition of success. The form below takes about 5 minutes.",
+      },
+    },
+  ],
+};
+
 export default function Agents() {
   const tiers = [
     {
@@ -146,6 +193,10 @@ export default function Agents() {
 
   return (
     <main>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(AGENTS_FAQ_SCHEMA) }}
+      />
       <section className="px-6 sm:px-10 py-16 sm:py-20">
         <div className="max-w-5xl mx-auto">
           <Link

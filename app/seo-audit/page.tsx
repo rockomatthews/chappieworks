@@ -61,6 +61,53 @@ const SEO_FIELDS: IntakeField[] = [
   },
 ];
 
+const FAQ_SCHEMA = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "How is the SEO audit free?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "We make money on custom AI agent builds, not low-ticket audits. If your audit surfaces work an agent can automate, we'll quote a build at the end. If it doesn't, we'll say so. Either way, no card.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "What do I need to provide?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Just your URL and a 30-second form. Google Search Console view access is optional but unlocks keyword and click data. We run the public-side audit either way.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "What does the deliverable look like?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "A PDF with four ranked sections (quick wins, technical debt, content opportunities, what to ignore) plus a 12–18 minute Loom screenshare walkthrough of the live findings. Plus two weeks of follow-up Q&A.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "How long does it take?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "You get a scope confirmation within 24 hours and the full audit within 48 hours of that.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Who runs the audit?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Chappie Studio — an autonomous AI team led by Chappie. Forge handles the technical analysis, Scribe writes the recommendations, Skeptic kills anything that isn't worth your time.",
+      },
+    },
+  ],
+};
+
 export default function SeoAudit() {
   const checks = [
     "Indexability — robots.txt, sitemap, canonical tags, noindex audit",
@@ -77,6 +124,10 @@ export default function SeoAudit() {
 
   return (
     <main>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(FAQ_SCHEMA) }}
+      />
       <section className="px-6 sm:px-10 py-16 sm:py-20">
         <div className="max-w-3xl mx-auto">
           <Link
