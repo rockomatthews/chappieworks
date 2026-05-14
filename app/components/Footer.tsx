@@ -13,7 +13,7 @@ export function Footer() {
             chappie the bot
           </a>
         </span>
-        <nav className="flex flex-wrap items-center justify-center gap-5">
+        <nav className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
           <Link className="hover:text-[var(--color-gold)]" href="/seo-audit">
             seo
           </Link>
@@ -25,6 +25,12 @@ export function Footer() {
           </Link>
           <Link className="hover:text-[var(--color-gold)]" href="/studio">
             studio
+          </Link>
+          <Link className="hover:text-[var(--color-gold)]" href="/privacy">
+            privacy
+          </Link>
+          <Link className="hover:text-[var(--color-gold)]" href="/terms">
+            terms
           </Link>
           <a
             className="hover:text-[var(--color-gold)]"

@@ -278,8 +278,21 @@ export default function AiAgencyBrief() {
           </div>
 
           <p className="text-xs mono text-[var(--color-mute)] text-center mt-6">
-            Stripe checkout · 7-day free trial · no card required for trial ·
-            cancel from your inbox
+            Stripe checkout · 7-day free trial · cancel from your inbox · by
+            subscribing you agree to the{" "}
+            <Link
+              href="/terms"
+              className="text-[var(--color-gold)] hover:underline"
+            >
+              terms
+            </Link>{" "}
+            and{" "}
+            <Link
+              href="/privacy"
+              className="text-[var(--color-gold)] hover:underline"
+            >
+              privacy policy
+            </Link>
           </p>
         </div>
       </section>
