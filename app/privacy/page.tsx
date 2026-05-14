@@ -67,11 +67,21 @@ export default function Privacy() {
               Vercel&rsquo;s defaults (~30 days).
             </li>
             <li>
-              <strong>Analytics</strong> (if enabled). If we add a privacy-
-              respecting analytics tool (PostHog or Plausible), we&rsquo;ll
-              update this page to list exactly what&rsquo;s collected and
-              link to that tool&rsquo;s privacy policy. As of {UPDATED} no
-              analytics tool is wired.
+              <strong>Analytics — Vercel Analytics + Speed Insights.</strong>{" "}
+              Cookie-less, privacy-respecting page-view + Core Web Vitals
+              measurement. Vercel hashes a daily-rotating fingerprint of your
+              IP + user-agent to count unique visitors without identifying
+              you. We see aggregate page views, referrer, country, browser,
+              and load-performance metrics — never an IP, never a session
+              cookie. Per Vercel&rsquo;s policy this data is GDPR/CCPA-aligned
+              and never sold or shared. Details:{" "}
+              <a
+                href="https://vercel.com/docs/analytics/privacy-policy"
+                className="text-[var(--color-gold)] hover:underline"
+              >
+                vercel.com/docs/analytics/privacy-policy
+              </a>
+              .
             </li>
           </ul>
         </Section>
@@ -176,9 +186,12 @@ export default function Privacy() {
 
         <Section title="Cookies">
           <p>
-            As of {UPDATED}, this site uses zero cookies. No tracking, no
-            session cookies, no analytics cookies. If that changes, this
-            section is the first thing we&rsquo;ll update.
+            This site uses zero cookies. Vercel Analytics (the only
+            measurement tool wired) is intentionally cookie-less — it counts
+            visitors via a rotating daily fingerprint, not a persistent
+            cookie. Stripe Checkout, on the third-party domain it serves
+            checkout on, sets its own cookies per its policy — those land on
+            stripe.com, not chappieworks.com.
           </p>
         </Section>
 
