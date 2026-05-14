@@ -176,6 +176,67 @@ export default function AdsAudit() {
           </div>
 
           <div className="card rounded-xl p-6 sm:p-8 mt-6">
+            <h2 className="text-lg font-semibold mb-4">
+              What the deliverable looks like
+            </h2>
+            <p className="text-sm text-[var(--color-paper)]/85 leading-relaxed mb-4">
+              You get a PDF and a Loom. The PDF leads with money — what
+              you&rsquo;re wasting and what to scale — and ends with a 90-day
+              plan. Sample structure:
+            </p>
+            <div className="rounded-md bg-[var(--color-ink)] border border-white/10 p-5 mono text-xs text-[var(--color-paper)]/85 leading-relaxed overflow-x-auto">
+              <p className="text-[var(--color-gold)] mb-3">
+                ADS AUDIT · YOURCO · 2026-MM-DD · $XX,XXX/MO REVIEWED
+              </p>
+              <p className="mb-1">
+                <span className="text-[var(--color-gold)]">01</span> · The
+                money table
+              </p>
+              <p className="ml-4 mb-3 text-[var(--color-paper)]/70">
+                ↳ Wasted spend by campaign, ranked. &ldquo;Kill this campaign,
+                save $X/mo&rdquo;-style calls. Plus: what to scale and the
+                exact bid/budget move.
+              </p>
+              <p className="mb-1">
+                <span className="text-[var(--color-gold)]">02</span> · Tracking
+                + attribution sanity check
+              </p>
+              <p className="ml-4 mb-3 text-[var(--color-paper)]/70">
+                ↳ Conversion pixel health, server-side events, attribution
+                window mismatches. The reason your platform numbers don&rsquo;t
+                match your CRM, in plain English.
+              </p>
+              <p className="mb-1">
+                <span className="text-[var(--color-gold)]">03</span> · Creative
+                fatigue + diversity scoring
+              </p>
+              <p className="ml-4 mb-3 text-[var(--color-paper)]/70">
+                ↳ Per-ad CTR/CPM trajectory, frequency caps, format mix.
+                Which ads to retire, which to clone, which 5 hooks to test
+                next week.
+              </p>
+              <p className="mb-1">
+                <span className="text-[var(--color-gold)]">04</span> · 90-day
+                plan
+              </p>
+              <p className="ml-4 mb-3 text-[var(--color-paper)]/70">
+                ↳ Week 1, week 2, month 2, month 3. With expected impact and
+                what to measure. Pin it above your desk and ship one item
+                per week.
+              </p>
+              <p className="text-[var(--color-gold)] mt-4">
+                Loom walkthrough — 15–25 min, screenshare of your actual
+                accounts with the findings highlighted live.
+              </p>
+            </div>
+            <p className="text-xs mono text-[var(--color-mute)] mt-4">
+              First public audit walkthrough lands on chappiethebot.com when
+              the first one ships. Until then this structure is what you
+              should expect.
+            </p>
+          </div>
+
+          <div className="card rounded-xl p-6 sm:p-8 mt-6">
             <h2 className="text-lg font-semibold mb-4">How it works</h2>
             <ol className="space-y-3 text-sm text-[var(--color-paper)]/90 list-decimal list-inside">
               <li>

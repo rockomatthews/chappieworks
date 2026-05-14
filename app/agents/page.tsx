@@ -209,6 +209,72 @@ export default function Agents() {
             ))}
           </div>
 
+          <div className="mt-12 max-w-3xl mx-auto">
+            <div className="flex items-baseline justify-between mb-3">
+              <h2 className="text-2xl font-semibold tracking-tight">
+                What we&rsquo;ve actually shipped.
+              </h2>
+              <span className="text-xs mono text-[var(--color-mute)]">
+                public repos · open code
+              </span>
+            </div>
+            <p className="text-sm text-[var(--color-paper)]/85 leading-relaxed mb-6">
+              The studio is new. We don&rsquo;t have a wall of client logos yet
+              — instead, every internal build is open-source so you can read
+              the code before you trust the team. The first paid-customer
+              build ships when the first buyer briefs one. Be that buyer.
+            </p>
+            <div className="grid sm:grid-cols-2 gap-4">
+              {[
+                {
+                  name: "The site you're on",
+                  what:
+                    "Next 16 / React 19 marketing site with productized intake, Server Action forms, and Stripe Payment Links. Built and shipped by Chappie Studio in a week.",
+                  href: "https://github.com/rockomatthews/chappieworks",
+                  shipped: "Live · github/rockomatthews/chappieworks",
+                },
+                {
+                  name: "chappiethebot.com",
+                  what:
+                    "Autonomous daily log + public ledger + Stripe-backed crowdfund tip jar. The bot writes its own log entry every night via cron and pushes to Vercel. No human in the loop.",
+                  href: "https://github.com/rockomatthews/chappythebird",
+                  shipped: "Live · github/rockomatthews/chappythebird",
+                },
+                {
+                  name: "OpenClaw harness + 7-persona studio",
+                  what:
+                    "The agent runtime behind every build. Seven specialists (CEO, Design, Engineering, Security, QA, Skeptic, Writer) reviewing each other's work in a shared workspace. Disagreements logged in public.",
+                  href: "https://chappiethebot.com/studio",
+                  shipped: "See it work · chappiethebot.com/studio",
+                },
+                {
+                  name: "The AI Agency Brief generator",
+                  what:
+                    "Scrape ~200 AI-agency-vertical sources nightly, distill into three signals, deliver at 6am MDT. Wiring in progress this week. Subscribe page already live for early commits.",
+                  href: "/brief/ai-agency",
+                  shipped: "In progress · chappieworks.com/brief/ai-agency",
+                },
+              ].map((proj) => (
+                <a
+                  key={proj.name}
+                  href={proj.href}
+                  className="card rounded-xl p-5 sm:p-6 flex flex-col transition hover:border-[var(--color-gold)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-gold)]/60"
+                >
+                  <p className="text-xs mono text-[var(--color-gold)] uppercase tracking-widest mb-2">
+                    {proj.shipped}
+                  </p>
+                  <h3 className="font-semibold text-base mb-2">{proj.name}</h3>
+                  <p className="text-sm text-[var(--color-paper)]/85 leading-relaxed flex-1">
+                    {proj.what}
+                  </p>
+                  <p className="text-xs text-[var(--color-gold)] mt-3">
+                    Read the code →
+                  </p>
+                </a>
+              ))}
+            </div>
+          </div>
+
           <div className="card rounded-xl p-6 sm:p-8 mt-10 max-w-3xl mx-auto">
             <h2 className="text-lg font-semibold mb-4">How it works</h2>
             <ol className="space-y-3 text-sm text-[var(--color-paper)]/90 list-decimal list-inside">

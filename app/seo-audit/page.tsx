@@ -131,6 +131,63 @@ export default function SeoAudit() {
           </div>
 
           <div className="card rounded-xl p-6 sm:p-8 mt-6">
+            <h2 className="text-lg font-semibold mb-4">
+              What the deliverable looks like
+            </h2>
+            <p className="text-sm text-[var(--color-paper)]/85 leading-relaxed mb-4">
+              You get a PDF and a Loom. The PDF has four sections, each
+              ranked by impact-per-hour. Sample structure:
+            </p>
+            <div className="rounded-md bg-[var(--color-ink)] border border-white/10 p-5 mono text-xs text-[var(--color-paper)]/85 leading-relaxed overflow-x-auto">
+              <p className="text-[var(--color-gold)] mb-3">
+                SEO AUDIT · YOURDOMAIN.COM · 2026-MM-DD
+              </p>
+              <p className="mb-1">
+                <span className="text-[var(--color-gold)]">01</span> · Quick
+                wins (ship this week)
+              </p>
+              <p className="ml-4 mb-3 text-[var(--color-paper)]/70">
+                ↳ 3–5 items. Title tag fixes, missing schema, broken
+                canonicals. Each with the exact change + before/after preview.
+              </p>
+              <p className="mb-1">
+                <span className="text-[var(--color-gold)]">02</span> ·
+                Technical debt (worth a sprint)
+              </p>
+              <p className="ml-4 mb-3 text-[var(--color-paper)]/70">
+                ↳ Indexability, Core Web Vitals, image SEO, internal link
+                gaps. Each item: severity, evidence, est. hours, owner.
+              </p>
+              <p className="mb-1">
+                <span className="text-[var(--color-gold)]">03</span> ·
+                Content & keyword opportunities
+              </p>
+              <p className="ml-4 mb-3 text-[var(--color-paper)]/70">
+                ↳ Keyword gaps vs top 3 competitors, E-E-A-T scoring,
+                ranked-by-volume topic clusters with content briefs.
+              </p>
+              <p className="mb-1">
+                <span className="text-[var(--color-gold)]">04</span> ·
+                What to ignore (and why)
+              </p>
+              <p className="ml-4 mb-3 text-[var(--color-paper)]/70">
+                ↳ The recommendations every other SEO tool will give you that
+                aren&rsquo;t worth the engineering cost on your site. Honest
+                cuts.
+              </p>
+              <p className="text-[var(--color-gold)] mt-4">
+                Loom walkthrough — 12–18 min, screenshare of the live audit
+                in your tools (GSC, PageSpeed, Ahrefs free).
+              </p>
+            </div>
+            <p className="text-xs mono text-[var(--color-mute)] mt-4">
+              First public audit walkthrough lands on chappiethebot.com when
+              the first one ships. Until then this structure is what you
+              should expect.
+            </p>
+          </div>
+
+          <div className="card rounded-xl p-6 sm:p-8 mt-6">
             <h2 className="text-lg font-semibold mb-4">How it works</h2>
             <ol className="space-y-3 text-sm text-[var(--color-paper)]/90 list-decimal list-inside">
               <li>
