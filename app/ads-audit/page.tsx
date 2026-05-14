@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { CreditedBy } from "../components/CreditedBy";
+import { IntakeForm, type IntakeField } from "../components/IntakeForm";
 
 export const metadata = {
   title: "Free paid ads audit · 48 hours — Chappie Works",
@@ -13,8 +14,65 @@ export const metadata = {
   },
 };
 
-const INTAKE_EMAIL =
-  "mailto:robmatthews1080@gmail.com?subject=Free%20Ads%20Audit%20%E2%80%94%20platforms&body=Platforms%20to%20audit%20(Google%2C%20Meta%2C%20TikTok%2C%20LinkedIn%2C%20Microsoft)%3A%20%0AAccount%20access%20method%20(MCC%20invite%2C%20screenshare)%3A%20%0AMonthly%20spend%20range%3A%20%0AGoals%20(more%20leads%2C%20lower%20CPA%2C%20etc.)%3A%20%0ANotes%3A%20";
+const ADS_FIELDS: IntakeField[] = [
+  {
+    kind: "checkboxes",
+    name: "platforms",
+    label: "Platforms to audit (pick all that apply)",
+    options: [
+      "Google Ads",
+      "Meta Ads (Facebook/Instagram)",
+      "TikTok Ads",
+      "LinkedIn Ads",
+      "Microsoft / Bing Ads",
+      "YouTube Ads (separate from Google)",
+      "Apple Search Ads",
+    ],
+  },
+  {
+    kind: "select",
+    name: "access_method",
+    label: "How can I access the account?",
+    options: [
+      "MCC / manager invite (preferred)",
+      "Read-only user invite",
+      "Live screenshare walkthrough",
+      "Exported reports only",
+      "Not sure — help me figure it out",
+    ],
+    required: true,
+  },
+  {
+    kind: "select",
+    name: "monthly_spend",
+    label: "Monthly ad spend (all platforms combined)",
+    options: [
+      "Under $1,000 / mo",
+      "$1,000 – $10,000 / mo",
+      "$10,000 – $50,000 / mo",
+      "$50,000 – $250,000 / mo",
+      "$250,000+ / mo",
+    ],
+    required: true,
+  },
+  {
+    kind: "textarea",
+    name: "goals",
+    label: "What do you want to fix?",
+    placeholder:
+      "Lower CPA on Google search, fix Meta creative fatigue, scale TikTok past learning phase…",
+    required: true,
+    rows: 4,
+  },
+  {
+    kind: "textarea",
+    name: "notes",
+    label: "Anything else? (optional)",
+    placeholder:
+      "Prior audits, agency relationships, deadline pressure, current attribution model…",
+    rows: 3,
+  },
+];
 
 export default function AdsAudit() {
   const platforms = [
@@ -144,23 +202,29 @@ export default function AdsAudit() {
             </ol>
           </div>
 
-          <div className="mt-10 flex flex-col sm:flex-row gap-3">
-            <a
-              href={INTAKE_EMAIL}
-              className="flex-1 flex items-center justify-center px-6 py-3 rounded-md bg-[var(--color-gold)] text-[var(--color-ink)] font-medium hover:opacity-90 transition"
-            >
-              Get your free audit →
-            </a>
+          <div id="intake" className="mt-10 scroll-mt-20">
+            <h2 className="text-2xl font-semibold tracking-tight mb-2">
+              Get your free ads audit.
+            </h2>
+            <p className="text-sm text-[var(--color-mute)] mb-6">
+              Fills in 60 seconds. I confirm access within 24 hours and the
+              audit lands within 48.
+            </p>
+            <IntakeForm
+              formType="ads-audit"
+              fields={ADS_FIELDS}
+              submitLabel="Request my free ads audit →"
+            />
+          </div>
+
+          <div className="mt-6 text-center">
             <Link
               href="/agents"
-              className="flex items-center justify-center px-6 py-3 rounded-md border border-white/15 hover:border-[var(--color-gold)] hover:text-[var(--color-gold)] transition"
+              className="inline-flex items-center justify-center px-6 py-3 rounded-md border border-white/15 hover:border-[var(--color-gold)] hover:text-[var(--color-gold)] transition text-sm"
             >
-              Or skip to agent builds
+              Or skip the audit and brief an agent build →
             </Link>
           </div>
-          <p className="text-xs mono text-[var(--color-mute)] mt-4 text-center">
-            Email-first intake while we wire up the form this week.
-          </p>
 
           <CreditedBy slugs={["forge", "skeptic", "scribe"]} />
         </div>

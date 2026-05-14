@@ -1,4 +1,6 @@
+import Link from "next/link";
 import { CreditedBy } from "../components/CreditedBy";
+import { IntakeForm, type IntakeField } from "../components/IntakeForm";
 
 export const metadata = {
   title: "Custom AI agent · $500–$1,500 · 5–7 days — Chappie Works",
@@ -12,8 +14,77 @@ export const metadata = {
   },
 };
 
-const INTAKE_EMAIL =
-  "mailto:robmatthews1080@gmail.com?subject=Custom%20Agent%20Intake%20%E2%80%94%20%24500%20or%20%241%2C500%20tier&body=Problem%20description%3A%20%0AInputs%20(forms%2C%20files%2C%20APIs)%3A%20%0ATools%2Fintegrations%20I%20already%20use%3A%20%0ASuccess%20looks%20like%3A%20%0ATarget%20budget%20(Starter%20%24500%20or%20Pro%20%241%2C500)%3A%20%0AReady%20to%20start%20when%3F%3A%20";
+const AGENT_FIELDS: IntakeField[] = [
+  {
+    kind: "text",
+    name: "company",
+    label: "Company (optional)",
+    placeholder: "Acme Inc.",
+  },
+  {
+    kind: "textarea",
+    name: "problem",
+    label: "What problem should the agent solve?",
+    placeholder:
+      "Triage 200 inbound form submissions per day, score them, and push the top 20% into our CRM as hot leads with a 60-second SLA.",
+    required: true,
+    rows: 4,
+  },
+  {
+    kind: "textarea",
+    name: "inputs",
+    label: "What does it take in? (forms, files, APIs, inbox, etc.)",
+    placeholder:
+      "Typeform webhook (JSON), nightly CSV exports, Gmail API on a shared inbox…",
+    required: true,
+    rows: 3,
+  },
+  {
+    kind: "text",
+    name: "stack",
+    label: "Tools / integrations you already use",
+    placeholder: "HubSpot, Slack, Notion, Stripe, Postgres on Supabase…",
+  },
+  {
+    kind: "textarea",
+    name: "success",
+    label: "What does success look like?",
+    placeholder:
+      "Hot leads in CRM within 60s, 0 missed since launch, sales team stops doing manual triage.",
+    required: true,
+    rows: 3,
+  },
+  {
+    kind: "select",
+    name: "budget",
+    label: "Target tier",
+    options: [
+      "Starter — $500 (single task, 5 days)",
+      "Pro — $1,500 (multi-step, 2–3 integrations, 7 days)",
+      "Enterprise — let's scope it (14+ days)",
+      "Not sure — recommend a tier",
+    ],
+    required: true,
+  },
+  {
+    kind: "select",
+    name: "timeline",
+    label: "When do you want to start?",
+    options: [
+      "ASAP — this week",
+      "Within 2 weeks",
+      "This month",
+      "Next month / flexible",
+    ],
+    required: true,
+  },
+  {
+    kind: "text",
+    name: "audit_reference",
+    label: "Did you come from a free audit? (optional)",
+    placeholder: "SEO audit / ads audit / no",
+  },
+];
 
 export default function Agents() {
   const tiers = [
@@ -77,12 +148,12 @@ export default function Agents() {
     <main>
       <section className="px-6 sm:px-10 py-16 sm:py-20">
         <div className="max-w-5xl mx-auto">
-          <a
+          <Link
             href="/"
             className="text-sm mono text-[var(--color-mute)] hover:text-[var(--color-gold)]"
           >
             ← chappieworks
-          </a>
+          </Link>
           <p className="text-xs mono text-[var(--color-gold)] mt-6 uppercase tracking-widest">
             Custom AI agents · $500–$1,500 · 5–7 days
           </p>
@@ -142,21 +213,21 @@ export default function Agents() {
             <h2 className="text-lg font-semibold mb-4">How it works</h2>
             <ol className="space-y-3 text-sm text-[var(--color-paper)]/90 list-decimal list-inside">
               <li>
-                Email me with the intake form (link below). Describe the
-                problem in plain English. If you came from a free{" "}
-                <a
+                Fill the intake form below. Describe the problem in plain
+                English. If you came from a free{" "}
+                <Link
                   href="/seo-audit"
                   className="text-[var(--color-gold)] hover:underline"
                 >
                   SEO
-                </a>{" "}
+                </Link>{" "}
                 or{" "}
-                <a
+                <Link
                   href="/ads-audit"
                   className="text-[var(--color-gold)] hover:underline"
                 >
                   ads
-                </a>{" "}
+                </Link>{" "}
                 audit, mention which one — half the scoping is already done.
               </li>
               <li>
@@ -179,23 +250,29 @@ export default function Agents() {
             </ol>
           </div>
 
-          <div className="mt-10 flex flex-col sm:flex-row gap-3 max-w-2xl mx-auto">
-            <a
-              href={INTAKE_EMAIL}
-              className="flex-1 flex items-center justify-center px-6 py-3 rounded-md bg-[var(--color-gold)] text-[var(--color-ink)] font-medium hover:opacity-90 transition"
-            >
-              Email me the intake →
-            </a>
-            <a
+          <div id="intake" className="mt-10 max-w-2xl mx-auto scroll-mt-20">
+            <h2 className="text-2xl font-semibold tracking-tight mb-2">
+              Brief the build.
+            </h2>
+            <p className="text-sm text-[var(--color-mute)] mb-6">
+              90 seconds to fill. One-page spec in your inbox within 24 hours
+              — scope, tier, price, ship date. No call required to start.
+            </p>
+            <IntakeForm
+              formType="agents"
+              fields={AGENT_FIELDS}
+              submitLabel="Send the brief →"
+            />
+          </div>
+
+          <div className="max-w-2xl mx-auto mt-6 text-center">
+            <Link
               href="/"
-              className="flex items-center justify-center px-6 py-3 rounded-md border border-white/15 hover:border-[var(--color-gold)] hover:text-[var(--color-gold)] transition"
+              className="inline-flex items-center justify-center px-6 py-3 rounded-md border border-white/15 hover:border-[var(--color-gold)] hover:text-[var(--color-gold)] transition text-sm"
             >
               Or browse the slate
-            </a>
+            </Link>
           </div>
-          <p className="text-xs mono text-[var(--color-mute)] mt-4 text-center max-w-2xl mx-auto">
-            Email-first intake while I wire up the booking calendar this week.
-          </p>
 
           <div className="max-w-2xl mx-auto">
             <CreditedBy slugs={["chappie", "forge", "vault", "bench", "scribe"]} />

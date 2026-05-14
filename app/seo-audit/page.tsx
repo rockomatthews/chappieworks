@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { CreditedBy } from "../components/CreditedBy";
+import { IntakeForm, type IntakeField } from "../components/IntakeForm";
 
 export const metadata = {
   title: "Free SEO audit · 48 hours — Chappie Works",
@@ -13,8 +14,52 @@ export const metadata = {
   },
 };
 
-const INTAKE_EMAIL =
-  "mailto:robmatthews1080@gmail.com?subject=Free%20SEO%20Audit%20%E2%80%94%20URL&body=URL%20to%20audit%3A%20%0AGoogle%20Search%20Console%20access%3F%20(yes%2Fno)%3A%20%0ATarget%20keywords%20(optional)%3A%20%0AWhat%20do%20you%20want%20more%20of%20(traffic%2C%20signups%2C%20sales)%3F%20%0AAnything%20else%3A%20";
+const SEO_FIELDS: IntakeField[] = [
+  {
+    kind: "text",
+    name: "url",
+    label: "URL to audit",
+    placeholder: "https://yourdomain.com",
+    required: true,
+  },
+  {
+    kind: "select",
+    name: "gsc_access",
+    label: "Google Search Console access?",
+    options: [
+      "Yes — I can grant view access",
+      "No — audit the public side only",
+      "Not sure / need help",
+    ],
+    required: true,
+  },
+  {
+    kind: "select",
+    name: "primary_goal",
+    label: "What do you want more of?",
+    options: [
+      "More organic traffic",
+      "More qualified signups / leads",
+      "More e-commerce sales",
+      "Better rankings on specific terms",
+      "Other (note below)",
+    ],
+    required: true,
+  },
+  {
+    kind: "text",
+    name: "target_keywords",
+    label: "Target keywords (optional)",
+    placeholder: "ai agency, productized AI, custom agent build",
+  },
+  {
+    kind: "textarea",
+    name: "notes",
+    label: "Anything else? (optional)",
+    placeholder: "Competitors, prior audits, known issues, deadline pressure…",
+    rows: 4,
+  },
+];
 
 export default function SeoAudit() {
   const checks = [
@@ -109,23 +154,29 @@ export default function SeoAudit() {
             </ol>
           </div>
 
-          <div className="mt-10 flex flex-col sm:flex-row gap-3">
-            <a
-              href={INTAKE_EMAIL}
-              className="flex-1 flex items-center justify-center px-6 py-3 rounded-md bg-[var(--color-gold)] text-[var(--color-ink)] font-medium hover:opacity-90 transition"
-            >
-              Get your free audit →
-            </a>
+          <div id="intake" className="mt-10 scroll-mt-20">
+            <h2 className="text-2xl font-semibold tracking-tight mb-2">
+              Get your free audit.
+            </h2>
+            <p className="text-sm text-[var(--color-mute)] mb-6">
+              Fills in 30 seconds. I confirm scope within 24 hours and the
+              audit lands within 48.
+            </p>
+            <IntakeForm
+              formType="seo-audit"
+              fields={SEO_FIELDS}
+              submitLabel="Request my free SEO audit →"
+            />
+          </div>
+
+          <div className="mt-6 text-center">
             <Link
               href="/agents"
-              className="flex items-center justify-center px-6 py-3 rounded-md border border-white/15 hover:border-[var(--color-gold)] hover:text-[var(--color-gold)] transition"
+              className="inline-flex items-center justify-center px-6 py-3 rounded-md border border-white/15 hover:border-[var(--color-gold)] hover:text-[var(--color-gold)] transition text-sm"
             >
-              Or skip to agent builds
+              Or skip the audit and brief an agent build →
             </Link>
           </div>
-          <p className="text-xs mono text-[var(--color-mute)] mt-4 text-center">
-            Email-first intake while we wire up the form this week.
-          </p>
 
           <CreditedBy slugs={["forge", "skeptic", "scribe"]} />
         </div>
