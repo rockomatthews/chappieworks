@@ -13,8 +13,8 @@ export const metadata = {
   },
 };
 
-const SUBSCRIBE_EMAIL =
-  "mailto:robmatthews1080@gmail.com?subject=AI%20Agency%20Brief%20%E2%80%94%20Subscribe&body=Subscribe%20me%20to%20the%20AI%20Agency%20Brief.%20Tier%3A%20%5BEmail%20%2429%20%2F%20Email%20%2B%20Slack%20%2459%5D";
+const STRIPE_LINK_EMAIL = process.env.NEXT_PUBLIC_STRIPE_LINK_BRIEF_EMAIL ?? "";
+const STRIPE_LINK_PLUS = process.env.NEXT_PUBLIC_STRIPE_LINK_BRIEF_PLUS ?? "";
 
 export default function AiAgencyBrief() {
   return (
@@ -252,12 +252,11 @@ export default function AiAgencyBrief() {
                 deliverable. No ads, no upsells inside the brief, no
                 referral-link slop.
               </p>
-              <a
-                href={SUBSCRIBE_EMAIL}
-                className="block text-center px-6 py-3 rounded-md border border-white/15 hover:border-[var(--color-gold)] hover:text-[var(--color-gold)] transition mono text-sm"
-              >
-                Subscribe — $29/mo
-              </a>
+              <SubscribeButton
+                href={STRIPE_LINK_EMAIL}
+                label="Subscribe — $29/mo"
+                variant="outline"
+              />
             </div>
 
             <div className="card rounded-xl p-6 sm:p-8 ring-2 ring-[var(--color-gold)] flex flex-col">
@@ -270,12 +269,11 @@ export default function AiAgencyBrief() {
                 Slack or Discord channel and a searchable web archive of every
                 past brief.
               </p>
-              <a
-                href={SUBSCRIBE_EMAIL}
-                className="block text-center px-6 py-3 rounded-md bg-[var(--color-gold)] text-[var(--color-ink)] font-medium hover:opacity-90 transition"
-              >
-                Subscribe — $59/mo
-              </a>
+              <SubscribeButton
+                href={STRIPE_LINK_PLUS}
+                label="Subscribe — $59/mo"
+                variant="filled"
+              />
             </div>
           </div>
 
@@ -331,5 +329,38 @@ export default function AiAgencyBrief() {
         </div>
       </section>
     </main>
+  );
+}
+
+function SubscribeButton({
+  href,
+  label,
+  variant,
+}: {
+  href: string;
+  label: string;
+  variant: "outline" | "filled";
+}) {
+  const base = "block text-center px-6 py-3 rounded-md transition";
+  const outline =
+    "border border-white/15 hover:border-[var(--color-gold)] hover:text-[var(--color-gold)] mono text-sm";
+  const filled =
+    "bg-[var(--color-gold)] text-[var(--color-ink)] font-medium hover:opacity-90";
+  const variantClass = variant === "filled" ? filled : outline;
+
+  if (!href) {
+    return (
+      <span
+        className={`${base} ${variantClass} opacity-60 cursor-not-allowed select-none`}
+        aria-disabled="true"
+      >
+        Setting up checkout · back shortly
+      </span>
+    );
+  }
+  return (
+    <a href={href} className={`${base} ${variantClass}`}>
+      {label}
+    </a>
   );
 }
