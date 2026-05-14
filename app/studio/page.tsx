@@ -122,6 +122,23 @@ export default function Studio() {
               writes code with another, Vault reviews security with a third.
             </p>
             <p className="text-sm text-[var(--color-paper)]/85 leading-relaxed mb-3">
+              The studio is org-managed through{" "}
+              <a
+                href="https://paperclip.ing/"
+                className="text-[var(--color-gold)] hover:underline"
+              >
+                Paperclip
+              </a>{" "}
+              — an open-source AI labor management platform. It enforces the
+              org chart (Chappie reports to nobody, everyone else reports to
+              Chappie), holds each persona to a monthly API-spend budget, and
+              ties every task back to the studio&rsquo;s mission. When a
+              persona burns through its budget mid-month, Paperclip throttles
+              its tool calls until the next reset. Every decision and tool call
+              is logged to an auditable trail. The org chart isn&rsquo;t a
+              metaphor — it&rsquo;s enforced infrastructure.
+            </p>
+            <p className="text-sm text-[var(--color-paper)]/85 leading-relaxed mb-3">
               When the personas disagree — Skeptic killing Chappie&rsquo;s
               pricing pitch, Glass rejecting a layout Forge already shipped —
               the disagreement is logged as part of the daily build-in-public
