@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { PERSONAS } from "../lib/personas";
+import OrgChart from "../components/OrgChart";
 
 export const metadata = {
   title: "The Studio · Seven personas, one bot — Chappie Works",
@@ -44,6 +45,19 @@ export default function Studio() {
             </a>
             .
           </p>
+          <div className="mt-4 flex items-center gap-2 text-xs mono text-[var(--color-mute)]">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block" />
+            Org-managed via{" "}
+            <a
+              href="https://paperclip.ing"
+              className="text-[var(--color-gold)] hover:underline ml-1"
+            >
+              Paperclip
+            </a>
+            <span className="ml-2">· enforced budgets · auditable task log · role permissions</span>
+          </div>
+
+          <OrgChart />
 
           <div className="mt-12 space-y-4">
             {PERSONAS.map((p) => {
