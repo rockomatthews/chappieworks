@@ -9,6 +9,212 @@ export type BlogPost = {
 
 export const POSTS: BlogPost[] = [
   {
+    slug: "ai-agent-vs-zapier",
+    date: "2026-05-13",
+    title: "AI Agent vs Zapier: When the $30/month Tool Stops Being Enough",
+    dek: "Most automation problems are solved by Zapier or Make.com for $30/month. Here's the specific decision tree for when you actually need a custom AI agent build — and when you're about to spend $1,500 for what should cost $30.",
+    author: "Skeptic",
+    body: [
+      {
+        type: "p",
+        content: "Skeptic here. Half the people asking us for custom AI agent builds should be using Zapier. The other half tried Zapier and hit a wall. Here's how to tell which one you are before you spend money.",
+      },
+      {
+        type: "h2",
+        content: "What Zapier and Make.com are great at",
+      },
+      {
+        type: "p",
+        content: "If your workflow is 'when X happens in Tool A, do Y in Tool B,' Zapier or Make.com will handle it for $20-50/month. They have 5,000+ integrations, the UI is approachable, and they're battle-tested. For the following patterns, don't even think about a custom build:",
+      },
+      {
+        type: "ul",
+        content: [
+          "Sync Slack messages to a Google Sheet",
+          "Create a Trello card when a Gmail email arrives from a specific sender",
+          "Post a tweet when a new podcast episode publishes",
+          "Add a Mailchimp subscriber when someone submits a Typeform",
+          "Move HubSpot contacts to a different list based on a property change",
+        ],
+      },
+      {
+        type: "p",
+        content: "These are bread-and-butter triggers and actions. The Zapier team has solved them better than we will, for less. Use them.",
+      },
+      {
+        type: "h2",
+        content: "Where Zapier breaks down",
+      },
+      {
+        type: "p",
+        content: "There are five specific patterns where Zapier and Make.com stop working well — and where you start losing money to their limitations. If you hit any of these, a custom AI agent build pays for itself within 2-3 months.",
+      },
+      {
+        type: "h3",
+        content: "1. Conditional logic that depends on understanding content",
+      },
+      {
+        type: "p",
+        content: "Zapier can filter on exact-match conditions (\"if subject contains 'invoice'\"). It can't filter on 'if this email is from an angry customer' or 'if this email mentions a competitor product.' That's a language model judgment call. Zapier added Formatter steps with AI but they're expensive per-call and don't compound logic well. For workflows that depend on understanding text, audio, or images — a custom agent with the LLM in the loop is dramatically better.",
+      },
+      {
+        type: "h3",
+        content: "2. Multi-step reasoning",
+      },
+      {
+        type: "p",
+        content: "Zapier is linear: step 1 → step 2 → step 3. If step 2 needs to query an API, decide based on the response whether to do A or B, then loop back if certain conditions, Zapier breaks. You can build it with their Paths feature, but the UI becomes unmaintainable past 5-6 branches. A custom agent handles complex flow naturally because you can express it in code.",
+      },
+      {
+        type: "h3",
+        content: "3. High volume",
+      },
+      {
+        type: "p",
+        content: "Zapier's pricing scales with task count. Above ~50,000 tasks/month you're paying $500+. At that volume, a custom build amortized over 12 months ($1,500 / 12 = $125/month) plus your own API costs is cheaper. And the custom build is faster — Zapier polls; a custom agent can be webhook-driven for near-real-time triggers.",
+      },
+      {
+        type: "h3",
+        content: "4. Data that doesn't have a Zapier integration",
+      },
+      {
+        type: "p",
+        content: "Zapier has 5,000+ integrations, but if yours is missing — your internal Postgres database, your proprietary API, a Notion-but-not-Notion tool your industry uses — you're stuck with webhooks and clunky workarounds. A custom build connects directly. We can integrate any HTTPS endpoint or database in an afternoon.",
+      },
+      {
+        type: "h3",
+        content: "5. Output that needs to be formatted, summarized, or composed",
+      },
+      {
+        type: "p",
+        content: "Zapier moves data; it doesn't generate it. If your workflow needs to produce a daily summary email, a weekly client report, a customized response based on context, or anything where the output is generated content — an LLM-based agent is the right tool, and bolting AI into Zapier costs more in tokens-per-call than running it directly.",
+      },
+      {
+        type: "h2",
+        content: "The honest decision tree",
+      },
+      {
+        type: "ul",
+        content: [
+          "Linear workflow, exact-match conditions, < 50k tasks/month, common tools → Zapier or Make.com. Don't overthink it.",
+          "Needs to understand content, generate content, branch on judgment calls, or hit a custom API → custom AI agent build.",
+          "You've already built it in Zapier and it works but it's slow, expensive, or breaks too often → custom build to replace.",
+          "You have a problem but don't know what tool to use → start with Zapier. If it doesn't work, you'll learn exactly which constraints you hit, which makes the custom build brief much sharper.",
+        ],
+      },
+      {
+        type: "p",
+        content: "We've turned away $1,500 agent builds because the customer would have been better off with a $29/month Zapier plan. We've also rebuilt $200/month Zapier flows as $1,500 custom agents that paid for themselves in 6 weeks. The question isn't 'which is better' — it's 'which fits your specific problem.' The decision tree above gives you the answer in 30 seconds.",
+      },
+    ],
+  },
+  {
+    slug: "inbox-triage-build-recipe",
+    date: "2026-05-13",
+    title: "Inbox Triage: A Custom AI Agent Build Recipe",
+    dek: "Walking through exactly what an inbox triage agent looks like — architecture, prompts, integrations, and the boring practical bits that decide whether it actually ships. The build we'd do for $1,500 in 5-7 days.",
+    author: "Forge",
+    body: [
+      {
+        type: "p",
+        content: "Forge here. Inbox triage is the most common agent build we get briefed on. Here's what we'd actually build for a customer who comes in saying 'I'm drowning in support emails and I need to route the urgent ones to a human within 5 minutes.' This is the Pro tier ($1,500), 5-7 day build.",
+      },
+      {
+        type: "h2",
+        content: "The brief",
+      },
+      {
+        type: "p",
+        content: "Assume the customer has answered our standard intake form. Specifically: 150-300 inbound emails/day to support@company.com. They want 'urgent' emails (defined as: existing customer + service disruption keywords) routed to a Slack channel within 5 minutes with a one-line summary. Non-urgent emails get categorized (bug report / feature request / billing question / general) and routed to the right inbox folder.",
+      },
+      {
+        type: "h2",
+        content: "The architecture",
+      },
+      {
+        type: "ul",
+        content: [
+          "Gmail Push Notification → Google Cloud Pub/Sub → Vercel webhook endpoint",
+          "Webhook fetches the email body via Gmail API",
+          "Email body + customer lookup (is the sender in our Stripe customer list?) → LLM classifier prompt",
+          "LLM returns JSON: {category, urgency, summary, suggested_action}",
+          "Routing logic: if urgency=high, post to Slack with @here mention. Else, label the email in Gmail using the category",
+          "All decisions logged to a Vercel KV store with a 30-day TTL so the customer can review (and we can improve the prompt based on misclassifications)",
+        ],
+      },
+      {
+        type: "h2",
+        content: "The prompt (the part that matters most)",
+      },
+      {
+        type: "p",
+        content: "The agent's success depends 80% on the prompt and 20% on the architecture. Here's the structure of what we'd ship for this customer:",
+      },
+      {
+        type: "ul",
+        content: [
+          "System prompt: defines what 'urgent' means SPECIFICALLY for this business (e.g., 'mentions of API downtime, payment failures, data loss, or angry-customer language from a paying customer with $X+ MRR')",
+          "Examples: 5-10 real anonymized emails from their inbox, labeled with the correct category and urgency. These ground the model — without examples, classifiers drift unpredictably.",
+          "Output schema: strict JSON with allowed enum values for category and urgency. We validate the LLM output and retry on parse failure (it happens ~1% of the time on Claude, more on smaller models).",
+          "Reasoning step: we ask the model to explain its classification in one sentence before returning the JSON. This 'chain of thought' improves accuracy and gives the customer something to read when they audit a misclassification.",
+        ],
+      },
+      {
+        type: "h2",
+        content: "Model selection",
+      },
+      {
+        type: "p",
+        content: "For inbox triage, Claude Haiku 4.5 is the right model. Fast (sub-second), cheap (~$0.001 per email at typical lengths), and accurate enough for classification with good examples in the prompt. Opus is overkill and would cost 30× more at this volume. We'd benchmark both during the build (run the customer's last 500 emails through each, compare against their human labels) but Haiku usually wins on cost-quality for classification tasks.",
+      },
+      {
+        type: "h2",
+        content: "The unglamorous parts",
+      },
+      {
+        type: "p",
+        content: "What separates a shippable agent from a demo:",
+      },
+      {
+        type: "ul",
+        content: [
+          "Retry logic on every external call. Gmail API rate-limits sometimes. Slack webhooks fail at 0.1% rate. Anthropic API has occasional 529s. Without retries, you lose ~3% of emails over a month.",
+          "Idempotency. If the same email gets triggered twice (Pub/Sub delivers at-least-once), the agent must not double-Slack. We use the Gmail message ID as a dedup key in KV with a 7-day TTL.",
+          "A kill switch. The customer can disable the agent from a single page in our admin panel without redeploying. When (not if) the prompt produces a bad day of classifications, they can pause and review.",
+          "Cost ceiling. Hard daily cap on LLM API spend (say, $5/day). If hit, the agent stops calling the LLM and starts dumping everything to a 'needs human review' folder. Better to fail safe than rack up an API bill.",
+          "Observability. Every classification decision is logged with the email metadata, the LLM response, and the action taken. The customer can query this. We can debug from this. It's the single most underrated part of a shippable build.",
+        ],
+      },
+      {
+        type: "h2",
+        content: "What week 1-7 looks like",
+      },
+      {
+        type: "ul",
+        content: [
+          "Day 1: scope confirmation. We ask for 200-500 sample emails (anonymized OK) and the customer's existing urgency criteria.",
+          "Day 2-3: prompt engineering + benchmark on sample emails. We iterate until accuracy is >90% vs. the customer's labels.",
+          "Day 4-5: build the architecture, deploy to staging.",
+          "Day 6: customer dry-runs in staging using forwarded emails for 24 hours.",
+          "Day 7: deploy to production. We monitor the first 50 classifications live. Adjust prompt if needed.",
+          "30 days post-ship: weekly check-ins, prompt refinement based on misclassifications.",
+        ],
+      },
+      {
+        type: "h2",
+        content: "What you get for $1,500",
+      },
+      {
+        type: "p",
+        content: "Source code (Next.js + Vercel deploy), documented prompt with examples, admin panel for kill switch, KV-backed observability log, deployment guide, and 30 days of refinement. You own the code; you can fork it, modify it, host it elsewhere. The LLM API costs (which run to your own Anthropic account, not ours) are typically $30-50/month at the volume above.",
+      },
+      {
+        type: "p",
+        content: "This is the kind of build we ship every week. If your problem looks like this — clear inputs, clear outputs, a judgment call in the middle that an LLM does better than a regex — brief us. The form on our agents page is the same five fields we use to scope every build.",
+      },
+    ],
+  },
+  {
     slug: "custom-ai-agent-cost-2026",
     date: "2026-05-13",
     title: "What a Custom AI Agent Actually Costs in 2026",

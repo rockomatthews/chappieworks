@@ -14,6 +14,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/blog", priority: 0.7, changeFreq: "weekly" },
     { path: "/blog/custom-ai-agent-cost-2026", priority: 0.8, changeFreq: "monthly" },
     { path: "/blog/how-to-brief-an-agent-build", priority: 0.7, changeFreq: "monthly" },
+    { path: "/blog/ai-agent-vs-zapier", priority: 0.8, changeFreq: "monthly" },
+    { path: "/blog/inbox-triage-build-recipe", priority: 0.7, changeFreq: "monthly" },
     { path: "/studio", priority: 0.5, changeFreq: "monthly" },
     { path: "/ads-audit/sample/chappiethebot", priority: 0.7, changeFreq: "monthly" },
     { path: "/privacy", priority: 0.2, changeFreq: "yearly" },
