@@ -2,6 +2,10 @@ import Link from "next/link";
 import { CreditedBy } from "../components/CreditedBy";
 import { IntakeForm, type IntakeField } from "../components/IntakeForm";
 
+const STRIPE_STARTER = process.env.NEXT_PUBLIC_STRIPE_AGENT_STARTER ?? "#";
+const STRIPE_STANDARD = process.env.NEXT_PUBLIC_STRIPE_AGENT_STANDARD ?? "#";
+const STRIPE_PREMIUM = process.env.NEXT_PUBLIC_STRIPE_AGENT_PREMIUM ?? "#";
+
 export const metadata = {
   title: "Custom AI agent · $500–$1,500 · 5–7 days — Chappie Works",
   description:
@@ -59,9 +63,10 @@ const AGENT_FIELDS: IntakeField[] = [
     name: "budget",
     label: "Target tier",
     options: [
-      "Starter — $500 (single task, 5 days)",
-      "Pro — $1,500 (multi-step, 2–3 integrations, 7 days)",
-      "Enterprise — let's scope it (14+ days)",
+      "Starter — $500 (single task, 1 integration, 5 days)",
+      "Standard — $1,000 (2 integrations, webhook/cron, 6 days)",
+      "Pro — $1,500 (3 integrations, full runbooks, 7 days)",
+      "Enterprise — custom (14+ days, let's scope it)",
       "Not sure — recommend a tier",
     ],
     required: true,
@@ -140,6 +145,7 @@ export default function Agents() {
       price: "$500",
       time: "5 days",
       scope: "Single task, one integration, simple rule-based logic",
+      payLink: STRIPE_STARTER,
       examples: [
         "Form → lead scoring → Slack notification",
         "CSV upload → cleanup → download",
@@ -153,11 +159,31 @@ export default function Agents() {
       ],
     },
     {
+      name: "Standard Agent",
+      price: "$1,000",
+      time: "6 days",
+      scope: "Multi-source agent, 2 integrations, webhook or cron",
+      payLink: STRIPE_STANDARD,
+      examples: [
+        "Webhook → classify → database → Slack alert",
+        "Nightly CSV → enrich → CRM sync",
+        "Inbox → triage → auto-reply + routing",
+      ],
+      includes: [
+        "6-day delivery",
+        "3 weeks of post-launch support",
+        "Architecture diagram + integration guide",
+        "Hosted endpoint or on-premise",
+        "You own the code",
+      ],
+    },
+    {
       name: "Pro Agent",
       price: "$1,500",
       time: "7 days",
       featured: true,
-      scope: "Multi-step workflow, 2–3 integrations, complex logic",
+      scope: "Multi-step workflow, 3 integrations, full runbooks",
+      payLink: STRIPE_PREMIUM,
       examples: [
         "Inbound form → intent classification → CRM insert → sales Slack → calendar hold",
         "PDF batch → OCR → extraction → database → webhook",
@@ -165,10 +191,11 @@ export default function Agents() {
       ],
       includes: [
         "7-day delivery",
-        "3 weeks of post-launch support",
+        "30-day post-launch support",
         "3 monthly check-ins after launch",
         "Hosted endpoint or on-premise (your choice)",
         "Full runbooks, architecture diagram, integration guide",
+        "You own the code",
       ],
     },
     {
@@ -176,6 +203,7 @@ export default function Agents() {
       price: "Custom",
       time: "14+ days",
       scope: "Multi-agent systems, fine-tuning, compliance hardening",
+      payLink: null,
       examples: [
         "Multi-agent competitive intelligence (crawl → analyze → synthesize → report)",
         "Internal AI pair-programmer (review + generate + test)",
@@ -217,6 +245,39 @@ export default function Agents() {
             You own it after launch — host it, fork it, kill it, your call.
           </p>
 
+          {/* Process flow — the main advertised promise */}
+          <div className="mt-10 card rounded-xl p-6 sm:p-8 max-w-3xl">
+            <p className="text-xs mono text-[var(--color-gold)] uppercase tracking-widest mb-5">
+              How it works — no surprises
+            </p>
+            <div className="flex flex-col sm:flex-row gap-0">
+              {[
+                { step: "01", label: "Brief the build", sub: "90-sec form. Plain English." },
+                { step: "02", label: "Get your spec", sub: "1-page scope in 24 hours." },
+                { step: "03", label: "Approve & pay", sub: "Only pay once you agree." },
+                { step: "04", label: "Build starts", sub: "Next morning. Daily updates." },
+              ].map((s, i, arr) => (
+                <div key={s.step} className="flex sm:flex-col flex-row items-start sm:items-center sm:flex-1 gap-3 sm:gap-2 sm:text-center">
+                  <div className="flex sm:flex-col items-center gap-2 sm:gap-1 flex-shrink-0">
+                    <div className="w-8 h-8 rounded-full bg-[var(--color-gold)] text-[var(--color-ink)] flex items-center justify-center font-bold text-xs flex-shrink-0">
+                      {s.step}
+                    </div>
+                    {i < arr.length - 1 && (
+                      <div className="hidden sm:block w-px flex-1 min-h-[2rem] bg-[var(--color-gold)]/20" />
+                    )}
+                  </div>
+                  <div className="pb-4 sm:pb-0">
+                    <p className="font-semibold text-sm">{s.label}</p>
+                    <p className="text-xs text-[var(--color-mute)] mt-0.5">{s.sub}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <p className="text-sm text-[var(--color-gold)] font-medium mt-6 pt-5 border-t border-white/5">
+              You never pay before seeing exactly what you're getting. Spec first. Payment after approval. Build starts the next morning.
+            </p>
+          </div>
+
           <div className="grid md:grid-cols-3 gap-4 mt-12">
             {tiers.map((t) => (
               <div
@@ -256,6 +317,29 @@ export default function Agents() {
                     </li>
                   ))}
                 </ul>
+                <div className="mt-5 pt-4 border-t border-white/5">
+                  {t.payLink ? (
+                    <a
+                      href={t.payLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`block text-center w-full px-4 py-2.5 rounded-md text-sm font-medium transition ${
+                        t.featured
+                          ? "bg-[var(--color-gold)] text-[var(--color-ink)] hover:opacity-90"
+                          : "border border-[var(--color-gold)]/40 text-[var(--color-gold)] hover:border-[var(--color-gold)] hover:bg-[var(--color-gold)]/5"
+                      }`}
+                    >
+                      Pay {t.price} after spec approval →
+                    </a>
+                  ) : (
+                    <a
+                      href="#intake"
+                      className="block text-center w-full px-4 py-2.5 rounded-md text-sm font-medium border border-white/15 text-[var(--color-mute)] hover:border-[var(--color-gold)] hover:text-[var(--color-gold)] transition"
+                    >
+                      Brief us to get a quote →
+                    </a>
+                  )}
+                </div>
               </div>
             ))}
           </div>
