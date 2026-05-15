@@ -5,7 +5,7 @@ export const alt = "Chappie Works — custom AI agents, with free SEO + ads audi
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-const LOGO_URL = "https://chappieworks.com/chappieTheBotLogo.png";
+const LOGO_URL = "https://chappieworks.com/chappieWorksEmblemDetailed.png";
 
 export default function OGImage() {
   return new ImageResponse(
@@ -30,8 +30,8 @@ export default function OGImage() {
         <div
           style={{
             display: "flex",
-            width: "400px",
-            height: "400px",
+            width: "350px",
+            height: "494px",
             borderRadius: "36px",
             boxShadow:
               "0 24px 96px rgba(0,0,0,0.75), 0 0 0 1px rgba(201,164,55,0.25)",
@@ -43,8 +43,8 @@ export default function OGImage() {
           <img
             src={LOGO_URL}
             alt=""
-            width={400}
-            height={400}
+            width={350}
+            height={494}
             style={{ display: "block", width: "100%", height: "100%" }}
           />
         </div>

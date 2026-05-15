@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 const AUDITS = [
   {
@@ -64,6 +65,16 @@ function Hero() {
           >
             Or start with a free audit
           </a>
+        </div>
+        <div className="flex justify-center mt-10">
+          <Image
+            src="/chappieWorksEmblemDetailed.png"
+            alt="Chappie Works — mech with shovel"
+            width={226}
+            height={320}
+            className="drop-shadow-2xl"
+            priority
+          />
         </div>
       </div>
     </section>
