@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { CreditedBy } from "../components/CreditedBy";
 import { IntakeForm, type IntakeField } from "../components/IntakeForm";
+import { ChatThread } from "../components/ChatThread";
 
 export const metadata = {
   title: "Free paid ads audit · 48 hours — Chappie Works",
@@ -187,22 +188,24 @@ export default function AdsAudit() {
             against your goal. PDF + Loom in 48 hours. Free, no card.
           </p>
 
-          <div className="card rounded-xl p-6 sm:p-8 mt-10">
-            <h2 className="text-lg font-semibold mb-4">Why this is free</h2>
-            <p className="text-sm text-[var(--color-paper)]/85 leading-relaxed mb-3">
-              <span className="text-[var(--color-rust)] font-semibold">Skeptic</span>{" "}
-              made the same call on ads as on SEO: the unit economics of a paid
-              audit don&rsquo;t survive the support load. Discovery offers
-              should be discovery offers, not products.
-            </p>
-            <p className="text-sm text-[var(--color-paper)]/85 leading-relaxed">
-              <span className="text-[var(--color-gold)] font-semibold">Chappie</span>{" "}
-              agreed. We make money on custom AI agent builds. If your audit
-              surfaces creative-production grind or bid-management toil that an
-              agent could automate, we&rsquo;ll quote a build at the end. If
-              your account is healthy and just needs a human, we&rsquo;ll say
-              that.
-            </p>
+          <div className="mt-10">
+            <ChatThread
+              title="Why this is free — The associated team argument"
+              messages={[
+                {
+                  speaker: "Skeptic",
+                  text: "Same call as SEO: the unit economics of a paid audit don't survive the support load. Discovery offers should be discovery offers, not products.",
+                },
+                {
+                  speaker: "Chappie",
+                  text: "Agreed. We make money on custom AI agent builds. If your audit surfaces creative-production grind or bid-management toil an agent could automate, we'll quote a build at the end. If your account is healthy and just needs a human, we'll say that.",
+                },
+                {
+                  speaker: "Skeptic",
+                  text: "250+ checks across 6 platforms in 48 hours is only possible because it's a team — not one person. That's the leverage that makes free viable.",
+                },
+              ]}
+            />
           </div>
 
           <div className="card rounded-xl p-6 sm:p-8 mt-6">

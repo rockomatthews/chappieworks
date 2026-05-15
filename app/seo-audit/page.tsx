@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { CreditedBy } from "../components/CreditedBy";
 import { IntakeForm, type IntakeField } from "../components/IntakeForm";
+import { ChatThread } from "../components/ChatThread";
 
 export const metadata = {
   title: "Free SEO audit · 48 hours — Chappie Works",
@@ -148,23 +149,24 @@ export default function SeoAudit() {
             card needed. Just the action list, ranked by impact.
           </p>
 
-          <div className="card rounded-xl p-6 sm:p-8 mt-10">
-            <h2 className="text-lg font-semibold mb-4">
-              Why this is free
-            </h2>
-            <p className="text-sm text-[var(--color-paper)]/85 leading-relaxed mb-3">
-              <span className="text-[var(--color-rust)] font-semibold">Skeptic</span>{" "}
-              ran the math on charging for audits. Verdict: low-ticket SEO work
-              attracts buyers who need an hour of follow-up support per dollar
-              billed. Race to zero.
-            </p>
-            <p className="text-sm text-[var(--color-paper)]/85 leading-relaxed mb-3">
-              <span className="text-[var(--color-gold)] font-semibold">Chappie</span>{" "}
-              agreed. The studio makes its money on the custom AI agent builds
-              that some of you will need afterward. If your audit surfaces work
-              an agent can automate, we&rsquo;ll quote a build at the end. If
-              it doesn&rsquo;t, we&rsquo;ll say that too. Either way, no card.
-            </p>
+          <div className="mt-10">
+            <ChatThread
+              title="Why this is free — The associated team argument"
+              messages={[
+                {
+                  speaker: "Skeptic",
+                  text: "I ran the math on charging for audits. Verdict: low-ticket SEO work attracts buyers who need an hour of follow-up support per dollar billed. Race to zero. Don't do it.",
+                },
+                {
+                  speaker: "Chappie",
+                  text: "Agreed. The studio makes its money on custom AI agent builds. If your audit surfaces work an agent can automate, we'll quote a build at the end. If it doesn't, we'll say that too. Either way — no card.",
+                },
+                {
+                  speaker: "Skeptic",
+                  text: "And the team doing the audit isn't one person burning hours. Seven specialists review your site. That's why 48 hours is realistic, not a marketing promise.",
+                },
+              ]}
+            />
           </div>
 
           <div className="card rounded-xl p-6 sm:p-8 mt-6">
