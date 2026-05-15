@@ -67,11 +67,11 @@ function Lightbox({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/90 sm:p-4"
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-4xl bg-[var(--color-raven)] rounded-xl overflow-hidden flex flex-col sm:flex-row"
+        className="relative w-full max-w-4xl bg-[var(--color-raven)] rounded-t-2xl sm:rounded-xl flex flex-col sm:flex-row max-h-[92vh] sm:max-h-[88vh] overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close */}
@@ -83,8 +83,8 @@ function Lightbox({
           ✕
         </button>
 
-        {/* Main image */}
-        <div className="relative sm:w-3/5 aspect-[3/4] bg-[var(--color-raven)] flex-shrink-0">
+        {/* Main image — capped on mobile so panel + buy button stay visible */}
+        <div className="relative sm:w-3/5 bg-[var(--color-raven)] flex-shrink-0 h-[45vh] sm:h-auto sm:aspect-[3/4]">
           {active && (
             <Image
               src={active.url}
@@ -117,8 +117,8 @@ function Lightbox({
           )}
         </div>
 
-        {/* Info panel */}
-        <div className="flex flex-col p-6 sm:w-2/5 gap-4">
+        {/* Info panel — scrollable on mobile so Buy button is always reachable */}
+        <div className="flex flex-col p-5 sm:p-6 sm:w-2/5 gap-3 overflow-y-auto">
           <div>
             <h2 className="text-xl font-semibold tracking-tight mb-1">
               {product.name}
@@ -153,12 +153,12 @@ function Lightbox({
             </div>
           )}
 
-          <div className="mt-auto pt-4">
+          <div className="pt-3 mt-auto">
             <a
               href={`https://${product.shopDomain}/products/${product.slug}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="block text-center w-full px-4 py-3 rounded-md bg-[var(--color-gold)] text-[var(--color-ink)] font-medium hover:opacity-90 transition"
+              className="block text-center w-full px-4 py-3.5 rounded-md bg-[var(--color-gold)] text-[var(--color-ink)] font-semibold hover:opacity-90 transition text-base"
             >
               Buy now
             </a>
