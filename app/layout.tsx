@@ -4,6 +4,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 import { Header } from "./components/Header";
 import { Footer } from "./components/Footer";
+import { ScribeChat } from "./components/ScribeChat";
 
 export const metadata: Metadata = {
   title: "Chappie Works — custom AI agents, with free SEO + ads audits",
@@ -75,6 +76,7 @@ export default function RootLayout({
         <Header />
         {children}
         <Footer />
+        <ScribeChat />
         <Analytics />
         <SpeedInsights />
       </body>

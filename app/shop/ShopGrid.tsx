@@ -71,7 +71,7 @@ function Lightbox({
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-4xl bg-[var(--color-raven)] rounded-t-2xl sm:rounded-xl flex flex-col sm:flex-row max-h-[92vh] sm:max-h-[88vh] overflow-hidden"
+        className="relative w-full max-w-4xl bg-[var(--color-raven)] rounded-t-2xl sm:rounded-xl flex flex-col sm:flex-row max-h-[92vh] sm:max-h-[88vh] overflow-y-auto sm:overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close */}
@@ -84,7 +84,7 @@ function Lightbox({
         </button>
 
         {/* Main image — capped on mobile so panel + buy button stay visible */}
-        <div className="relative sm:w-3/5 bg-[var(--color-raven)] flex-shrink-0 h-[45vh] sm:h-auto sm:aspect-[3/4]">
+        <div className="relative sm:w-3/5 bg-[var(--color-raven)] flex-shrink-0 h-[40vh] sm:h-auto sm:aspect-[3/4]">
           {active && (
             <Image
               src={active.url}

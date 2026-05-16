@@ -4,5 +4,11 @@
       "path": "/api/cron/brief",
       "schedule": "0 11 * * *"
     }
-  ]
+  ],
+  "functions": {
+    "app/api/seo-audit/run/route.ts": {
+      "maxDuration": 300,
+      "memory": 3008
+    }
+  }
 }

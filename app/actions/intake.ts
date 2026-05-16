@@ -1,8 +1,14 @@
 "use server";
 
+import { createHmac } from "crypto";
+import { after } from "next/server";
 import { revalidatePath } from "next/cache";
 
-export type IntakeFormType = "agents" | "seo-audit" | "ads-audit";
+export type IntakeFormType =
+  | "agents"
+  | "seo-audit"
+  | "ads-audit"
+  | "photoshoot";
 
 export type IntakeResult =
   | { ok: true; message: string }
@@ -19,15 +25,18 @@ const FORM_TITLES: Record<IntakeFormType, string> = {
   agents: "Custom Agent Intake",
   "seo-audit": "Free SEO Audit",
   "ads-audit": "Free Ads Audit",
+  photoshoot: "Free Brand Aesthetic Preview",
 };
 
 const SUCCESS_COPY: Record<IntakeFormType, string> = {
   agents:
     "Got it. I'll send a one-page spec — scope, tier, price, ship date — within 24 hours.",
   "seo-audit":
-    "Got it. Audit lands in your inbox in 48 hours. I'll ping within 24 to confirm scope.",
+    "Got it. Audit is running now. PDF lands in your inbox in minutes from intake@chappieworks.com — check spam just in case.",
   "ads-audit":
     "Got it. Audit lands in your inbox in 48 hours. I'll ping within 24 to confirm access.",
+  photoshoot:
+    "Got it. The studio is generating your 3-image preview right now. Look for it in your inbox in 2–3 minutes from intake@chappieworks.com — check spam just in case.",
 };
 
 export async function submitIntake(
@@ -97,9 +106,132 @@ export async function submitIntake(
   // Best-effort email notification via Resend.
   await tryNotifyByResend(submission);
 
+  // If it's an SEO audit, kick off the autonomous pipeline after the response
+  // is sent so the user doesn't wait on PDF generation.
+  if (formType === "seo-audit" && submission.fields.url) {
+    after(() => triggerSeoAudit(submission));
+  }
+
+  // If it's a photoshoot preview, kick off the image-generation pipeline.
+  if (formType === "photoshoot" && submission.fields.brand_description) {
+    after(() => triggerPhotoshoot(submission));
+  }
+
   revalidatePath(`/${formType === "agents" ? "agents" : formType}`);
 
   return { ok: true, message: SUCCESS_COPY[formType] };
+}
+
+async function triggerSeoAudit(submission: {
+  formType: IntakeFormType;
+  name: string;
+  email: string;
+  fields: Record<string, string>;
+}) {
+  const secret = process.env.INTAKE_WEBHOOK_SECRET;
+  if (!secret) {
+    console.error(
+      "[chappieworks:intake] INTAKE_WEBHOOK_SECRET not set — cannot trigger audit",
+    );
+    return;
+  }
+  const baseUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : "http://localhost:3000";
+
+  const payload = {
+    name: submission.name,
+    email: submission.email,
+    url: submission.fields.url,
+    primary_goal: submission.fields.primary_goal,
+    gsc_access: submission.fields.gsc_access,
+    target_keywords: submission.fields.target_keywords,
+    notes: submission.fields.notes,
+  };
+  const body = JSON.stringify(payload);
+  const sig = createHmac("sha256", secret).update(body).digest("hex");
+
+  try {
+    const res = await fetch(`${baseUrl}/api/seo-audit/run`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-chappie-sig": sig,
+      },
+      body,
+    });
+    if (!res.ok) {
+      console.error(
+        "[chappieworks:intake] audit trigger failed",
+        res.status,
+        await res.text(),
+      );
+    } else {
+      console.log("[chappieworks:intake] audit triggered for", submission.email);
+    }
+  } catch (err) {
+    console.error("[chappieworks:intake] audit trigger threw", err);
+  }
+}
+
+async function triggerPhotoshoot(submission: {
+  formType: IntakeFormType;
+  name: string;
+  email: string;
+  fields: Record<string, string>;
+}) {
+  const secret = process.env.INTAKE_WEBHOOK_SECRET;
+  if (!secret) {
+    console.error(
+      "[chappieworks:intake] INTAKE_WEBHOOK_SECRET not set — cannot trigger photoshoot",
+    );
+    return;
+  }
+  const baseUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : "http://localhost:3000";
+
+  const payload = {
+    name: submission.name,
+    email: submission.email,
+    brand_name: submission.fields.brand_name,
+    brand_description: submission.fields.brand_description,
+    industry: submission.fields.industry,
+    vibe: submission.fields.vibe,
+    color_palette: submission.fields.color_palette,
+    reference_url: submission.fields.reference_url,
+  };
+  const body = JSON.stringify(payload);
+  const sig = createHmac("sha256", secret).update(body).digest("hex");
+
+  try {
+    const res = await fetch(`${baseUrl}/api/photoshoot/run`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-chappie-sig": sig,
+      },
+      body,
+    });
+    if (!res.ok) {
+      console.error(
+        "[chappieworks:intake] photoshoot trigger failed",
+        res.status,
+        await res.text(),
+      );
+    } else {
+      console.log(
+        "[chappieworks:intake] photoshoot triggered for",
+        submission.email,
+      );
+    }
+  } catch (err) {
+    console.error("[chappieworks:intake] photoshoot trigger threw", err);
+  }
 }
 
 async function tryNotifyByResend(submission: {

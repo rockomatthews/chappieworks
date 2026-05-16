@@ -13,9 +13,9 @@ export const dynamic = "force-dynamic";
 const MAX_PROMPT_LEN = 800;
 const MIN_PROMPT_LEN = 10;
 
-// Kling 1.6 Pro on Replicate — ~$1.50 per 5s clip, good quality/price tradeoff
+// Runway Gen-3 on Replicate — text-to-video, ~$0.06 per generation
 const MODEL =
-  "kwaivgi/kling-v1.6-pro" as `${string}/${string}`;
+  "runwayml/gen-3-turbo" as `${string}/${string}`;
 
 type GenerateBody = {
   prompt?: string;
@@ -69,9 +69,6 @@ export async function POST(req: Request) {
       model: MODEL,
       input: {
         prompt,
-        duration: 5,
-        aspect_ratio: "16:9",
-        cfg_scale: 0.5,
       },
     });
 

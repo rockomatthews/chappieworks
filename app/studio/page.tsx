@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { PERSONAS } from "../lib/personas";
 import OrgChart from "../components/OrgChart";
@@ -59,8 +60,8 @@ export default function Studio() {
 
           <OrgChart />
 
-          <div className="mt-12 space-y-4">
-            {PERSONAS.map((p) => {
+          <div className="mt-12 space-y-5">
+            {PERSONAS.map((p, idx) => {
               const accentClass =
                 p.accent === "gold"
                   ? "text-[var(--color-gold)]"
@@ -69,43 +70,72 @@ export default function Studio() {
                 p.accent === "gold"
                   ? "ring-[var(--color-gold)]/30"
                   : "ring-[var(--color-rust)]/40";
+              const portraitRing =
+                p.accent === "gold"
+                  ? "0 0 0 2px var(--color-gold), 0 0 32px -8px rgba(201,164,55,0.55)"
+                  : "0 0 0 2px var(--color-rust), 0 0 32px -8px rgba(139,74,43,0.6)";
+              const catalogId = String(idx + 1).padStart(2, "0");
               return (
                 <article
                   key={p.slug}
                   id={p.slug}
                   className={`card rounded-xl p-6 sm:p-8 ring-1 ${ringClass} scroll-mt-24`}
                 >
-                  <header className="flex flex-wrap items-baseline justify-between gap-3 mb-3">
-                    <div className="flex items-baseline gap-3">
-                      <h2 className={`text-2xl font-semibold ${accentClass}`}>
-                        {p.name}
-                      </h2>
-                      <span className="text-sm mono text-[var(--color-mute)]">
-                        {p.role}
-                      </span>
+                  <div className="flex flex-col sm:flex-row gap-5 sm:gap-7">
+                    <div className="flex sm:flex-col items-center sm:items-start gap-4 sm:gap-2 sm:w-[140px] sm:flex-shrink-0">
+                      <div
+                        className="relative w-[110px] h-[110px] sm:w-[140px] sm:h-[140px] rounded-lg overflow-hidden flex-shrink-0 transition-transform duration-300 hover:scale-[1.03]"
+                        style={{ boxShadow: portraitRing }}
+                      >
+                        <Image
+                          src={`/profileShot${p.name}.png`}
+                          alt={`${p.name} — ${p.role}`}
+                          fill
+                          sizes="(max-width: 640px) 110px, 140px"
+                          className="object-cover"
+                        />
+                      </div>
+                      <div className="flex flex-col gap-0.5 sm:items-start">
+                        <span
+                          className={`text-[10px] mono uppercase tracking-[0.18em] ${accentClass}`}
+                        >
+                          Studio · {catalogId} / 07
+                        </span>
+                        <span className="text-[10px] mono text-[var(--color-mute)] uppercase tracking-widest">
+                          #{p.slug}
+                        </span>
+                      </div>
                     </div>
-                    <span className="text-xs mono text-[var(--color-mute)]">
-                      #{p.slug}
-                    </span>
-                  </header>
-                  <p className="text-base text-[var(--color-paper)] font-medium mb-3">
-                    {p.tagline}
-                  </p>
-                  <p className="text-sm text-[var(--color-paper)]/85 leading-relaxed mb-4">
-                    {p.bio}
-                  </p>
-                  <blockquote
-                    className={`border-l-2 ${
-                      p.accent === "gold"
-                        ? "border-[var(--color-gold)]"
-                        : "border-[var(--color-rust)]"
-                    } pl-4 my-4 italic text-[var(--color-paper)]/90`}
-                  >
-                    &ldquo;{p.quote}&rdquo;
-                  </blockquote>
-                  <p className="text-xs mono text-[var(--color-mute)]">
-                    <span className={accentClass}>Owns:</span> {p.owns}
-                  </p>
+
+                    <div className="flex-1 min-w-0">
+                      <header className="flex flex-wrap items-baseline gap-x-3 gap-y-1 mb-3">
+                        <h2 className={`text-2xl font-semibold ${accentClass}`}>
+                          {p.name}
+                        </h2>
+                        <span className="text-sm mono text-[var(--color-mute)]">
+                          {p.role}
+                        </span>
+                      </header>
+                      <p className="text-base text-[var(--color-paper)] font-medium mb-3">
+                        {p.tagline}
+                      </p>
+                      <p className="text-sm text-[var(--color-paper)]/85 leading-relaxed mb-4">
+                        {p.bio}
+                      </p>
+                      <blockquote
+                        className={`border-l-2 ${
+                          p.accent === "gold"
+                            ? "border-[var(--color-gold)]"
+                            : "border-[var(--color-rust)]"
+                        } pl-4 my-4 italic text-[var(--color-paper)]/90`}
+                      >
+                        &ldquo;{p.quote}&rdquo;
+                      </blockquote>
+                      <p className="text-xs mono text-[var(--color-mute)]">
+                        <span className={accentClass}>Owns:</span> {p.owns}
+                      </p>
+                    </div>
+                  </div>
                 </article>
               );
             })}
