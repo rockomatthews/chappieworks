@@ -3,49 +3,40 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 function WatermarkOverlay({ jobId }: { jobId: string }) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    const updateCanvas = () => {
-      const rect = canvas.parentElement?.getBoundingClientRect();
-      if (!rect) return;
-
-      canvas.width = rect.width;
-      canvas.height = rect.height;
-
-      ctx.fillStyle = "rgba(0, 0, 0, 0)";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      ctx.font = "bold 72px sans-serif";
-      ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-
-      const text = "CHAPPIE WORKS PREVIEW";
-      ctx.fillText(text, canvas.width / 2, canvas.height / 2);
-
-      ctx.font = "28px sans-serif";
-      ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
-      ctx.fillText("chappieworks.com/movie · buy to remove", canvas.width / 2, canvas.height - 40);
-    };
-
-    updateCanvas();
-    window.addEventListener("resize", updateCanvas);
-    return () => window.removeEventListener("resize", updateCanvas);
-  }, []);
-
   return (
-    <canvas
-      ref={canvasRef}
-      className="absolute inset-0 rounded-md pointer-events-none"
+    <svg
+      className="absolute inset-0 rounded-md pointer-events-none z-10"
+      viewBox="0 0 1920 1080"
+      preserveAspectRatio="xMidYMid slice"
       style={{ width: "100%", height: "100%" }}
-    />
+    >
+      {/* Center watermark */}
+      <text
+        x="960"
+        y="540"
+        fontSize="120"
+        fontWeight="bold"
+        fill="rgba(255,255,255,0.35)"
+        textAnchor="middle"
+        dominantBaseline="middle"
+        fontFamily="sans-serif"
+      >
+        CHAPPIE WORKS PREVIEW
+      </text>
+
+      {/* Bottom watermark */}
+      <text
+        x="960"
+        y="980"
+        fontSize="48"
+        fill="rgba(255,255,255,0.5)"
+        textAnchor="middle"
+        dominantBaseline="middle"
+        fontFamily="monospace"
+      >
+        chappieworks.com/movie · buy to remove
+      </text>
+    </svg>
   );
 }
 
@@ -301,7 +292,10 @@ export function MovieGenerator() {
       {job && job.status === "ready" && job.previewUrl && (
         <div className="space-y-5">
           <div className="card rounded-xl p-4 ring-2 ring-[var(--color-gold)] overflow-hidden">
-            <div className="relative w-full bg-black rounded-md">
+            <div
+              className="relative w-full bg-black rounded-md overflow-hidden"
+              onContextMenu={(e) => e.preventDefault()}
+            >
               <video
                 src={job.previewUrl}
                 controls
@@ -310,6 +304,7 @@ export function MovieGenerator() {
                 loop
                 playsInline
                 className="w-full rounded-md block"
+                style={{ pointerEvents: "auto" }}
               />
               <WatermarkOverlay jobId={job.jobId} />
             </div>
