@@ -13,9 +13,9 @@ export const dynamic = "force-dynamic";
 const MAX_PROMPT_LEN = 800;
 const MIN_PROMPT_LEN = 10;
 
-// Runway Gen-3 on Replicate — text-to-video, ~$0.06 per generation
+// Hunyuan Video on Replicate — text-to-video
 const MODEL =
-  "runwayml/gen-3-turbo" as `${string}/${string}`;
+  "tencent/hunyuan-video" as `${string}/${string}`;
 
 type GenerateBody = {
   prompt?: string;
