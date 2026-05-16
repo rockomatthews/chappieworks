@@ -33,8 +33,10 @@ async function burnWatermark(cleanMp4: Buffer): Promise<Buffer> {
   const workDir = await mkdtemp(path.join(tmpdir(), "movie-"));
   const inPath = path.join(workDir, "in.mp4");
   const outPath = path.join(workDir, "out.mp4");
+  console.log("[chappieworks:watermark] workdir", workDir, "ffmpegPath", ffmpegPath);
   try {
     await writeFile(inPath, cleanMp4);
+    console.log("[chappieworks:watermark] wrote input file", inPath);
 
     // Two-layer watermark: large diagonal "CHAPPIE WORKS PREVIEW" text +
     // smaller bottom-strip URL. Both are burned into the pixels so the
@@ -51,23 +53,34 @@ async function burnWatermark(cleanMp4: Buffer): Promise<Buffer> {
       "box=1:boxcolor=black@0.5:boxborderw=14";
 
     return await new Promise<Buffer>((resolve, reject) => {
-      const timeout = setTimeout(
-        () => reject(new Error("watermark encoding timeout (120s)")),
-        120000,
-      );
+      console.log("[chappieworks:watermark] starting ffmpeg encoding");
+      const timeout = setTimeout(() => {
+        console.error("[chappieworks:watermark] timeout after 120s");
+        reject(new Error("watermark encoding timeout (120s)"));
+      }, 120000);
       ffmpeg(inPath)
         .videoFilters([drawtext1, drawtext2])
         .outputOptions(["-c:a copy", "-preset veryfast", "-crf 23"])
+        .on("start", (cmd) => {
+          console.log("[chappieworks:watermark] ffmpeg started", cmd);
+        })
+        .on("progress", (prog) => {
+          console.log("[chappieworks:watermark] progress", prog);
+        })
         .on("end", async () => {
+          console.log("[chappieworks:watermark] ffmpeg completed");
           clearTimeout(timeout);
           try {
             const data = await readFile(outPath);
+            console.log("[chappieworks:watermark] read output", data.length, "bytes");
             resolve(data);
           } catch (err) {
+            console.error("[chappieworks:watermark] failed to read output", err);
             reject(err);
           }
         })
         .on("error", (err) => {
+          console.error("[chappieworks:watermark] ffmpeg error", err);
           clearTimeout(timeout);
           reject(err);
         })
@@ -144,9 +157,15 @@ export async function GET(
       // Mark watermarking so concurrent polls don't double-process
       await writeState({ ...state, status: "watermarking" });
 
+      console.log("[chappieworks:movie] downloading video", jobId, url);
       const cleanBuffer = await downloadToBuffer(url);
-      const previewBuffer = await burnWatermark(cleanBuffer);
+      console.log("[chappieworks:movie] video downloaded", jobId, cleanBuffer.length, "bytes");
 
+      console.log("[chappieworks:movie] starting watermark burn", jobId);
+      const previewBuffer = await burnWatermark(cleanBuffer);
+      console.log("[chappieworks:movie] watermark burned", jobId, previewBuffer.length, "bytes");
+
+      console.log("[chappieworks:movie] uploading to blob storage");
       const [previewBlob, cleanBlob] = await Promise.all([
         put(PREVIEW_KEY(jobId), previewBuffer, {
           access: "public",
@@ -161,6 +180,13 @@ export async function GET(
           allowOverwrite: true,
         }),
       ]);
+
+      console.log(
+        "[chappieworks:movie] blobs uploaded",
+        jobId,
+        "preview",
+        previewBlob.url,
+      );
 
       const ready: MovieState = {
         ...state,
@@ -182,7 +208,13 @@ export async function GET(
     return NextResponse.json(publicView(state));
   } catch (err) {
     const message = err instanceof Error ? err.message : "unknown";
-    console.error("[chappieworks:movie] status poll failed", jobId, message);
+    const stack = err instanceof Error ? err.stack : "";
+    console.error(
+      "[chappieworks:movie] status poll failed",
+      jobId,
+      message,
+      stack,
+    );
     return NextResponse.json(publicView(state));
   }
 }
