@@ -50,16 +50,29 @@ async function burnWatermark(cleanMp4: Buffer): Promise<Buffer> {
       "x=(w-text_w)/2:y=h-th-30:" +
       "box=1:boxcolor=black@0.5:boxborderw=14";
 
-    await new Promise<void>((resolve, reject) => {
+    return await new Promise<Buffer>((resolve, reject) => {
+      const timeout = setTimeout(
+        () => reject(new Error("watermark encoding timeout (120s)")),
+        120000,
+      );
       ffmpeg(inPath)
         .videoFilters([drawtext1, drawtext2])
         .outputOptions(["-c:a copy", "-preset veryfast", "-crf 23"])
-        .on("end", () => resolve())
-        .on("error", (err) => reject(err))
+        .on("end", async () => {
+          clearTimeout(timeout);
+          try {
+            const data = await readFile(outPath);
+            resolve(data);
+          } catch (err) {
+            reject(err);
+          }
+        })
+        .on("error", (err) => {
+          clearTimeout(timeout);
+          reject(err);
+        })
         .save(outPath);
     });
-
-    return await readFile(outPath);
   } finally {
     await rm(workDir, { recursive: true, force: true }).catch(() => {});
   }
