@@ -6,14 +6,28 @@ const AUDITS = [
     slug: "seo-audit",
     name: "SEO audit",
     blurb:
-      "Full technical + content audit. GSC pull, Core Web Vitals, schema, keyword gaps, on-page action list. Free.",
-    turnaround: "48 hours",
+      "Full technical + content audit. Core Web Vitals, schema, keyword gaps, on-page action list. AI-generated PDF.",
+    turnaround: "Minutes",
+  },
+  {
+    slug: "photoshoot",
+    name: "Brand visuals preview",
+    blurb:
+      "3 brand-aligned images from your brief — hero banner, social card, moodboard. 2K PNGs, commercial rights yours.",
+    turnaround: "Minutes",
+  },
+  {
+    slug: "movie",
+    name: "Make a movie",
+    blurb:
+      "5-second cinematic clip from a prompt. Watermarked preview free, $14.99 unlocks the unwatermarked HD MP4. Commercial rights yours.",
+    turnaround: "90 seconds",
   },
   {
     slug: "ads-audit",
     name: "Paid ads audit",
     blurb:
-      "250+ checks across Google, Meta, TikTok, LinkedIn, Microsoft. Wasted spend, creative fatigue, kill/scale calls. Free.",
+      "250+ checks across Google, Meta, TikTok, LinkedIn, Microsoft. Wasted spend, creative fatigue, kill/scale calls.",
     turnaround: "48 hours",
   },
 ];
@@ -160,14 +174,15 @@ function Slate() {
             Or start free
           </p>
           <h3 className="text-xl sm:text-2xl font-semibold tracking-tight mb-2 text-center">
-            Two free audits, 48-hour turnaround.
+            Four free previews. Minutes to 48 hours.
           </h3>
           <p className="text-sm text-[var(--color-mute)] text-center mb-8 max-w-xl mx-auto">
             We do these free because the buyers we want next are the ones who
-            need an agent built after. No card, no upsell deck — just the audit
-            and an honest read on whether automation actually fits your shop.
+            need an agent built after. No card, no upsell deck — just the
+            preview and an honest read on whether automation actually fits your
+            shop.
           </p>
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {AUDITS.map((a) => (
               <Link
                 key={a.slug}
