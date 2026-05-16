@@ -161,37 +161,25 @@ export async function GET(
       const cleanBuffer = await downloadToBuffer(url);
       console.log("[chappieworks:movie] video downloaded", jobId, cleanBuffer.length, "bytes");
 
-      console.log("[chappieworks:movie] starting watermark burn", jobId);
-      const previewBuffer = await burnWatermark(cleanBuffer);
-      console.log("[chappieworks:movie] watermark burned", jobId, previewBuffer.length, "bytes");
-
       console.log("[chappieworks:movie] uploading to blob storage");
-      const [previewBlob, cleanBlob] = await Promise.all([
-        put(PREVIEW_KEY(jobId), previewBuffer, {
-          access: "public",
-          contentType: "video/mp4",
-          addRandomSuffix: false,
-          allowOverwrite: true,
-        }),
-        put(CLEAN_KEY(jobId), cleanBuffer, {
-          access: "public",
-          contentType: "video/mp4",
-          addRandomSuffix: false,
-          allowOverwrite: true,
-        }),
-      ]);
+      const cleanBlob = await put(CLEAN_KEY(jobId), cleanBuffer, {
+        access: "public",
+        contentType: "video/mp4",
+        addRandomSuffix: false,
+        allowOverwrite: true,
+      });
 
       console.log(
-        "[chappieworks:movie] blobs uploaded",
+        "[chappieworks:movie] blob uploaded",
         jobId,
-        "preview",
-        previewBlob.url,
+        "url",
+        cleanBlob.url,
       );
 
       const ready: MovieState = {
         ...state,
         status: "ready",
-        previewUrl: previewBlob.url,
+        previewUrl: cleanBlob.url,
         cleanUrl: cleanBlob.url,
         durationSec: 5,
       };
@@ -199,8 +187,8 @@ export async function GET(
       console.log(
         "[chappieworks:movie] job ready",
         jobId,
-        "preview",
-        previewBlob.url,
+        "url",
+        cleanBlob.url,
       );
       return NextResponse.json(publicView(ready));
     }
