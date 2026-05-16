@@ -2,6 +2,53 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
+function WatermarkOverlay({ jobId }: { jobId: string }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const updateCanvas = () => {
+      const rect = canvas.parentElement?.getBoundingClientRect();
+      if (!rect) return;
+
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+
+      ctx.fillStyle = "rgba(0, 0, 0, 0)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.font = "bold 72px sans-serif";
+      ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+
+      const text = "CHAPPIE WORKS PREVIEW";
+      ctx.fillText(text, canvas.width / 2, canvas.height / 2);
+
+      ctx.font = "28px sans-serif";
+      ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
+      ctx.fillText("chappieworks.com/movie · buy to remove", canvas.width / 2, canvas.height - 40);
+    };
+
+    updateCanvas();
+    window.addEventListener("resize", updateCanvas);
+    return () => window.removeEventListener("resize", updateCanvas);
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="absolute inset-0 rounded-md pointer-events-none"
+      style={{ width: "100%", height: "100%" }}
+    />
+  );
+}
+
 type JobStatus = {
   jobId: string;
   status: "pending" | "generating" | "watermarking" | "ready" | "failed";
@@ -254,55 +301,26 @@ export function MovieGenerator() {
       {job && job.status === "ready" && job.previewUrl && (
         <div className="space-y-5">
           <div className="card rounded-xl p-4 ring-2 ring-[var(--color-gold)] overflow-hidden">
-            <video
-              src={job.paid && job.cleanUrl ? job.cleanUrl : job.previewUrl}
-              controls
-              autoPlay
-              loop
-              playsInline
-              className="w-full rounded-md"
-            />
+            <div className="relative w-full bg-black rounded-md">
+              <video
+                src={job.previewUrl}
+                controls
+                autoPlay
+                loop
+                playsInline
+                className="w-full rounded-md block"
+              />
+              <WatermarkOverlay jobId={job.jobId} />
+            </div>
             <div className="flex flex-wrap items-baseline justify-between gap-2 mt-4">
               <p className="text-xs mono text-[var(--color-gold)] uppercase tracking-widest">
-                {job.paid ? "Unlocked · HD" : "Preview · watermarked"}
+                HD Preview
               </p>
               <p className="text-[10px] mono text-[var(--color-mute)]">
                 /m/{job.jobId.slice(0, 8)}…
               </p>
             </div>
           </div>
-
-          {!job.paid && (
-            <div
-              className="card rounded-xl p-6 sm:p-8"
-              style={{
-                background:
-                  "linear-gradient(135deg, rgba(201,164,55,0.1), rgba(201,164,55,0.02))",
-                border: "1px solid rgba(201,164,55,0.4)",
-              }}
-            >
-              <p className="text-xs mono text-[var(--color-gold)] uppercase tracking-widest mb-2">
-                Like it? Unlock the HD download.
-              </p>
-              <h3 className="text-xl font-semibold mb-2">
-                Remove the watermark — $14.99
-              </h3>
-              <p className="text-sm text-[var(--color-paper)]/85 mb-5 leading-relaxed">
-                Get the unwatermarked 1080p MP4 in your inbox + on this page.
-                Commercial rights yours.
-              </p>
-              <button
-                onClick={() => void startCheckout()}
-                disabled={checkoutLoading}
-                className="w-full sm:w-auto px-6 py-3 rounded-md bg-[var(--color-gold)] text-[var(--color-ink)] font-medium hover:opacity-90 transition disabled:opacity-50"
-              >
-                {checkoutLoading ? "Opening checkout…" : "Buy clean HD — $14.99 →"}
-              </button>
-              <p className="text-xs mono text-[var(--color-mute)] mt-3">
-                Secure checkout via Stripe. Apple Pay / Google Pay supported.
-              </p>
-            </div>
-          )}
 
           <button
             onClick={() => {
