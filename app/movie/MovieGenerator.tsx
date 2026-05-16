@@ -30,8 +30,10 @@ export function MovieGenerator() {
   const [error, setError] = useState<string | null>(null);
   const [job, setJob] = useState<JobStatus | null>(null);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [pollError, setPollError] = useState<string | null>(null);
   const pollStartRef = useRef<number>(0);
   const pollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pollAttemptsRef = useRef<number>(0);
 
   const stopPolling = useCallback(() => {
     if (pollTimerRef.current) {
@@ -42,13 +44,20 @@ export function MovieGenerator() {
 
   const pollOnce = useCallback(
     async (jobId: string) => {
+      pollAttemptsRef.current += 1;
       try {
         const res = await fetch(`/api/movie/status/${jobId}`, {
           cache: "no-store",
         });
-        if (!res.ok) throw new Error(`status ${res.status}`);
+        if (!res.ok) {
+          const msg = `status check failed (${res.status})`;
+          console.error("[movie:poll]", msg);
+          setPollError(msg);
+          throw new Error(msg);
+        }
         const data = (await res.json()) as JobStatus;
         setJob(data);
+        setPollError(null);
 
         if (data.status === "ready" || data.status === "failed") {
           stopPolling();
@@ -67,6 +76,9 @@ export function MovieGenerator() {
           POLL_INTERVAL_MS,
         );
       } catch (err) {
+        const msg = err instanceof Error ? err.message : "unknown error";
+        console.error("[movie:poll]", "attempt", pollAttemptsRef.current, msg);
+        setPollError(msg);
         pollTimerRef.current = setTimeout(
           () => void pollOnce(jobId),
           POLL_INTERVAL_MS * 2,
@@ -91,7 +103,9 @@ export function MovieGenerator() {
     }
     setSubmitting(true);
     setJob(null);
+    setPollError(null);
     stopPolling();
+    pollAttemptsRef.current = 0;
     try {
       const res = await fetch("/api/movie/generate", {
         method: "POST",
@@ -215,7 +229,7 @@ export function MovieGenerator() {
       )}
 
       {isRendering && job && (
-        <div className="card rounded-xl p-6 sm:p-8 ring-1 ring-[var(--color-rust)]/40 bg-[var(--color-rust)]/12">
+        <div className="card rounded-xl p-6 sm:p-8 ring-1 ring-[var(--color-rust)] bg-[var(--color-rust)]/25">
           <div className="flex items-center gap-3 mb-3">
             <span className="inline-block w-2 h-2 rounded-full bg-[var(--color-gold)] animate-pulse" />
             <p className="text-xs mono text-[var(--color-gold)] uppercase tracking-widest">
@@ -225,6 +239,11 @@ export function MovieGenerator() {
           <p className="text-base text-[var(--color-paper)] leading-relaxed">
             {STATUS_COPY[job.status]}
           </p>
+          {pollError && (
+            <p className="text-xs mono text-[var(--color-rust)] mt-3 bg-[var(--color-rust)]/10 rounded px-2 py-1">
+              Status check: {pollError}
+            </p>
+          )}
           <p className="text-xs mono text-[var(--color-mute)] mt-3">
             You can stay here or come back later — we&rsquo;ll keep the result
             for 30 days at /m/{job.jobId.slice(0, 8)}…
