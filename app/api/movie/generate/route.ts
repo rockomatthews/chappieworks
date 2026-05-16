@@ -13,9 +13,9 @@ export const dynamic = "force-dynamic";
 const MAX_PROMPT_LEN = 800;
 const MIN_PROMPT_LEN = 10;
 
-// Hunyuan Video on Replicate — text-to-video
+// Alibaba Happy Horse 1.0 on Replicate — text-to-video, 3-15s duration, ~$0.04 per generation
 const MODEL =
-  "tencent/hunyuan-video" as `${string}/${string}`;
+  "alibaba/happyhorse-1.0" as `${string}/${string}`;
 
 type GenerateBody = {
   prompt?: string;
@@ -69,6 +69,9 @@ export async function POST(req: Request) {
       model: MODEL,
       input: {
         prompt,
+        duration: 8,
+        aspect_ratio: "16:9",
+        resolution: "720p",
       },
     });
 
