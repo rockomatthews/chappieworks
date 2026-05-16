@@ -215,7 +215,7 @@ export function MovieGenerator() {
       )}
 
       {isRendering && job && (
-        <div className="card rounded-xl p-6 sm:p-8 ring-1 ring-[var(--color-gold)]/30">
+        <div className="card rounded-xl p-6 sm:p-8 ring-1 ring-[var(--color-rust)]/40 bg-[var(--color-rust)]/12">
           <div className="flex items-center gap-3 mb-3">
             <span className="inline-block w-2 h-2 rounded-full bg-[var(--color-gold)] animate-pulse" />
             <p className="text-xs mono text-[var(--color-gold)] uppercase tracking-widest">
