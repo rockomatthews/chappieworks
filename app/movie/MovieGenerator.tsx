@@ -305,6 +305,7 @@ export function MovieGenerator() {
               <video
                 src={job.previewUrl}
                 controls
+                controlsList="nodownload"
                 autoPlay
                 loop
                 playsInline
@@ -314,12 +315,42 @@ export function MovieGenerator() {
             </div>
             <div className="flex flex-wrap items-baseline justify-between gap-2 mt-4">
               <p className="text-xs mono text-[var(--color-gold)] uppercase tracking-widest">
-                HD Preview
+                Preview · watermarked
               </p>
               <p className="text-[10px] mono text-[var(--color-mute)]">
                 /m/{job.jobId.slice(0, 8)}…
               </p>
             </div>
+          </div>
+
+          <div
+            className="card rounded-xl p-6 sm:p-8"
+            style={{
+              background:
+                "linear-gradient(135deg, rgba(201,164,55,0.1), rgba(201,164,55,0.02))",
+              border: "1px solid rgba(201,164,55,0.4)",
+            }}
+          >
+            <p className="text-xs mono text-[var(--color-gold)] uppercase tracking-widest mb-2">
+              Like it? Unlock the clean version.
+            </p>
+            <h3 className="text-xl font-semibold mb-2">
+              Buy the unwatermarked HD video — $14.99
+            </h3>
+            <p className="text-sm text-[var(--color-paper)]/85 mb-5 leading-relaxed">
+              Get the 1080p MP4 without watermark in your inbox + on this page.
+              Commercial rights yours.
+            </p>
+            <button
+              onClick={() => void startCheckout()}
+              disabled={checkoutLoading}
+              className="w-full sm:w-auto px-6 py-3 rounded-md bg-[var(--color-gold)] text-[var(--color-ink)] font-medium hover:opacity-90 transition disabled:opacity-50"
+            >
+              {checkoutLoading ? "Opening checkout…" : "Buy clean HD — $14.99 →"}
+            </button>
+            <p className="text-xs mono text-[var(--color-mute)] mt-3">
+              Secure checkout via Stripe. Apple Pay / Google Pay supported.
+            </p>
           </div>
 
           <button
