@@ -8,7 +8,8 @@ export type IntakeFormType =
   | "agents"
   | "seo-audit"
   | "ads-audit"
-  | "photoshoot";
+  | "photoshoot"
+  | "website";
 
 export type IntakeResult =
   | { ok: true; message: string }
@@ -26,6 +27,7 @@ const FORM_TITLES: Record<IntakeFormType, string> = {
   "seo-audit": "Free SEO Audit",
   "ads-audit": "Free Ads Audit",
   photoshoot: "Free Brand Aesthetic Preview",
+  website: "Chappie Site — Build Brief",
 };
 
 const SUCCESS_COPY: Record<IntakeFormType, string> = {
@@ -37,6 +39,8 @@ const SUCCESS_COPY: Record<IntakeFormType, string> = {
     "Got it. Audit lands in your inbox in 48 hours. I'll ping within 24 to confirm access.",
   photoshoot:
     "Got it. The studio is generating your 3-image preview right now. Look for it in your inbox in 2–3 minutes from intake@chappieworks.com — check spam just in case.",
+  website:
+    "Got it. The studio has your brief. You'll get a Stripe link for the $99 launch fee within a few hours from intake@chappieworks.com — check spam just in case. Pay it and your site goes live within 48 hours.",
 };
 
 export async function submitIntake(

@@ -103,7 +103,7 @@ function Slate() {
           The product.
         </h2>
         <p className="text-sm text-[var(--color-mute)] text-center mb-10">
-          One bespoke build. One daily subscription. Two free audits.
+          One bespoke build. Two subscriptions. Four free audits.
         </p>
 
         <Link
@@ -139,12 +139,46 @@ function Slate() {
         </Link>
 
         <Link
+          href="/website"
+          className="card rounded-xl p-6 sm:p-8 mt-4 flex flex-col sm:flex-row sm:items-center gap-6 transition hover:border-[var(--color-gold)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-gold)]/60"
+        >
+          <div className="flex-1">
+            <p className="text-xs mono text-[var(--color-gold)] uppercase tracking-widest mb-2">
+              New · Monthly subscription
+            </p>
+            <h3 className="text-xl sm:text-2xl font-semibold mb-3">
+              Chappie Site
+            </h3>
+            <p className="text-base text-[var(--color-paper)]/85 leading-relaxed mb-4 max-w-2xl">
+              A website you can chat with. The studio builds it in 48 hours,
+              then keeps editing it forever. Type changes in plain English —
+              new pages, fresh copy, swapped colors — and they ship within 24
+              hours. Real Next.js code on Vercel. You own it.
+            </p>
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
+              <span className="text-[var(--color-gold)] font-semibold">
+                $99 launch + $49/mo
+              </span>
+              <span className="mono text-[var(--color-mute)]">
+                Live in 48hr
+              </span>
+              <span className="mono text-[var(--color-mute)]">
+                You own the code
+              </span>
+            </div>
+          </div>
+          <div className="text-[var(--color-gold)] font-medium whitespace-nowrap text-sm sm:text-base">
+            Brief the studio →
+          </div>
+        </Link>
+
+        <Link
           href="/brief/ai-agency"
           className="card rounded-xl p-6 sm:p-8 mt-4 flex flex-col sm:flex-row sm:items-center gap-6 transition hover:border-[var(--color-gold)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-gold)]/60"
         >
           <div className="flex-1">
             <p className="text-xs mono text-[var(--color-gold)] uppercase tracking-widest mb-2">
-              New · Daily subscription
+              Daily subscription
             </p>
             <h3 className="text-xl sm:text-2xl font-semibold mb-3">
               The AI Agency Brief
