@@ -6,11 +6,12 @@ import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 
 const NAV = [
+  { href: "/website", label: "Website" },
+  { href: "/agents", label: "Agents" },
   { href: "/seo-audit", label: "SEO" },
   { href: "/ads-audit", label: "Ads" },
   { href: "/photoshoot", label: "Visuals" },
   { href: "/movie", label: "Movie" },
-  { href: "/agents", label: "Agents" },
   { href: "/blog", label: "Blog" },
   { href: "/studio", label: "Studio" },
   { href: "/shop", label: "Shop" },
