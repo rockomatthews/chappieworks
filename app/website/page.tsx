@@ -140,7 +140,17 @@ const FAQ_SCHEMA = {
   ],
 };
 
-export default function WebsiteSku() {
+export default async function WebsiteSku({
+  searchParams,
+}: {
+  searchParams: Promise<{ paid?: string }>;
+}) {
+  const { paid } = await searchParams;
+  const justPaid = paid === "1";
+  const stripeLink =
+    process.env.NEXT_PUBLIC_STRIPE_LINK_WEBSITE ||
+    "https://buy.stripe.com/9B614nd0m3tH5ax5Rs3oA0c";
+
   const included = [
     "Real Next.js + Tailwind code — fast, SEO-friendly, real Lighthouse scores",
     "Mobile-responsive by default — looks right on every screen",
@@ -190,6 +200,44 @@ export default function WebsiteSku() {
             edit ships within a day. $99 to launch, $49/mo to keep it perfect.
             Cancel any time and keep the code.
           </p>
+
+          {justPaid ? (
+            <div className="card rounded-xl p-6 sm:p-8 mt-8 ring-2 ring-[var(--color-gold)]">
+              <p className="text-xs mono text-[var(--color-gold)] uppercase tracking-widest mb-2">
+                Payment received
+              </p>
+              <h2 className="text-xl sm:text-2xl font-semibold mb-3">
+                Got it. Now tell the studio what to build.
+              </h2>
+              <p className="text-sm text-[var(--color-paper)]/85 leading-relaxed mb-4">
+                $99 launch fee is paid, $49/mo subscription is set up. To kick
+                off the build we need your two-minute brief — scroll down or
+                jump straight to it. Your site goes live within 48 hours of
+                this form submission.
+              </p>
+              <a
+                href="#intake"
+                className="inline-flex items-center justify-center px-5 py-2.5 rounded-md bg-[var(--color-gold)] text-[var(--color-ink)] font-medium hover:opacity-90 transition text-sm"
+              >
+                Fill the brief →
+              </a>
+            </div>
+          ) : (
+            <div className="mt-8 flex flex-col sm:flex-row gap-3">
+              <a
+                href={stripeLink}
+                className="flex-1 flex items-center justify-center px-6 py-4 rounded-md bg-[var(--color-gold)] text-[var(--color-ink)] font-medium hover:opacity-90 transition"
+              >
+                Pay $99 + start the $49/mo →
+              </a>
+              <a
+                href="#intake"
+                className="flex-1 flex items-center justify-center px-6 py-4 rounded-md border border-white/15 hover:border-[var(--color-gold)] hover:text-[var(--color-gold)] transition"
+              >
+                Brief us first (free)
+              </a>
+            </div>
+          )}
 
           <div className="mt-10">
             <ChatThread
