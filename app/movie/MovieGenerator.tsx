@@ -61,9 +61,13 @@ const STATUS_COPY: Record<JobStatus["status"], string> = {
   failed: "The render failed. Try a different prompt.",
 };
 
+const MAX_IMAGE_MB = 4;
+
 export function MovieGenerator() {
   const [prompt, setPrompt] = useState("");
   const [email, setEmail] = useState("");
+  const [image, setImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [job, setJob] = useState<JobStatus | null>(null);
@@ -74,6 +78,37 @@ export function MovieGenerator() {
   const pollAttemptsRef = useRef<number>(0);
   const errorRef = useRef<HTMLParagraphElement>(null);
   const renderPanelRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!image) {
+      setImagePreview(null);
+      return;
+    }
+    const url = URL.createObjectURL(image);
+    setImagePreview(url);
+    return () => URL.revokeObjectURL(url);
+  }, [image]);
+
+  function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0] ?? null;
+    if (!file) {
+      setImage(null);
+      return;
+    }
+    if (file.size > MAX_IMAGE_MB * 1024 * 1024) {
+      setError(`Reference image must be under ${MAX_IMAGE_MB} MB.`);
+      e.target.value = "";
+      return;
+    }
+    setImage(file);
+    setError(null);
+  }
+
+  function clearImage() {
+    setImage(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  }
 
   const stopPolling = useCallback(() => {
     if (pollTimerRef.current) {
@@ -160,10 +195,15 @@ export function MovieGenerator() {
       renderPanelRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
     });
     try {
+      const formData = new FormData();
+      formData.append("prompt", prompt);
+      formData.append("email", email);
+      if (image) {
+        formData.append("image", image);
+      }
       const res = await fetch("/api/movie/generate", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt, email }),
+        body: formData,
       });
       const data = (await res.json()) as { jobId?: string; error?: string };
       if (!res.ok || !data.jobId) {
@@ -240,6 +280,55 @@ export function MovieGenerator() {
               </span>
               <span>{prompt.length} / 800</span>
             </div>
+          </div>
+
+          <div>
+            <label
+              htmlFor="movie-image"
+              className="block text-xs mono text-[var(--color-gold)] uppercase tracking-widest mb-2"
+            >
+              Reference image · optional
+            </label>
+            {imagePreview ? (
+              <div className="flex items-start gap-3">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={imagePreview}
+                  alt="Reference image preview"
+                  className="w-24 h-24 object-cover rounded-md border border-white/15"
+                />
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs text-[var(--color-paper)]/85 leading-relaxed">
+                    The studio will use this as the first frame and animate it
+                    using your prompt. Drop the image if you&rsquo;d rather
+                    generate from text alone.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={clearImage}
+                    className="mt-2 text-[10px] mono uppercase tracking-widest text-[var(--color-rust)] hover:underline"
+                  >
+                    Remove image
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <>
+                <input
+                  ref={fileInputRef}
+                  id="movie-image"
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp"
+                  onChange={handleImageChange}
+                  className="block w-full text-xs text-[var(--color-paper)]/85 file:mr-3 file:px-3 file:py-2 file:rounded-md file:border-0 file:bg-[var(--color-gold)]/15 file:text-[var(--color-gold)] file:text-xs file:mono file:uppercase file:tracking-widest hover:file:bg-[var(--color-gold)]/25"
+                />
+                <p className="text-[10px] mono text-[var(--color-mute)] mt-1.5">
+                  Adding an image switches us to image-to-video — the studio
+                  animates your reference. PNG/JPG/WebP, under 4 MB. Leave
+                  empty for pure text-to-video.
+                </p>
+              </>
+            )}
           </div>
 
           <div>

@@ -19,6 +19,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/blog/inbox-triage-build-recipe", priority: 0.7, changeFreq: "monthly" },
     { path: "/blog/running-7-ai-personas-with-paperclip", priority: 0.8, changeFreq: "monthly" },
     { path: "/studio", priority: 0.5, changeFreq: "monthly" },
+    { path: "/studio/queue", priority: 0.6, changeFreq: "weekly" },
     { path: "/shop", priority: 0.7, changeFreq: "weekly" },
     { path: "/studio/debates", priority: 0.6, changeFreq: "weekly" },
     { path: "/ads-audit/sample/chappiethebot", priority: 0.7, changeFreq: "monthly" },

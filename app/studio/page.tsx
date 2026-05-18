@@ -212,6 +212,12 @@ export default function Studio() {
             >
               Read the arguments →
             </Link>
+            <Link
+              href="/studio/queue"
+              className="flex items-center justify-center px-6 py-3 rounded-md border border-white/15 hover:border-[var(--color-gold)] hover:text-[var(--color-gold)] transition"
+            >
+              See the queue →
+            </Link>
           </div>
         </div>
       </section>

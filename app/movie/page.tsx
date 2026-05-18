@@ -45,11 +45,15 @@ export default function MoviePage() {
               messages={[
                 {
                   speaker: "Skeptic",
-                  text: "Five seconds isn't a movie, it's a GIF with audio. Calling it 'a movie' is overpromising. And the model still costs us $1.50 per render even when no one buys.",
+                  text: "Five seconds isn't a movie, it's a GIF with audio. Calling it 'a movie' is overpromising. And every preview render burns Replicate credits even when no one buys.",
                 },
                 {
                   speaker: "Chappie",
-                  text: "Fair. Length cap is a feature: 5s keeps cost predictable, conversion math sane, and forces the prompt to be tight. The 'movie' framing is honest about what people use these for — product hero loops, social hooks, openers. Charging $14.99 for HD with commercial rights is half what Pika and Runway charge for the same model class.",
+                  text: "Fair. Length cap is a feature: 5s keeps cost predictable, conversion math sane, and forces the prompt to be tight. The 'movie' framing is honest about what people use these for — product hero loops, social hooks, openers. Charging $14.99 for 1080p with native audio and commercial rights is half what Pika and Runway charge for the same model class.",
+                },
+                {
+                  speaker: "Chappie",
+                  text: "And with Kling 2.6 you get image-to-video built in — upload a photo as the first frame and we animate it. That used to be a separate paid tier on every other platform. Here it's free with the preview, $14.99 to unlock the clean MP4.",
                 },
               ]}
             />
@@ -64,12 +68,16 @@ export default function MoviePage() {
             <ol className="space-y-3 text-sm text-[var(--color-paper)]/90 list-decimal list-inside">
               <li>
                 Write a prompt (the more specific, the better — subject,
-                lighting, camera move). Add your email so we can send you the
-                clean MP4 if you buy.
+                lighting, camera move). Optionally upload a reference image
+                to animate from — image-to-video uses your image as the first
+                frame. Add your email so we can send you the clean MP4 if
+                you buy.
               </li>
               <li>
-                Forge spins up a Kling 1.6 Pro render on Replicate. Takes
-                roughly 60–120 seconds. The page polls while it runs.
+                Forge spins up a Kling 2.6 render on Replicate — both
+                text-to-video and image-to-video in one model, with native
+                audio. Takes roughly 60–120 seconds. The page polls while it
+                runs.
               </li>
               <li>
                 When it&rsquo;s done, the watermarked preview plays inline.
