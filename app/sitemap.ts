@@ -11,6 +11,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/brief/ai-agency", priority: 0.9, changeFreq: "daily" },
     { path: "/seo-audit", priority: 0.8, changeFreq: "weekly" },
     { path: "/seo-audit/sample/chappiethebot", priority: 0.7, changeFreq: "monthly" },
+    { path: "/seo-fix", priority: 0.85, changeFreq: "weekly" },
     { path: "/ads-audit", priority: 0.8, changeFreq: "weekly" },
     { path: "/blog", priority: 0.7, changeFreq: "weekly" },
     { path: "/blog/custom-ai-agent-cost-2026", priority: 0.8, changeFreq: "monthly" },

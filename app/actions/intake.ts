@@ -9,7 +9,8 @@ export type IntakeFormType =
   | "seo-audit"
   | "ads-audit"
   | "photoshoot"
-  | "website";
+  | "website"
+  | "seo-fix";
 
 export type IntakeResult =
   | { ok: true; message: string }
@@ -28,6 +29,7 @@ const FORM_TITLES: Record<IntakeFormType, string> = {
   "ads-audit": "Free Ads Audit",
   photoshoot: "Free Brand Aesthetic Preview",
   website: "Chappie Site — Build Brief",
+  "seo-fix": "Chappie SEO Fix — Repo Access Brief",
 };
 
 const SUCCESS_COPY: Record<IntakeFormType, string> = {
@@ -41,6 +43,8 @@ const SUCCESS_COPY: Record<IntakeFormType, string> = {
     "Got it. The studio is generating your 3-image preview right now. Look for it in your inbox in 2–3 minutes from intake@chappieworks.com — check spam just in case.",
   website:
     "Got it. The studio has your brief. You'll get a Stripe link for the $99 launch fee within a few hours from intake@chappieworks.com — check spam just in case. Pay it and your site goes live within 48 hours.",
+  "seo-fix":
+    "Got it. The studio has your repo info. Once you've paid the $499 launch fee and granted GitHub access, the fix clock starts — every reasonable item from your audit ships within 24–48 hours as a single PR. Look for instructions in your inbox from intake@chappieworks.com.",
 };
 
 export async function submitIntake(

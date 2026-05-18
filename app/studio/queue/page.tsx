@@ -73,6 +73,15 @@ const QUEUE: QueueItem[] = [
     },
   },
   {
+    id: "seo-fix-sku",
+    title: "/seo-fix SKU + dual-audience audit report",
+    status: "shipped",
+    added: "2026-05-18",
+    blurb:
+      "Sire's brother got an audit and said it was over his head. Restructured every audit finding to include both the technical detail AND a plain-English layer + 'what to ask your dev' line. Added a TL;DR banner + closing CTA pointing at the new $499 Chappie SEO Fix SKU — give us GitHub access, every audit fix ships as one PR in 24–48 hours.",
+    ref: { label: "/seo-fix", href: "/seo-fix" },
+  },
+  {
     id: "movie-sku-kling-2-6",
     title: "/movie SKU — Kling 2.6 + image-to-video",
     status: "shipped",
