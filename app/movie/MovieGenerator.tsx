@@ -72,6 +72,8 @@ export function MovieGenerator() {
   const pollStartRef = useRef<number>(0);
   const pollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pollAttemptsRef = useRef<number>(0);
+  const errorRef = useRef<HTMLParagraphElement>(null);
+  const renderPanelRef = useRef<HTMLDivElement>(null);
 
   const stopPolling = useCallback(() => {
     if (pollTimerRef.current) {
@@ -131,19 +133,32 @@ export function MovieGenerator() {
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
+    const failValidation = (msg: string) => {
+      setError(msg);
+      requestAnimationFrame(() => {
+        errorRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      });
+    };
     if (prompt.trim().length < 10) {
-      setError("Prompt should be at least 10 characters.");
+      failValidation("Prompt should be at least 10 characters.");
       return;
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setError("Add a valid email so we can send the clean MP4 if you buy.");
+      failValidation(
+        "Please add a valid email below — we email the unwatermarked HD MP4 if you buy.",
+      );
       return;
     }
     setSubmitting(true);
-    setJob(null);
     setPollError(null);
     stopPolling();
     pollAttemptsRef.current = 0;
+    // Immediately show the rendering state so mobile users see feedback
+    // before the network round-trip resolves.
+    setJob({ jobId: "starting", status: "pending", paid: false });
+    requestAnimationFrame(() => {
+      renderPanelRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
     try {
       const res = await fetch("/api/movie/generate", {
         method: "POST",
@@ -162,7 +177,11 @@ export function MovieGenerator() {
         POLL_INTERVAL_MS,
       );
     } catch (err) {
+      setJob(null);
       setError(err instanceof Error ? err.message : "Couldn't kick off render");
+      requestAnimationFrame(() => {
+        errorRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      });
     } finally {
       setSubmitting(false);
     }
@@ -212,7 +231,8 @@ export function MovieGenerator() {
               rows={5}
               maxLength={800}
               required
-              className="w-full bg-[var(--color-ink)] border border-white/15 rounded-md px-3 py-2 text-sm text-[var(--color-paper)] placeholder:text-[var(--color-mute)] focus:outline-none focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/50"
+              className="w-full bg-[var(--color-ink)] border border-white/15 rounded-md px-3 py-2 text-base sm:text-sm text-[var(--color-paper)] placeholder:text-[var(--color-mute)] focus:outline-none focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/50"
+              style={{ fontSize: "16px" }}
             />
             <div className="flex justify-between mt-1.5 text-[10px] mono text-[var(--color-mute)]">
               <span>
@@ -236,7 +256,10 @@ export function MovieGenerator() {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@company.com"
               required
-              className="w-full bg-[var(--color-ink)] border border-white/15 rounded-md px-3 py-2 text-sm text-[var(--color-paper)] placeholder:text-[var(--color-mute)] focus:outline-none focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/50"
+              autoComplete="email"
+              inputMode="email"
+              className="w-full bg-[var(--color-ink)] border border-white/15 rounded-md px-3 py-2 text-base sm:text-sm text-[var(--color-paper)] placeholder:text-[var(--color-mute)] focus:outline-none focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/50"
+              style={{ fontSize: "16px" }}
             />
             <p className="text-[10px] mono text-[var(--color-mute)] mt-1.5">
               We email the unwatermarked HD MP4 if you buy. No spam.
@@ -245,8 +268,9 @@ export function MovieGenerator() {
 
           {error && (
             <p
+              ref={errorRef}
               role="alert"
-              className="text-sm text-[var(--color-rust)] bg-[var(--color-rust)]/10 rounded-md px-3 py-2"
+              className="text-sm text-[var(--color-rust)] bg-[var(--color-rust)]/10 border border-[var(--color-rust)]/40 rounded-md px-3 py-2 scroll-mt-24"
             >
               {error}
             </p>
@@ -267,11 +291,16 @@ export function MovieGenerator() {
       )}
 
       {isRendering && job && (
-        <div className="rounded-xl p-6 sm:p-8 ring-2 ring-red-600 bg-red-900/70">
+        <div
+          ref={renderPanelRef}
+          className="card rounded-xl p-6 sm:p-8 ring-2 ring-[var(--color-gold)] scroll-mt-24"
+        >
           <div className="flex items-center gap-3 mb-3">
             <span className="inline-block w-2 h-2 rounded-full bg-[var(--color-gold)] animate-pulse" />
             <p className="text-xs mono text-[var(--color-gold)] uppercase tracking-widest">
-              Rendering · job {job.jobId.slice(0, 8)}
+              {job.jobId === "starting"
+                ? "Starting render…"
+                : `Rendering · job ${job.jobId.slice(0, 8)}`}
             </p>
           </div>
           <p className="text-base text-[var(--color-paper)] leading-relaxed">
@@ -282,10 +311,12 @@ export function MovieGenerator() {
               Status check: {pollError}
             </p>
           )}
-          <p className="text-xs mono text-[var(--color-mute)] mt-3">
-            You can stay here or come back later — we&rsquo;ll keep the result
-            for 30 days at /m/{job.jobId.slice(0, 8)}…
-          </p>
+          {job.jobId !== "starting" && (
+            <p className="text-xs mono text-[var(--color-mute)] mt-3">
+              You can stay here or come back later — we&rsquo;ll keep the result
+              for 30 days at /m/{job.jobId.slice(0, 8)}…
+            </p>
+          )}
         </div>
       )}
 
@@ -302,7 +333,9 @@ export function MovieGenerator() {
                 controlsList="nodownload"
                 autoPlay
                 loop
+                muted
                 playsInline
+                preload="metadata"
                 className="w-full rounded-md block"
                 style={{ pointerEvents: "auto" }}
               />
