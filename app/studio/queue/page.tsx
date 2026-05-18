@@ -33,7 +33,7 @@ const QUEUE: QueueItem[] = [
       "Utility token for chappieworks SKUs. Pay-with-CHAPPIE for 15% off, stake for 25% off. Launch via @bankr on X (cross-cast to Farcaster). Target Sat 2026-05-24.",
     ref: { label: "bankr.bot", href: "https://bankr.bot/" },
     workItems: [
-      "Sire: deploy 2-of-3 Safe on Base via app.safe.global",
+      "✓ Safe 2-of-3 deployed on Base — treasury at 0x5f216AeB…1F00",
       "Sire: fund signer 1 wallet with $200 of ETH on Base for starter bag",
       "Pay-with-CHAPPIE checkout component on chappieworks (Wagmi + viem)",
       "/coin landing page on chappieworks",
