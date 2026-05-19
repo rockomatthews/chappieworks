@@ -33,14 +33,15 @@ async function burnWatermark(cleanMp4: Buffer): Promise<Buffer> {
   const workDir = await mkdtemp(path.join(tmpdir(), "movie-"));
   const inPath = path.join(workDir, "in.mp4");
   const outPath = path.join(workDir, "out.mp4");
-  console.log("[chappieworks:watermark] workdir", workDir, "ffmpegPath", ffmpegPath);
+  console.log(
+    "[chappieworks:watermark] workdir",
+    workDir,
+    "ffmpegPath",
+    ffmpegPath,
+  );
   try {
     await writeFile(inPath, cleanMp4);
-    console.log("[chappieworks:watermark] wrote input file", inPath);
 
-    // Two-layer watermark: large diagonal "CHAPPIE WORKS PREVIEW" text +
-    // smaller bottom-strip URL. Both are burned into the pixels so the
-    // overlay survives download / inspect-element.
     const drawtext1 =
       "drawtext=text='CHAPPIE WORKS PREVIEW':" +
       "fontcolor=white@0.55:fontsize=72:" +
@@ -53,34 +54,21 @@ async function burnWatermark(cleanMp4: Buffer): Promise<Buffer> {
       "box=1:boxcolor=black@0.5:boxborderw=14";
 
     return await new Promise<Buffer>((resolve, reject) => {
-      console.log("[chappieworks:watermark] starting ffmpeg encoding");
       const timeout = setTimeout(() => {
-        console.error("[chappieworks:watermark] timeout after 120s");
         reject(new Error("watermark encoding timeout (120s)"));
       }, 120000);
       ffmpeg(inPath)
         .videoFilters([drawtext1, drawtext2])
         .outputOptions(["-c:a copy", "-preset veryfast", "-crf 23"])
-        .on("start", (cmd) => {
-          console.log("[chappieworks:watermark] ffmpeg started", cmd);
-        })
-        .on("progress", (prog) => {
-          console.log("[chappieworks:watermark] progress", prog);
-        })
         .on("end", async () => {
-          console.log("[chappieworks:watermark] ffmpeg completed");
           clearTimeout(timeout);
           try {
-            const data = await readFile(outPath);
-            console.log("[chappieworks:watermark] read output", data.length, "bytes");
-            resolve(data);
+            resolve(await readFile(outPath));
           } catch (err) {
-            console.error("[chappieworks:watermark] failed to read output", err);
             reject(err);
           }
         })
         .on("error", (err) => {
-          console.error("[chappieworks:watermark] ffmpeg error", err);
           clearTimeout(timeout);
           reject(err);
         })
@@ -154,14 +142,11 @@ export async function GET(
         return NextResponse.json(publicView(failed));
       }
 
-      // Mark watermarking so concurrent polls don't double-process
       await writeState({ ...state, status: "watermarking" });
 
       console.log("[chappieworks:movie] downloading video", jobId, url);
       const cleanBuffer = await downloadToBuffer(url);
-      console.log("[chappieworks:movie] video downloaded", jobId, cleanBuffer.length, "bytes");
 
-      console.log("[chappieworks:movie] uploading to blob storage");
       const cleanBlob = await put(CLEAN_KEY(jobId), cleanBuffer, {
         access: "public",
         contentType: "video/mp4",
@@ -169,26 +154,46 @@ export async function GET(
         allowOverwrite: true,
       });
 
-      console.log(
-        "[chappieworks:movie] blob uploaded",
-        jobId,
-        "url",
-        cleanBlob.url,
-      );
+      // For extension mode (user uploaded a video to extend), burn a real
+      // watermark on the new 10s so the preview clearly signals "buy to
+      // unlock." Paid users get the bare clean clip. For text/image mode,
+      // the client-side SVG overlay handles preview labeling.
+      let previewUrl = cleanBlob.url;
+      if (state.mode === "video") {
+        try {
+          const watermarked = await burnWatermark(cleanBuffer);
+          const previewBlob = await put(PREVIEW_KEY(jobId), watermarked, {
+            access: "public",
+            contentType: "video/mp4",
+            addRandomSuffix: false,
+            allowOverwrite: true,
+          });
+          previewUrl = previewBlob.url;
+        } catch (err) {
+          const message = err instanceof Error ? err.message : "unknown";
+          console.error(
+            "[chappieworks:watermark] burn failed, falling back to clean",
+            jobId,
+            message,
+          );
+        }
+      }
 
       const ready: MovieState = {
         ...state,
         status: "ready",
-        previewUrl: cleanBlob.url,
+        previewUrl,
         cleanUrl: cleanBlob.url,
-        durationSec: 5,
+        durationSec: state.durationSec ?? 5,
       };
       await writeState(ready);
       console.log(
         "[chappieworks:movie] job ready",
         jobId,
-        "url",
-        cleanBlob.url,
+        "mode",
+        state.mode ?? "text",
+        "duration",
+        ready.durationSec,
       );
       return NextResponse.json(publicView(ready));
     }
@@ -216,5 +221,8 @@ function publicView(state: MovieState) {
     cleanUrl: state.paid ? state.cleanUrl : undefined,
     failureReason: state.failureReason,
     prompt: state.prompt,
+    mode: state.mode ?? "text",
+    durationSec: state.durationSec,
+    inputVideoUrl: state.inputVideoUrl,
   };
 }

@@ -2,7 +2,13 @@
 
 import { useState } from "react";
 
-export function UnlockButton({ jobId }: { jobId: string }) {
+export function UnlockButton({
+  jobId,
+  priceLabel,
+}: {
+  jobId: string;
+  priceLabel: string;
+}) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -31,7 +37,7 @@ export function UnlockButton({ jobId }: { jobId: string }) {
         disabled={loading}
         className="w-full sm:w-auto px-6 py-3 rounded-md bg-[var(--color-gold)] text-[var(--color-ink)] font-medium hover:opacity-90 transition disabled:opacity-50"
       >
-        {loading ? "Opening checkout…" : "Buy clean HD — $14.99 →"}
+        {loading ? "Opening checkout…" : `Buy clean HD — ${priceLabel} →`}
       </button>
       {error && (
         <p

@@ -1,9 +1,15 @@
 import { NextResponse } from "next/server";
 import Replicate from "replicate";
 import { put } from "@vercel/blob";
+import ffmpegPath from "ffmpeg-static";
+import ffmpeg from "fluent-ffmpeg";
+import { mkdtemp, rm, readFile, writeFile } from "fs/promises";
+import { tmpdir } from "os";
+import path from "path";
 import {
   newJobId,
   writeState,
+  type MovieMode,
   type MovieState,
 } from "../../../lib/movies";
 
@@ -11,9 +17,13 @@ export const runtime = "nodejs";
 export const maxDuration = 60;
 export const dynamic = "force-dynamic";
 
+if (ffmpegPath) {
+  ffmpeg.setFfmpegPath(ffmpegPath);
+}
+
 const MAX_PROMPT_LEN = 800;
 const MIN_PROMPT_LEN = 10;
-const MAX_IMAGE_BYTES = 4 * 1024 * 1024; // 4 MB cap on uploaded reference image
+const MAX_IMAGE_BYTES = 4 * 1024 * 1024;
 const ALLOWED_IMAGE_TYPES = new Set([
   "image/png",
   "image/jpeg",
@@ -22,32 +32,81 @@ const ALLOWED_IMAGE_TYPES = new Set([
 ]);
 
 // Kling 2.6 on Replicate — text-to-video AND image-to-video in one model,
-// native audio generation, Western-agnostic training. ~$0.50–$1.00 per 5s clip.
+// native audio generation, supports 5s and 10s durations.
 const MODEL = "kwaivgi/kling-v2.6" as `${string}/${string}`;
 
+// Pull the last frame from a video at a public URL and return it as a PNG
+// buffer. Used by extension mode to seed the next 10s with the final frame
+// of the user's uploaded clip, so motion + scene continue cleanly.
+async function extractLastFrame(videoUrl: string): Promise<Buffer> {
+  const workDir = await mkdtemp(path.join(tmpdir(), "movie-frame-"));
+  const inPath = path.join(workDir, "input.mp4");
+  const outPath = path.join(workDir, "last.png");
+  try {
+    const res = await fetch(videoUrl);
+    if (!res.ok) throw new Error(`video fetch failed ${res.status}`);
+    const ab = await res.arrayBuffer();
+    await writeFile(inPath, Buffer.from(ab));
+
+    await new Promise<void>((resolve, reject) => {
+      const timeout = setTimeout(
+        () => reject(new Error("frame extract timeout (30s)")),
+        30000,
+      );
+      ffmpeg(inPath)
+        // -sseof seeks from the end. -1s grabs the final visible frame
+        // reliably across codecs without needing to know the duration.
+        .inputOptions(["-sseof -1"])
+        .outputOptions(["-vsync 0", "-q:v 2", "-frames:v 1"])
+        .on("end", () => {
+          clearTimeout(timeout);
+          resolve();
+        })
+        .on("error", (err) => {
+          clearTimeout(timeout);
+          reject(err);
+        })
+        .save(outPath);
+    });
+
+    return await readFile(outPath);
+  } finally {
+    await rm(workDir, { recursive: true, force: true }).catch(() => {});
+  }
+}
+
 export async function POST(req: Request) {
-  // Accept either multipart/form-data (with optional reference image) or JSON.
   const contentType = req.headers.get("content-type") ?? "";
   let prompt = "";
   let email = "";
   let imageFile: File | null = null;
+  let inputVideoUrl: string | undefined;
+  let duration = 5;
 
   if (contentType.includes("multipart/form-data")) {
     const form = await req.formData();
     prompt = String(form.get("prompt") ?? "").trim();
     email = String(form.get("email") ?? "").trim().toLowerCase();
+    const rawDuration = Number(form.get("duration") ?? 5);
+    duration = rawDuration === 10 ? 10 : 5;
     const maybeImage = form.get("image");
     if (maybeImage instanceof File && maybeImage.size > 0) {
       imageFile = maybeImage;
     }
+    const maybeVideoUrl = String(form.get("inputVideoUrl") ?? "").trim();
+    if (maybeVideoUrl) inputVideoUrl = maybeVideoUrl;
   } else {
     try {
       const body = (await req.json()) as {
         prompt?: string;
         email?: string;
+        duration?: number;
+        inputVideoUrl?: string;
       };
       prompt = (body.prompt ?? "").trim();
       email = (body.email ?? "").trim().toLowerCase();
+      duration = body.duration === 10 ? 10 : 5;
+      if (body.inputVideoUrl) inputVideoUrl = body.inputVideoUrl;
     } catch {
       return NextResponse.json({ error: "invalid request body" }, { status: 400 });
     }
@@ -71,6 +130,16 @@ export async function POST(req: Request) {
       { status: 400 },
     );
   }
+
+  // Can't both extend a video AND seed with an image — extension mode IS an
+  // image-to-video under the hood (last-frame seed). Reject mixed mode.
+  if (imageFile && inputVideoUrl) {
+    return NextResponse.json(
+      { error: "upload either an image or a video, not both" },
+      { status: 400 },
+    );
+  }
+
   if (imageFile) {
     if (!ALLOWED_IMAGE_TYPES.has(imageFile.type)) {
       return NextResponse.json(
@@ -86,6 +155,12 @@ export async function POST(req: Request) {
     }
   }
 
+  // Extension mode is fixed at 10s — the cadence is the directorial lever.
+  // Force it regardless of the form value so we never silently shorten.
+  if (inputVideoUrl) {
+    duration = 10;
+  }
+
   const apiToken = process.env.REPLICATE_API_TOKEN;
   if (!apiToken) {
     console.error("[chappieworks:movie] REPLICATE_API_TOKEN missing");
@@ -98,10 +173,12 @@ export async function POST(req: Request) {
   const replicate = new Replicate({ auth: apiToken });
   const jobId = newJobId();
 
-  // Upload the optional reference image to Vercel Blob and use the public URL
-  // as the start frame for Kling 2.6's image-to-video mode.
   let startImageUrl: string | undefined;
+  let mode: MovieMode = "text";
+
+  // Path A: explicit image upload → image-to-video.
   if (imageFile) {
+    mode = "image";
     try {
       const ext = imageFile.name.split(".").pop()?.toLowerCase() ?? "png";
       const buf = Buffer.from(await imageFile.arrayBuffer());
@@ -119,10 +196,43 @@ export async function POST(req: Request) {
     }
   }
 
+  // Path B: video URL (extension mode) → extract last frame, use as seed.
+  if (inputVideoUrl) {
+    mode = "video";
+    try {
+      const frame = await extractLastFrame(inputVideoUrl);
+      const blob = await put(`movie/${jobId}/last-frame.png`, frame, {
+        access: "public",
+        contentType: "image/png",
+      });
+      startImageUrl = blob.url;
+      console.log(
+        "[chappieworks:movie] extracted last frame",
+        jobId,
+        "from",
+        inputVideoUrl,
+      );
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "unknown";
+      console.error(
+        "[chappieworks:movie] last-frame extraction failed",
+        jobId,
+        message,
+      );
+      return NextResponse.json(
+        {
+          error:
+            "couldn't read the last frame of that video — try a shorter MP4 or different format",
+        },
+        { status: 502 },
+      );
+    }
+  }
+
   try {
     const input: Record<string, unknown> = {
       prompt,
-      duration: 5,
+      duration,
       aspect_ratio: "16:9",
       audio: true,
     };
@@ -143,6 +253,10 @@ export async function POST(req: Request) {
       replicateId: prediction.id,
       status: "generating",
       paid: false,
+      durationSec: duration,
+      mode,
+      startImageUrl,
+      inputVideoUrl,
     };
     await writeState(state);
 
@@ -152,7 +266,9 @@ export async function POST(req: Request) {
       "replicate",
       prediction.id,
       "mode",
-      startImageUrl ? "image-to-video" : "text-to-video",
+      mode,
+      "duration",
+      duration,
     );
 
     return NextResponse.json({ jobId });

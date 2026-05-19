@@ -1,8 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { upload } from "@vercel/blob/client";
 
-function WatermarkOverlay({ jobId }: { jobId: string }) {
+function WatermarkOverlay() {
   return (
     <svg
       className="absolute inset-0 rounded-md pointer-events-none z-10"
@@ -10,7 +11,6 @@ function WatermarkOverlay({ jobId }: { jobId: string }) {
       preserveAspectRatio="xMidYMid slice"
       style={{ width: "100%", height: "100%" }}
     >
-      {/* Center watermark */}
       <text
         x="960"
         y="540"
@@ -23,8 +23,6 @@ function WatermarkOverlay({ jobId }: { jobId: string }) {
       >
         CHAPPIE WORKS PREVIEW
       </text>
-
-      {/* Bottom watermark */}
       <text
         x="960"
         y="980"
@@ -48,7 +46,12 @@ type JobStatus = {
   cleanUrl?: string;
   failureReason?: string;
   prompt?: string;
+  mode?: "text" | "image" | "video";
+  durationSec?: number;
+  inputVideoUrl?: string;
 };
+
+type Duration = 5 | 10;
 
 const POLL_INTERVAL_MS = 4000;
 const MAX_POLL_DURATION_MS = 8 * 60 * 1000;
@@ -56,18 +59,37 @@ const MAX_POLL_DURATION_MS = 8 * 60 * 1000;
 const STATUS_COPY: Record<JobStatus["status"], string> = {
   pending: "Queued — starting the render…",
   generating: "Forge is rendering your clip. 60–120 seconds.",
-  watermarking: "Almost there — burning the watermark on the preview.",
+  watermarking: "Almost there — finalizing the preview.",
   ready: "Ready. Watch it below.",
   failed: "The render failed. Try a different prompt.",
 };
 
 const MAX_IMAGE_MB = 4;
+const MAX_VIDEO_MB = 100;
+const VIDEO_TYPES = new Set([
+  "video/mp4",
+  "video/quicktime",
+  "video/webm",
+  "video/x-matroska",
+]);
+const IMAGE_TYPES = new Set(["image/png", "image/jpeg", "image/webp"]);
+
+const PRICE_5S = "$14.99";
+const PRICE_10S = "$24.99";
+
+type Mode = "text" | "image" | "video";
 
 export function MovieGenerator() {
   const [prompt, setPrompt] = useState("");
   const [email, setEmail] = useState("");
+  const [duration, setDuration] = useState<Duration>(5);
   const [image, setImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [video, setVideo] = useState<File | null>(null);
+  const [videoPreview, setVideoPreview] = useState<string | null>(null);
+  const [videoUploadProgress, setVideoUploadProgress] = useState<number | null>(
+    null,
+  );
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [job, setJob] = useState<JobStatus | null>(null);
@@ -80,6 +102,35 @@ export function MovieGenerator() {
   const renderPanelRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Derived: which mode is active based on what's uploaded. The single file
+  // input accepts both images and videos and we route based on the picked
+  // file's MIME type. Extension mode (video) locks duration to 10s.
+  const mode: Mode = video ? "video" : image ? "image" : "text";
+  const effectiveDuration: Duration = mode === "video" ? 10 : duration;
+  const priceLabel = effectiveDuration === 10 ? PRICE_10S : PRICE_5S;
+
+  const uploadLabel = useMemo(() => {
+    switch (mode) {
+      case "video":
+        return "Extend this clip · +10 seconds";
+      case "image":
+        return "Animate this image · give it motion";
+      default:
+        return "Reference image or video · optional";
+    }
+  }, [mode]);
+
+  const uploadHelp = useMemo(() => {
+    switch (mode) {
+      case "video":
+        return "We'll continue your clip with a new 10-second beat — same vibe, your direction. Preview shows your clip plus the new 10s with a watermark.";
+      case "image":
+        return "We'll use this as the first frame and animate it. Cartoon, logo, product shot, photo — anything.";
+      default:
+        return "Drop an image to give it motion, or drop a video to extend it by 10 seconds. PNG/JPG/WebP up to 4 MB, MP4/MOV/WebM up to 100 MB. Leave empty for pure text-to-video.";
+    }
+  }, [mode]);
+
   useEffect(() => {
     if (!image) {
       setImagePreview(null);
@@ -90,23 +141,53 @@ export function MovieGenerator() {
     return () => URL.revokeObjectURL(url);
   }, [image]);
 
-  function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
+  useEffect(() => {
+    if (!video) {
+      setVideoPreview(null);
+      return;
+    }
+    const url = URL.createObjectURL(video);
+    setVideoPreview(url);
+    return () => URL.revokeObjectURL(url);
+  }, [video]);
+
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0] ?? null;
     if (!file) {
       setImage(null);
+      setVideo(null);
       return;
     }
-    if (file.size > MAX_IMAGE_MB * 1024 * 1024) {
-      setError(`Reference image must be under ${MAX_IMAGE_MB} MB.`);
-      e.target.value = "";
+    if (IMAGE_TYPES.has(file.type)) {
+      if (file.size > MAX_IMAGE_MB * 1024 * 1024) {
+        setError(`Reference image must be under ${MAX_IMAGE_MB} MB.`);
+        e.target.value = "";
+        return;
+      }
+      setImage(file);
+      setVideo(null);
+      setError(null);
       return;
     }
-    setImage(file);
-    setError(null);
+    if (VIDEO_TYPES.has(file.type)) {
+      if (file.size > MAX_VIDEO_MB * 1024 * 1024) {
+        setError(`Video must be under ${MAX_VIDEO_MB} MB.`);
+        e.target.value = "";
+        return;
+      }
+      setVideo(file);
+      setImage(null);
+      setError(null);
+      return;
+    }
+    setError("Unsupported file. Try PNG/JPG/WebP or MP4/MOV/WebM.");
+    e.target.value = "";
   }
 
-  function clearImage() {
+  function clearUpload() {
     setImage(null);
+    setVideo(null);
+    setVideoUploadProgress(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
   }
 
@@ -126,7 +207,6 @@ export function MovieGenerator() {
         });
         if (!res.ok) {
           const msg = `status check failed (${res.status})`;
-          console.error("[movie:poll]", msg);
           setPollError(msg);
           throw new Error(msg);
         }
@@ -152,7 +232,6 @@ export function MovieGenerator() {
         );
       } catch (err) {
         const msg = err instanceof Error ? err.message : "unknown error";
-        console.error("[movie:poll]", "attempt", pollAttemptsRef.current, msg);
         setPollError(msg);
         pollTimerRef.current = setTimeout(
           () => void pollOnce(jobId),
@@ -188,19 +267,35 @@ export function MovieGenerator() {
     setPollError(null);
     stopPolling();
     pollAttemptsRef.current = 0;
-    // Immediately show the rendering state so mobile users see feedback
-    // before the network round-trip resolves.
     setJob({ jobId: "starting", status: "pending", paid: false });
     requestAnimationFrame(() => {
       renderPanelRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
     });
+
     try {
+      // Video files are too big for the server multipart limit. Upload
+      // direct to Vercel Blob from the browser first, then submit the URL.
+      let inputVideoUrl: string | undefined;
+      if (video) {
+        setVideoUploadProgress(0);
+        const blob = await upload(video.name, video, {
+          access: "public",
+          handleUploadUrl: "/api/movie/blob-upload",
+          onUploadProgress: ({ percentage }) => {
+            setVideoUploadProgress(Math.min(99, Math.round(percentage)));
+          },
+        });
+        inputVideoUrl = blob.url;
+        setVideoUploadProgress(100);
+      }
+
       const formData = new FormData();
       formData.append("prompt", prompt);
       formData.append("email", email);
-      if (image) {
-        formData.append("image", image);
-      }
+      formData.append("duration", String(effectiveDuration));
+      if (image) formData.append("image", image);
+      if (inputVideoUrl) formData.append("inputVideoUrl", inputVideoUrl);
+
       const res = await fetch("/api/movie/generate", {
         method: "POST",
         body: formData,
@@ -210,7 +305,7 @@ export function MovieGenerator() {
         throw new Error(data.error ?? `request failed (${res.status})`);
       }
       const jobId = data.jobId;
-      setJob({ jobId, status: "pending", paid: false });
+      setJob({ jobId, status: "pending", paid: false, mode });
       pollStartRef.current = Date.now();
       pollTimerRef.current = setTimeout(
         () => void pollOnce(jobId),
@@ -224,6 +319,7 @@ export function MovieGenerator() {
       });
     } finally {
       setSubmitting(false);
+      setVideoUploadProgress(null);
     }
   }
 
@@ -247,7 +343,14 @@ export function MovieGenerator() {
 
   const showForm = !job || job.status === "failed";
   const isRendering =
-    job && (job.status === "pending" || job.status === "generating" || job.status === "watermarking");
+    job &&
+    (job.status === "pending" ||
+      job.status === "generating" ||
+      job.status === "watermarking");
+
+  const readyPriceLabel =
+    job?.durationSec === 10 ? PRICE_10S : PRICE_5S;
+  const isExtensionResult = job?.mode === "video";
 
   return (
     <div className="space-y-6">
@@ -261,13 +364,23 @@ export function MovieGenerator() {
               htmlFor="movie-prompt"
               className="block text-xs mono text-[var(--color-gold)] uppercase tracking-widest mb-2"
             >
-              Prompt *
+              {mode === "video"
+                ? "Direction for the next 10s *"
+                : mode === "image"
+                  ? "How should it move? *"
+                  : "Describe your scene *"}
             </label>
             <textarea
               id="movie-prompt"
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
-              placeholder="A close-up of a hand pouring espresso into a glass cup. Warm morning light from a window. Slow motion. Cinematic, shallow depth of field."
+              placeholder={
+                mode === "video"
+                  ? "Continue the same scene — camera pushes in slowly, subject turns toward the light, beat lands on the final note."
+                  : mode === "image"
+                    ? "Camera pushes in slowly. Subject blinks, looks up. Soft wind in the hair. Cinematic, shallow depth of field."
+                    : "A close-up of a hand pouring espresso into a glass cup. Warm morning light from a window. Slow motion. Cinematic, shallow depth of field."
+              }
               rows={5}
               maxLength={800}
               required
@@ -276,7 +389,9 @@ export function MovieGenerator() {
             />
             <div className="flex justify-between mt-1.5 text-[10px] mono text-[var(--color-mute)]">
               <span>
-                Tip: be specific. Subject, lighting, camera move, mood.
+                {mode === "video"
+                  ? "The previous clip is your anchor. The next 10s picks up from its final frame."
+                  : "Tip: be specific. Subject, lighting, camera move, mood."}
               </span>
               <span>{prompt.length} / 800</span>
             </div>
@@ -284,10 +399,10 @@ export function MovieGenerator() {
 
           <div>
             <label
-              htmlFor="movie-image"
+              htmlFor="movie-file"
               className="block text-xs mono text-[var(--color-gold)] uppercase tracking-widest mb-2"
             >
-              Reference image · optional
+              {uploadLabel}
             </label>
             {imagePreview ? (
               <div className="flex items-start gap-3">
@@ -299,16 +414,36 @@ export function MovieGenerator() {
                 />
                 <div className="flex-1 min-w-0">
                   <p className="text-xs text-[var(--color-paper)]/85 leading-relaxed">
-                    The studio will use this as the first frame and animate it
-                    using your prompt. Drop the image if you&rsquo;d rather
-                    generate from text alone.
+                    {uploadHelp}
                   </p>
                   <button
                     type="button"
-                    onClick={clearImage}
+                    onClick={clearUpload}
                     className="mt-2 text-[10px] mono uppercase tracking-widest text-[var(--color-rust)] hover:underline"
                   >
-                    Remove image
+                    Remove
+                  </button>
+                </div>
+              </div>
+            ) : videoPreview ? (
+              <div className="flex items-start gap-3">
+                <video
+                  src={videoPreview}
+                  className="w-32 h-20 object-cover rounded-md border border-white/15 bg-black"
+                  muted
+                  playsInline
+                  preload="metadata"
+                />
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs text-[var(--color-paper)]/85 leading-relaxed">
+                    {uploadHelp}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={clearUpload}
+                    className="mt-2 text-[10px] mono uppercase tracking-widest text-[var(--color-rust)] hover:underline"
+                  >
+                    Remove
                   </button>
                 </div>
               </div>
@@ -316,18 +451,58 @@ export function MovieGenerator() {
               <>
                 <input
                   ref={fileInputRef}
-                  id="movie-image"
+                  id="movie-file"
                   type="file"
-                  accept="image/png,image/jpeg,image/webp"
-                  onChange={handleImageChange}
+                  accept="image/png,image/jpeg,image/webp,video/mp4,video/quicktime,video/webm,video/x-matroska"
+                  onChange={handleFileChange}
                   className="block w-full text-xs text-[var(--color-paper)]/85 file:mr-3 file:px-3 file:py-2 file:rounded-md file:border-0 file:bg-[var(--color-gold)]/15 file:text-[var(--color-gold)] file:text-xs file:mono file:uppercase file:tracking-widest hover:file:bg-[var(--color-gold)]/25"
                 />
                 <p className="text-[10px] mono text-[var(--color-mute)] mt-1.5">
-                  Adding an image switches us to image-to-video — the studio
-                  animates your reference. PNG/JPG/WebP, under 4 MB. Leave
-                  empty for pure text-to-video.
+                  {uploadHelp}
                 </p>
               </>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-xs mono text-[var(--color-gold)] uppercase tracking-widest mb-2">
+              Duration
+            </label>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => setDuration(5)}
+                disabled={mode === "video"}
+                className={`px-4 py-3 rounded-md border text-sm transition ${
+                  effectiveDuration === 5
+                    ? "border-[var(--color-gold)] bg-[var(--color-gold)]/10 text-[var(--color-gold)]"
+                    : "border-white/15 text-[var(--color-paper)]/80 hover:border-white/30"
+                } ${mode === "video" ? "opacity-40 cursor-not-allowed" : ""}`}
+              >
+                <div className="font-medium">5 seconds</div>
+                <div className="text-[10px] mono text-[var(--color-mute)] mt-0.5">
+                  {PRICE_5S} to unlock
+                </div>
+              </button>
+              <button
+                type="button"
+                onClick={() => setDuration(10)}
+                className={`px-4 py-3 rounded-md border text-sm transition ${
+                  effectiveDuration === 10
+                    ? "border-[var(--color-gold)] bg-[var(--color-gold)]/10 text-[var(--color-gold)]"
+                    : "border-white/15 text-[var(--color-paper)]/80 hover:border-white/30"
+                }`}
+              >
+                <div className="font-medium">10 seconds</div>
+                <div className="text-[10px] mono text-[var(--color-mute)] mt-0.5">
+                  {PRICE_10S} to unlock
+                </div>
+              </button>
+            </div>
+            {mode === "video" && (
+              <p className="text-[10px] mono text-[var(--color-mute)] mt-1.5">
+                Extensions are always 10s — the cadence is the director&rsquo;s lever.
+              </p>
             )}
           </div>
 
@@ -365,16 +540,28 @@ export function MovieGenerator() {
             </p>
           )}
 
+          {videoUploadProgress !== null && (
+            <p className="text-xs mono text-[var(--color-gold)]">
+              Uploading video… {videoUploadProgress}%
+            </p>
+          )}
+
           <button
             type="submit"
             disabled={submitting}
             className="w-full px-6 py-3 rounded-md bg-[var(--color-gold)] text-[var(--color-ink)] font-medium hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {submitting ? "Starting…" : "Generate my free preview →"}
+            {submitting
+              ? video
+                ? "Uploading & starting…"
+                : "Starting…"
+              : mode === "video"
+                ? "Generate my +10s extension →"
+                : "Generate my free preview →"}
           </button>
 
           <p className="text-xs mono text-[var(--color-mute)] text-center">
-            Free to preview. $14.99 to unlock the HD download.
+            Free to preview. {priceLabel} to unlock the HD download.
           </p>
         </form>
       )}
@@ -411,6 +598,24 @@ export function MovieGenerator() {
 
       {job && job.status === "ready" && job.previewUrl && (
         <div className="space-y-5">
+          {isExtensionResult && job.inputVideoUrl && (
+            <div className="card rounded-xl p-4 overflow-hidden">
+              <p className="text-xs mono text-[var(--color-gold)] uppercase tracking-widest mb-3">
+                Your clip · plays first
+              </p>
+              <div className="relative w-full bg-black rounded-md overflow-hidden">
+                <video
+                  src={job.inputVideoUrl}
+                  controls
+                  controlsList="nodownload"
+                  playsInline
+                  preload="metadata"
+                  className="w-full rounded-md block"
+                />
+              </div>
+            </div>
+          )}
+
           <div className="card rounded-xl p-4 ring-2 ring-[var(--color-gold)] overflow-hidden">
             <div
               className="relative w-full bg-black rounded-md overflow-hidden"
@@ -426,13 +631,16 @@ export function MovieGenerator() {
                 playsInline
                 preload="metadata"
                 className="w-full rounded-md block"
-                style={{ pointerEvents: "auto" }}
               />
-              <WatermarkOverlay jobId={job.jobId} />
+              {/* Server-burned watermark covers extension mode. Other modes
+                  rely on this SVG overlay until the buyer unlocks. */}
+              {!isExtensionResult && <WatermarkOverlay />}
             </div>
             <div className="flex flex-wrap items-baseline justify-between gap-2 mt-4">
               <p className="text-xs mono text-[var(--color-gold)] uppercase tracking-widest">
-                Preview · watermarked
+                {isExtensionResult
+                  ? "Your +10s extension · preview"
+                  : "Preview · watermarked"}
               </p>
               <p className="text-[10px] mono text-[var(--color-mute)]">
                 /m/{job.jobId.slice(0, 8)}…
@@ -452,18 +660,23 @@ export function MovieGenerator() {
               Like it? Unlock the clean version.
             </p>
             <h3 className="text-xl font-semibold mb-2">
-              Buy the unwatermarked HD video — $14.99
+              {isExtensionResult
+                ? `Buy the unwatermarked extension — ${readyPriceLabel}`
+                : `Buy the unwatermarked HD video — ${readyPriceLabel}`}
             </h3>
             <p className="text-sm text-[var(--color-paper)]/85 mb-5 leading-relaxed">
-              Get the 1080p MP4 without watermark in your inbox + on this page.
-              Commercial rights yours.
+              {isExtensionResult
+                ? "Get the new 10s 1080p MP4 (just the extension, no watermark) in your inbox + on this page. Stack another 10s anytime by uploading this clip again."
+                : "Get the 1080p MP4 without watermark in your inbox + on this page. Commercial rights yours."}
             </p>
             <button
               onClick={() => void startCheckout()}
               disabled={checkoutLoading}
               className="w-full sm:w-auto px-6 py-3 rounded-md bg-[var(--color-gold)] text-[var(--color-ink)] font-medium hover:opacity-90 transition disabled:opacity-50"
             >
-              {checkoutLoading ? "Opening checkout…" : "Buy clean HD — $14.99 →"}
+              {checkoutLoading
+                ? "Opening checkout…"
+                : `Buy clean HD — ${readyPriceLabel} →`}
             </button>
             <p className="text-xs mono text-[var(--color-mute)] mt-3">
               Secure checkout via Stripe. Apple Pay / Google Pay supported.

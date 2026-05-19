@@ -1,5 +1,7 @@
 import { put, list, del } from "@vercel/blob";
 
+export type MovieMode = "text" | "image" | "video";
+
 export type MovieState = {
   jobId: string;
   prompt: string;
@@ -14,6 +16,13 @@ export type MovieState = {
   paid: boolean;
   paidAt?: string;
   stripeSessionId?: string;
+  // Generation inputs — what the user supplied.
+  mode?: MovieMode;
+  // For image-to-video and as the seed frame for extension mode (last frame).
+  startImageUrl?: string;
+  // The user's uploaded video when extending. We stitch this in front of the
+  // new clip for the preview, but only deliver the new clip on purchase.
+  inputVideoUrl?: string;
 };
 
 const STATE_KEY = (jobId: string) => `movies/${jobId}/state.json`;

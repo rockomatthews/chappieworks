@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: PageProps) {
   return {
     title: `Movie ${short} · Chappie Works`,
     description:
-      "5-second AI-generated movie. Preview free, unlock the HD download for $14.99.",
+      "AI-generated movie. Preview free, unlock the HD download to remove the watermark.",
     robots: { index: false, follow: false },
   };
 }
@@ -39,6 +39,9 @@ export default async function MovieSharePage({
     state.status === "pending" ||
     state.status === "generating" ||
     state.status === "watermarking";
+
+  const priceLabel = state.durationSec === 10 ? "$24.99" : "$14.99";
+  const isExtension = state.mode === "video";
 
   return (
     <main>
@@ -162,13 +165,16 @@ export default async function MovieSharePage({
                     Like it? Unlock the HD download.
                   </p>
                   <h2 className="text-xl font-semibold mb-2">
-                    Remove the watermark — $14.99
+                    {isExtension
+                      ? `Buy the unwatermarked extension — ${priceLabel}`
+                      : `Remove the watermark — ${priceLabel}`}
                   </h2>
                   <p className="text-sm text-[var(--color-paper)]/85 mb-5 leading-relaxed">
-                    Get the unwatermarked 1080p MP4 in your inbox + on this
-                    page. Commercial rights yours.
+                    {isExtension
+                      ? "Get the new 10s 1080p MP4 (just the extension, no watermark) in your inbox + on this page. Stack another 10s anytime by uploading this clip again."
+                      : "Get the unwatermarked 1080p MP4 in your inbox + on this page. Commercial rights yours."}
                   </p>
-                  <UnlockButton jobId={jobId} />
+                  <UnlockButton jobId={jobId} priceLabel={priceLabel} />
                   <p className="text-xs mono text-[var(--color-mute)] mt-3">
                     Secure checkout via Stripe. Apple Pay / Google Pay
                     supported.
