@@ -1,7 +1,12 @@
 import { NextResponse } from "next/server";
+import { after } from "next/server";
 import Stripe from "stripe";
 import { readState, writeState } from "../../../lib/movies";
 import { sendCleanMovieEmail } from "../../../lib/movieEmail";
+import {
+  generatePackAndEmail,
+  readPackState,
+} from "../../../lib/photoshootPack";
 
 export const runtime = "nodejs";
 export const maxDuration = 30;
@@ -36,6 +41,62 @@ export async function POST(req: Request) {
   }
 
   const session = event.data.object as Stripe.Checkout.Session;
+  const kind = session.metadata?.kind;
+
+  // Branch on SKU. Default (no kind) is the legacy /movie flow which only
+  // sets `jobId` metadata.
+  if (kind === "photoshoot-pack") {
+    const packId = session.metadata?.packId;
+    if (!packId) {
+      return NextResponse.json(
+        { received: true, note: "no packId metadata" },
+        { status: 200 },
+      );
+    }
+    try {
+      const state = await readPackState(packId);
+      if (!state) {
+        return NextResponse.json({ received: true, note: "pack state missing" });
+      }
+      if (state.status === "delivered") {
+        return NextResponse.json({ received: true, note: "already delivered" });
+      }
+      // Pack generation takes 60-300s. Respond fast so Stripe doesn't retry,
+      // and run the work after the response via `after`. Idempotent — re-entry
+      // sees status === "delivered" and returns early.
+      after(() =>
+        generatePackAndEmail(packId, {
+          stripeSessionId: session.id,
+          bypass: false,
+        }).catch((err) => {
+          console.error(
+            "[chappieworks:pack] webhook generation threw",
+            packId,
+            err instanceof Error ? err.message : err,
+          );
+        }),
+      );
+      console.log(
+        "[chappieworks:stripe-webhook] photoshoot pack paid, queued",
+        packId,
+        "session",
+        session.id,
+      );
+      return NextResponse.json({ received: true, ok: true, packId });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "unknown";
+      console.error(
+        "[chappieworks:stripe-webhook] pack handler failed",
+        message,
+      );
+      return NextResponse.json(
+        { received: true, error: message },
+        { status: 500 },
+      );
+    }
+  }
+
+  // Legacy /movie flow.
   const jobId = session.metadata?.jobId;
   if (!jobId) {
     return NextResponse.json({ received: true, note: "no jobId metadata" });

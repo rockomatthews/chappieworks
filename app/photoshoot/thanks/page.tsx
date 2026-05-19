@@ -38,12 +38,13 @@ export default function PhotoshootThanks() {
                 used at checkout.
               </li>
               <li>
-                The studio matches your order to the brief you submitted in the
-                free preview (or the new brief notes you entered at checkout).
+                Scribe translates your brief into 10 image prompts. Forge runs
+                each through gpt-image-1 at 2K. Glass picks the modes.
               </li>
               <li>
-                10 PNGs land in your inbox in 10–15 minutes from
+                10 PNGs land in your inbox in 2–5 minutes from
                 intake@chappieworks.com. 2K resolution, commercial rights yours.
+                Check spam just in case.
               </li>
               <li>
                 Anything not landing right? Reply to the receipt or use the

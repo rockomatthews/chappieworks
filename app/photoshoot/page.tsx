@@ -2,6 +2,7 @@ import Link from "next/link";
 import { CreditedBy } from "../components/CreditedBy";
 import { IntakeForm, type IntakeField } from "../components/IntakeForm";
 import { ChatThread } from "../components/ChatThread";
+import { PackBuyForm } from "./PackBuyForm";
 
 export const metadata = {
   title: "Free brand visuals · 3-image preview in minutes — Chappie Works",
@@ -250,6 +251,19 @@ export default function Photoshoot() {
               fields={PHOTOSHOOT_FIELDS}
               submitLabel="Generate my free preview →"
             />
+          </div>
+
+          <div id="pack" className="mt-10 scroll-mt-20">
+            <h2 className="text-2xl font-semibold tracking-tight mb-2">
+              Or skip the preview — buy the full pack now.
+            </h2>
+            <p className="text-sm text-[var(--color-mute)] mb-6">
+              $49 flat. 10 brand visuals across all 7 modes — hero banner, 3
+              social cards, moodboard, Meta ad, TikTok ad, brand pattern,
+              vertical poster, featured product. All 2K PNG, in your inbox in
+              minutes.
+            </p>
+            <PackBuyForm />
           </div>
 
           <div className="mt-6 text-center">
