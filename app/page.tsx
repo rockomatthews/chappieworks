@@ -47,6 +47,13 @@ function Hero() {
   return (
     <section className="px-6 sm:px-10 py-16 sm:py-24">
       <div className="max-w-3xl mx-auto text-center">
+        <Link
+          href="/coin"
+          className="inline-flex items-center gap-2 px-4 py-2 mb-6 rounded-full border border-[var(--color-gold)]/40 bg-[var(--color-gold)]/10 text-xs mono uppercase tracking-widest text-[var(--color-gold)] hover:bg-[var(--color-gold)]/15 transition"
+        >
+          <span className="inline-block w-1.5 h-1.5 rounded-full bg-[var(--color-gold)] animate-pulse" />
+          $CHAPPIE launches Sat May 24 — read the announcement →
+        </Link>
         <p className="text-xs sm:text-sm mono text-[var(--color-gold)] mb-5 uppercase tracking-widest">
           Custom AI agents · 5–7 days · free audits in 48hr
         </p>

@@ -34,12 +34,12 @@ const QUEUE: QueueItem[] = [
     ref: { label: "bankr.bot", href: "https://bankr.bot/" },
     workItems: [
       "✓ Safe 2-of-3 deployed on Base — treasury at 0x5f216AeB…1F00",
+      "✓ /coin landing page live with countdown + email notify list",
       "Sire: fund signer 1 wallet with $200 of ETH on Base for starter bag",
       "Pay-with-CHAPPIE checkout component on chappieworks (Wagmi + viem)",
-      "/coin landing page on chappieworks",
       "Launch copy: X thread + Farcaster cast + LinkedIn + blog",
       "Day 3: @bankr launch + @stakrbot vault deploy",
-      "Day 4 (Sat 2026-05-24): public launch push",
+      "Day 4 (Sat 2026-05-24, 12pm MDT): public launch push",
     ],
   },
   {
