@@ -2,17 +2,27 @@
 // (after a paid checkout) and by the checkout route's bypass path (when
 // state.email matches BYPASS_CHECKOUT_EMAIL).
 
+export type SendResult =
+  | { ok: true; id?: string }
+  | { ok: false; status?: number; error: string };
+
 export async function sendCleanMovieEmail(opts: {
   to: string;
   jobId: string;
   prompt: string;
   cleanUrl: string;
   bypass?: boolean;
-}): Promise<void> {
+}): Promise<SendResult> {
   const apiKey = process.env.RESEND_API_KEY;
   const from = process.env.INTAKE_FROM_EMAIL ?? "intake@chappieworks.com";
   const bcc = process.env.INTAKE_NOTIFY_EMAIL;
-  if (!apiKey) return;
+  if (!apiKey) {
+    console.error(
+      "[chappieworks:movieEmail] RESEND_API_KEY missing — cannot send",
+      opts.jobId,
+    );
+    return { ok: false, error: "RESEND_API_KEY missing" };
+  }
 
   const shareUrl = `https://chappieworks.com/m/${opts.jobId}`;
   const subject = opts.bypass
@@ -52,14 +62,55 @@ export async function sendCleanMovieEmail(opts: {
   };
   if (bcc) payload.bcc = [bcc];
 
-  await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(payload),
-  });
+  try {
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+    const text = await res.text();
+    if (!res.ok) {
+      console.error(
+        "[chappieworks:movieEmail] resend rejected",
+        opts.jobId,
+        "status",
+        res.status,
+        "body",
+        text,
+        "to",
+        opts.to,
+        "from",
+        from,
+      );
+      return { ok: false, status: res.status, error: text };
+    }
+    let id: string | undefined;
+    try {
+      id = (JSON.parse(text) as { id?: string }).id;
+    } catch {
+      // resend always returns JSON; ignore parse error
+    }
+    console.log(
+      "[chappieworks:movieEmail] sent",
+      opts.jobId,
+      "to",
+      opts.to,
+      "resend id",
+      id ?? "(none)",
+    );
+    return { ok: true, id };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "unknown";
+    console.error(
+      "[chappieworks:movieEmail] fetch threw",
+      opts.jobId,
+      message,
+    );
+    return { ok: false, error: message };
+  }
 }
 
 export function escapeHtml(s: string): string {

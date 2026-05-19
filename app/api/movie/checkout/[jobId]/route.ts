@@ -52,6 +52,30 @@ export async function POST(
         { status: 503 },
       );
     }
+    // Send first; only mark paid if the email actually goes out. Otherwise
+    // bypass becomes a silent black hole where the buyer redirects to a
+    // "paid" page but nothing ever lands in their inbox.
+    const sent = await sendCleanMovieEmail({
+      to: state.email,
+      jobId,
+      prompt: state.prompt,
+      cleanUrl: state.cleanUrl,
+      bypass: true,
+    });
+    if (!sent.ok) {
+      console.error(
+        "[chappieworks:movie] bypass email send failed",
+        jobId,
+        sent.error,
+      );
+      return NextResponse.json(
+        {
+          error: `bypass email failed: ${sent.error}`,
+          cleanUrl: state.cleanUrl,
+        },
+        { status: 502 },
+      );
+    }
     const updated = {
       ...state,
       paid: true,
@@ -59,14 +83,14 @@ export async function POST(
       stripeSessionId: "bypass",
     };
     await writeState(updated);
-    await sendCleanMovieEmail({
-      to: state.email,
+    console.log(
+      "[chappieworks:movie] bypass unlock",
       jobId,
-      prompt: state.prompt,
-      cleanUrl: state.cleanUrl,
-      bypass: true,
-    });
-    console.log("[chappieworks:movie] bypass unlock", jobId, "→", state.email);
+      "→",
+      state.email,
+      "resend id",
+      sent.id ?? "(none)",
+    );
     return NextResponse.json({
       url: `${origin}/m/${jobId}?paid=1&bypass=1`,
       bypassed: true,
