@@ -2,6 +2,7 @@ import Link from "next/link";
 import { CreditedBy } from "../components/CreditedBy";
 import { ChatThread } from "../components/ChatThread";
 import { MovieGenerator } from "./MovieGenerator";
+import { MovieReel } from "./MovieReel";
 
 export const metadata = {
   title: "Make a movie · instant AI video from a prompt — Chappie Works",
@@ -26,7 +27,11 @@ export default function MoviePage() {
           >
             ← chappieworks
           </Link>
-          <p className="text-xs mono text-[var(--color-gold)] mt-6 uppercase tracking-widest">
+          <div className="mt-8">
+            <MovieReel />
+          </div>
+
+          <p className="text-xs mono text-[var(--color-gold)] mt-10 uppercase tracking-widest">
             Movie · preview free · $14.99 to unlock
           </p>
           <h1 className="text-4xl sm:text-5xl font-semibold tracking-tight mt-3 mb-6 leading-[1.1]">
