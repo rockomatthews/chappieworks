@@ -25,31 +25,41 @@ type QueueItem = {
 
 const QUEUE: QueueItem[] = [
   {
+    id: "chappie-site-dashboard",
+    title: "Chappie Site — private chat-edit dashboard",
+    status: "in-progress",
+    added: "2026-05-17",
+    blurb:
+      "The promised private dashboard at chappieworks.com/site/{slug} where /website customers chat their edit requests. Sire's call: this MUST work before the coin launches — the /website SKU is the flagship that justifies the token, and the coin can't ship on top of an unfulfilled promise. Hard gate on the 2026-05-24 launch.",
+    ref: { label: "/website", href: "/website" },
+    workItems: [
+      "Auth: passwordless email magic link tied to the order email (Resend)",
+      "Route: /site/[slug] — private to the customer + studio operators",
+      "Chat thread UI — reuse ChatThread component, persist messages in Vercel KV",
+      "Operator inbox: /studio/site-edits — every new request pings Sire on Telegram",
+      "Status states per request: received · in progress · shipped · needs info",
+      "Backfill access for any /website customers who buy before this lands",
+      "Smoke test end-to-end before coin launch (2026-05-24, 12pm MDT)",
+    ],
+  },
+  {
     id: "chappie-coin-launch",
     title: "CHAPPIE coin on Base — Bankr + STAKR launch",
     status: "in-progress",
     added: "2026-05-17",
     blurb:
-      "Utility token for chappieworks SKUs. Pay-with-CHAPPIE for 15% off, stake for 25% off. Launch via @bankr on X (cross-cast to Farcaster). Target Sat 2026-05-24.",
+      "Utility token for chappieworks SKUs. Pay-with-CHAPPIE for 15% off, stake for 25% off. Launch via @bankr on X (cross-cast to Farcaster). Target Sat 2026-05-24. Blocked on the Chappie Site private chat dashboard landing first.",
     ref: { label: "bankr.bot", href: "https://bankr.bot/" },
     workItems: [
       "✓ Safe 2-of-3 deployed on Base — treasury at 0x5f216AeB…1F00",
       "✓ /coin landing page live with countdown + email notify list",
+      "Blocked: Chappie Site private chat dashboard must ship first",
       "Sire: fund signer 1 wallet with $200 of ETH on Base for starter bag",
       "Pay-with-CHAPPIE checkout component on chappieworks (Wagmi + viem)",
       "Launch copy: X thread + Farcaster cast + LinkedIn + blog",
       "Day 3: @bankr launch + @stakrbot vault deploy",
       "Day 4 (Sat 2026-05-24, 12pm MDT): public launch push",
     ],
-  },
-  {
-    id: "chappie-site-dashboard",
-    title: "Chappie Site — private chat-edit dashboard",
-    status: "queued",
-    added: "2026-05-17",
-    blurb:
-      "Build the promised private dashboard at chappieworks.com/site/{slug} where Chappie Site customers chat their edit requests. For the first 3-5 paying clients we handle edits by email; build the dashboard once volume justifies.",
-    ref: { label: "/website", href: "/website" },
   },
   {
     id: "clawbazaar",
