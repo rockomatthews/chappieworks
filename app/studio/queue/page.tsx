@@ -65,6 +65,15 @@ const QUEUE: QueueItem[] = [
     ],
   },
   {
+    id: "gitbank-integration",
+    title: "gitbank.io — GitHub bounty bank on Base, scope CHAPPIE + /seo-fix fit",
+    status: "queued",
+    added: "2026-05-20",
+    blurb:
+      "On-chain treasury/bounty layer inside GitHub on Base L2 — attach bounties to issues, contributors get paid automatically on PR merge. Three angles for chappieworks: (1) flagship second utility for CHAPPIE (pay bounties in the token) for the Sat launch narrative; (2) automate /seo-fix billing (each audit finding becomes a bountied issue, PR merge settles); (3) compounds an open-source contributor flywheel later. Need to verify custody model (must be non-custodial for treasury policy), arbitrary ERC-20 support so CHAPPIE works post-launch, per-settlement fee vs /seo-fix margin, and the auth surface for comment-triggered settlement.",
+    ref: { label: "gitbank.io", href: "https://gitbank.io/" },
+  },
+  {
     id: "clawbazaar",
     title: "ClawBazaar — opportunity scoping",
     status: "queued",
