@@ -114,11 +114,21 @@ export async function GET(
     }
 
     if (prediction.status === "failed" || prediction.status === "canceled") {
+      const rawError =
+        prediction.error?.toString() ?? `replicate ${prediction.status}`;
+      // Seedance's safety filter (E005) flags inputs or outputs that ByteDance
+      // considers sensitive — public figures, brand IP, violence, suggestive
+      // content, etc. Surface that clearly so the customer rephrases instead
+      // of staring at a cryptic ModelError.
+      const isSensitive =
+        /E005|flagged as sensitive|content[\s_-]*polic/i.test(rawError);
+      const friendly = isSensitive
+        ? "Seedance flagged this prompt as sensitive (real public figures, branded IP, violence, or suggestive content trigger it). Rephrase and try again."
+        : rawError;
       const failed: MovieState = {
         ...state,
         status: "failed",
-        failureReason:
-          prediction.error?.toString() ?? `replicate ${prediction.status}`,
+        failureReason: friendly,
       };
       await writeState(failed);
       return NextResponse.json(publicView(failed));
