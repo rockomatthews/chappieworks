@@ -13,21 +13,39 @@ export function Footer() {
             chappie the bot
           </a>
         </span>
-        <nav className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
-          <Link className="hover:text-[var(--color-gold)]" href="/seo-audit">
-            seo
+        <nav className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
+          <Link className="hover:text-[var(--color-gold)]" href="/agents">
+            agents
+          </Link>
+          <Link className="hover:text-[var(--color-gold)]" href="/website">
+            website
+          </Link>
+          <Link className="hover:text-[var(--color-gold)]" href="/movie">
+            movie
+          </Link>
+          <Link className="hover:text-[var(--color-gold)]" href="/photoshoot">
+            visuals
+          </Link>
+          <Link className="hover:text-[var(--color-gold)]" href="/seo-fix">
+            seo fix
           </Link>
           <Link className="hover:text-[var(--color-gold)]" href="/ads-audit">
             ads
           </Link>
-          <Link className="hover:text-[var(--color-gold)]" href="/agents">
-            agents
+          <Link className="hover:text-[var(--color-gold)]" href="/brief/ai-agency">
+            brief
           </Link>
-          <Link className="hover:text-[var(--color-gold)]" href="/blog">
-            blog
+          <Link className="hover:text-[var(--color-gold)]" href="/coin">
+            $chappie
+          </Link>
+          <Link className="hover:text-[var(--color-gold)]" href="/shop">
+            shop
           </Link>
           <Link className="hover:text-[var(--color-gold)]" href="/studio">
             studio
+          </Link>
+          <Link className="hover:text-[var(--color-gold)]" href="/blog">
+            blog
           </Link>
           <Link className="hover:text-[var(--color-gold)]" href="/privacy">
             privacy
