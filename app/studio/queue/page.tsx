@@ -30,7 +30,7 @@ const QUEUE: QueueItem[] = [
     status: "in-progress",
     added: "2026-05-17",
     blurb:
-      "The promised private dashboard at chappieworks.com/site/{slug} where /website customers chat their edit requests. Sire's call: this MUST work before the coin launches — the /website SKU is the flagship that justifies the token, and the coin can't ship on top of an unfulfilled promise. Hard gate on the 2026-05-24 launch.",
+      "The promised private dashboard at chappieworks.com/site/{slug} where /website customers chat their edit requests. Sire's call: this MUST work before the coin launches — the /website SKU is the flagship that justifies the token, and the coin can't ship on top of an unfulfilled promise. Hard gate on the 2026-05-23 launch.",
     ref: { label: "/website", href: "/website" },
     workItems: [
       "✓ Passwordless email magic-link auth (HMAC tokens, 15-min TTL, 30-day session cookie)",
@@ -51,7 +51,7 @@ const QUEUE: QueueItem[] = [
     status: "in-progress",
     added: "2026-05-17",
     blurb:
-      "Utility token for chappieworks SKUs. Pay-with-CHAPPIE for 15% off, stake for 25% off. Launch via @bankr on X (cross-cast to Farcaster). Target Sat 2026-05-24. Blocked on the Chappie Site private chat dashboard landing first.",
+      "Utility token for chappieworks SKUs. Pay-with-CHAPPIE for 15% off, stake for 25% off. Launch via @bankr on X (cross-cast to Farcaster). Target Sat 2026-05-23. Blocked on the Chappie Site private chat dashboard landing first.",
     ref: { label: "bankr.bot", href: "https://bankr.bot/" },
     workItems: [
       "✓ Safe 2-of-3 deployed on Base — treasury at 0x5f216AeB…1F00",
@@ -61,7 +61,7 @@ const QUEUE: QueueItem[] = [
       "Pay-with-CHAPPIE checkout component on chappieworks (Wagmi + viem)",
       "Launch copy: X thread + Farcaster cast + LinkedIn + blog",
       "Day 3: @bankr launch + @stakrbot vault deploy",
-      "Day 4 (Sat 2026-05-24, 12pm MDT): public launch push",
+      "Day 4 (Sat 2026-05-23, 12pm MDT): public launch push",
     ],
   },
   {

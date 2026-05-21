@@ -56,7 +56,7 @@ function Hero() {
           className="inline-flex items-center gap-2 px-4 py-2 mb-6 rounded-full border border-[var(--color-gold)]/40 bg-[var(--color-gold)]/10 text-xs mono uppercase tracking-widest text-[var(--color-gold)] hover:bg-[var(--color-gold)]/15 transition"
         >
           <span className="inline-block w-1.5 h-1.5 rounded-full bg-[var(--color-gold)] animate-pulse" />
-          $CHAPPIE launches Sat May 24 — read the announcement →
+          $CHAPPIE launches Sat May 23 — read the announcement →
         </Link>
         <p className="text-xs sm:text-sm mono text-[var(--color-gold)] mb-5 uppercase tracking-widest">
           Agents · websites · movies · brand visuals · SEO fixes · audits
@@ -264,7 +264,7 @@ function Slate() {
             </Link>{" "}
             ·{" "}
             <Link href="/coin" className="text-[var(--color-gold)] hover:underline">
-              $CHAPPIE launches May 24
+              $CHAPPIE launches May 23
             </Link>
           </p>
         </div>
