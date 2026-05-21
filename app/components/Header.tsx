@@ -11,7 +11,6 @@ const NAV = [
   { href: "/website", label: "Website" },
   { href: "/movie", label: "Movie" },
   { href: "/photoshoot", label: "Visuals" },
-  { href: "/seo-fix", label: "SEO Fix" },
   { href: "/ads-audit", label: "Ads" },
   { href: "/brief/ai-agency", label: "Brief" },
   { href: "/blog", label: "Blog" },

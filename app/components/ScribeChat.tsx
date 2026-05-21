@@ -157,7 +157,7 @@ export function ScribeChat() {
         <div
           role="dialog"
           aria-label="Scribe chat"
-          className="fixed bottom-24 right-5 z-50 w-[min(380px,calc(100vw-2rem))] h-[min(560px,calc(100vh-8rem))] rounded-xl flex flex-col overflow-hidden"
+          className="fixed bottom-24 left-4 right-4 sm:left-auto sm:right-5 sm:w-[380px] z-50 h-[min(560px,calc(100dvh-8rem))] max-h-[calc(100dvh-7rem)] rounded-xl flex flex-col overflow-hidden"
           style={{
             background: "var(--color-raven)",
             border: "1px solid rgba(201,164,55,0.25)",
@@ -274,7 +274,7 @@ export function ScribeChat() {
                 onKeyDown={onKeyDown}
                 placeholder="Ask about audits, builds, pricing…"
                 rows={1}
-                className="flex-1 bg-transparent border-0 outline-none resize-none text-sm placeholder:opacity-40 leading-relaxed"
+                className="flex-1 min-w-0 bg-transparent border-0 outline-none resize-none text-sm placeholder:opacity-40 leading-relaxed"
                 style={{
                   color: "var(--color-paper)",
                   maxHeight: 120,
