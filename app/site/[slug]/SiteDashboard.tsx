@@ -155,7 +155,7 @@ export function SiteDashboard({ initialSite }: { initialSite: SiteRecord }) {
             <span>Original brief on file</span>
             <span aria-hidden="true">{briefOpen ? "−" : "+"}</span>
           </summary>
-          <pre className="mt-3 whitespace-pre-wrap text-sm text-[var(--color-paper)]/80 leading-relaxed font-sans">
+          <pre className="mt-3 whitespace-pre-wrap break-words text-sm text-[var(--color-paper)]/80 leading-relaxed font-sans">
             {site.brief}
           </pre>
         </details>
@@ -170,7 +170,7 @@ export function SiteDashboard({ initialSite }: { initialSite: SiteRecord }) {
         </div>
         <div
           ref={draftRef}
-          className="border border-white/10 rounded-md bg-black/20 p-4 max-h-[40vh] overflow-y-auto flex flex-col gap-3 mb-3"
+          className="border border-white/10 rounded-md bg-black/20 p-3 sm:p-4 max-h-[40vh] overflow-y-auto flex flex-col gap-3 mb-3"
         >
           {draft.length === 0 ? (
             <p className="text-sm text-[var(--color-mute)] italic">
@@ -186,7 +186,7 @@ export function SiteDashboard({ initialSite }: { initialSite: SiteRecord }) {
                   {m.role === "user" ? "You" : "Chappie"}
                 </div>
                 <div
-                  className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed whitespace-pre-wrap ${
+                  className={`max-w-[90%] sm:max-w-[85%] rounded-2xl px-3 sm:px-4 py-2.5 text-sm leading-relaxed whitespace-pre-wrap break-words ${
                     m.role === "user"
                       ? "bg-[var(--color-gold)]/15 border border-[var(--color-gold)]/30 rounded-tr-sm"
                       : "bg-white/5 border border-white/10 rounded-tl-sm"
@@ -223,17 +223,17 @@ export function SiteDashboard({ initialSite }: { initialSite: SiteRecord }) {
             }}
             rows={2}
             placeholder="What would you like changed?"
-            className="w-full rounded-md border border-white/15 bg-black/30 px-3 py-2 text-sm focus:border-[var(--color-gold)] focus:outline-none resize-y"
+            className="w-full rounded-md border border-white/15 bg-black/30 px-3 py-2 text-base sm:text-sm focus:border-[var(--color-gold)] focus:outline-none resize-y"
             disabled={thinking}
           />
-          <div className="flex items-center justify-between gap-3 mt-2">
-            <p className="text-[10px] mono text-[var(--color-mute)]">
+          <div className="flex flex-wrap items-center justify-between gap-2 mt-2">
+            <p className="hidden sm:block text-[10px] mono text-[var(--color-mute)]">
               Cmd/Ctrl+Enter to send.
             </p>
             <button
               type="submit"
               disabled={thinking || !input.trim()}
-              className="rounded-md border border-white/20 hover:border-[var(--color-gold)] px-3 py-1.5 text-xs mono disabled:opacity-40"
+              className="ml-auto rounded-md border border-white/20 hover:border-[var(--color-gold)] px-3 py-1.5 text-xs mono disabled:opacity-40"
             >
               {thinking ? "Thinking…" : "Send"}
             </button>
@@ -245,10 +245,10 @@ export function SiteDashboard({ initialSite }: { initialSite: SiteRecord }) {
             <div className="text-[10px] mono uppercase tracking-widest text-[var(--color-gold)] mb-2">
               Proposed edit
             </div>
-            <p className="text-sm text-[var(--color-paper)]/90 leading-relaxed whitespace-pre-wrap">
+            <p className="text-sm text-[var(--color-paper)]/90 leading-relaxed whitespace-pre-wrap break-words">
               {proposedEdit}
             </p>
-            <div className="flex flex-wrap items-center justify-between gap-3 mt-4">
+            <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center sm:justify-between gap-3 mt-4">
               <p className="text-[10px] mono text-[var(--color-mute)]">
                 Looks right? Submit it. Not quite? Keep refining above.
               </p>
@@ -256,7 +256,7 @@ export function SiteDashboard({ initialSite }: { initialSite: SiteRecord }) {
                 type="button"
                 onClick={submitEdit}
                 disabled={submitting}
-                className="rounded-md bg-[var(--color-gold)] text-black px-4 py-2 text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full sm:w-auto rounded-md bg-[var(--color-gold)] text-black px-4 py-2 text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {submitting ? "Submitting…" : "Submit edit to the studio →"}
               </button>
@@ -297,7 +297,7 @@ export function SiteDashboard({ initialSite }: { initialSite: SiteRecord }) {
                   {isCustomer ? "You · submitted" : "The studio"} · {timeLabel(m.at)}
                 </div>
                 <div
-                  className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap ${
+                  className={`max-w-[90%] sm:max-w-[85%] rounded-2xl px-3 sm:px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap break-words ${
                     isCustomer
                       ? "bg-[var(--color-gold)]/15 border border-[var(--color-gold)]/30 rounded-tr-sm"
                       : "bg-white/5 border border-white/10 rounded-tl-sm"
