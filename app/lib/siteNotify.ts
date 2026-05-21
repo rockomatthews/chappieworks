@@ -79,6 +79,41 @@ export async function sendWelcomeDashboard(opts: {
   });
 }
 
+export async function sendLaunchPayLink(opts: {
+  to: string;
+  businessName: string;
+  ownerName: string;
+}): Promise<SendResult> {
+  const from = process.env.INTAKE_FROM_EMAIL ?? FROM_DEFAULT;
+  const stripeLink =
+    process.env.NEXT_PUBLIC_STRIPE_LINK_WEBSITE ||
+    "https://buy.stripe.com/9B614nd0m3tH5ax5Rs3oA0c";
+  const firstName = (opts.ownerName || "").split(" ")[0] || "there";
+
+  const html = `<!DOCTYPE html><html><body style="font-family: -apple-system, system-ui, sans-serif; background:#0b0b0c; color:#faf7ee; padding:32px 16px; margin:0;">
+<div style="max-width:560px; margin:0 auto;">
+<div style="border-bottom:2px solid #c9a437; padding-bottom:14px; margin-bottom:24px;">
+  <div style="font-family:'SF Mono', monospace; font-size:11px; color:#c9a437; letter-spacing:0.12em; text-transform:uppercase;">Chappie Site · Launch fee</div>
+  <h1 style="font-size:22px; margin:8px 0 0; font-weight:600;">Pay $99 and we start building ${escapeHtml(opts.businessName)}.</h1>
+</div>
+<p style="font-size:15px; line-height:1.6; color:rgba(250,247,238,0.85);">Hey ${escapeHtml(firstName)} — your brief is in. To kick off the build, pay the $99 launch fee. The studio starts the moment payment lands and your site goes live within 48 hours.</p>
+<p style="font-size:15px; line-height:1.6; color:rgba(250,247,238,0.85);">The $49/mo unlimited-edits subscription auto-starts at launch. Cancel any time and keep the code.</p>
+<p style="margin: 28px 0;">
+  <a href="${stripeLink}" style="display:inline-block; background:#c9a437; color:#0b0b0c; padding:12px 24px; border-radius:6px; text-decoration:none; font-weight:600; font-size:15px;">Pay $99 — start the 48hr clock →</a>
+</p>
+<p style="font-size:13px; line-height:1.55; color:rgba(250,247,238,0.55);">Card processed by Stripe. We never see the number. Questions? Reply to this email or chat with the studio from your dashboard.</p>
+</div>
+</body></html>`;
+
+  return sendResend({
+    from: `Chappie Works <${from}>`,
+    to: [opts.to],
+    reply_to: from,
+    subject: `Pay $99 to launch ${opts.businessName} — Chappie Site`,
+    html,
+  });
+}
+
 export async function sendMagicLink(opts: {
   to: string;
   slug: string;

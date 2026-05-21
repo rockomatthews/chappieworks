@@ -5,7 +5,7 @@ import { after } from "next/server";
 import { revalidatePath } from "next/cache";
 import { createSite } from "../lib/sites";
 import { makeMagicToken, WELCOME_TOKEN_TTL_MS } from "../lib/siteAuth";
-import { sendWelcomeDashboard } from "../lib/siteNotify";
+import { sendLaunchPayLink, sendWelcomeDashboard } from "../lib/siteNotify";
 
 export type IntakeFormType =
   | "agents"
@@ -373,6 +373,27 @@ async function provisionSiteFromBrief(submission: {
         "[chappieworks:intake] site provisioned",
         site.slug,
         "for",
+        site.ownerEmail,
+      );
+    }
+
+    const payResult = await sendLaunchPayLink({
+      to: site.ownerEmail,
+      businessName: site.businessName,
+      ownerName: site.ownerName,
+    });
+    if (!payResult.ok) {
+      console.error(
+        "[chappieworks:intake] stripe pay-link email failed",
+        site.slug,
+        "error",
+        payResult.error,
+      );
+    } else {
+      console.log(
+        "[chappieworks:intake] stripe pay-link emailed",
+        site.slug,
+        "to",
         site.ownerEmail,
       );
     }
