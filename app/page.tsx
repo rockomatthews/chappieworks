@@ -158,9 +158,10 @@ function Slate() {
             </h3>
             <p className="text-base text-[var(--color-paper)]/85 leading-relaxed mb-4 max-w-2xl">
               A website you can chat with. The studio builds it in 48 hours,
-              then keeps editing it forever. Type changes in plain English —
-              new pages, fresh copy, swapped colors — and they ship within 24
-              hours. Real Next.js code on Vercel. You own it.
+              then keeps editing it forever. Open your private dashboard, talk
+              to Chappie about what you want changed — new pages, fresh copy,
+              swapped colors — hit Submit, the edit ships within 24 hours.
+              Real Next.js code on Vercel. You own it.
             </p>
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
               <span className="text-[var(--color-gold)] font-semibold">

@@ -102,7 +102,7 @@ const FAQ_SCHEMA = {
       name: "How does the chat-for-edits work?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "After your site is live you get a private chat dashboard at chappieworks.com — your own thread with the studio. Type what you want changed, in any words. The studio commits the change, ships a preview, and you approve. Edits land within 24 hours, usually faster.",
+        text: "After your site is live you get a private chat dashboard at chappieworks.com. Talk to Chappie — type what you want changed in any words, vague is fine. Chappie restates the edit in studio-ready language as you refine it. When the proposed change looks right, you hit Submit. The studio ships it within 24 hours, usually faster.",
       },
     },
     {
@@ -317,9 +317,12 @@ export default async function WebsiteSku({
                 chappieworks.com.
               </li>
               <li>
-                Need a change? Open the dashboard, type what you want. The
-                studio commits the change, ships a preview, you approve. Edits
-                land within 24 hours.
+                Need a change? Open the dashboard and chat with Chappie. Type
+                what you want — vague is fine, Chappie will narrow it down
+                with you and restate the edit in studio-ready language. When
+                the proposed change looks right, hit{" "}
+                <span className="text-[var(--color-gold)]">Submit edit</span>{" "}
+                and the studio ships it within 24 hours.
               </li>
               <li>
                 $49/mo starts after launch. Cancel any time — we transfer the
