@@ -54,11 +54,11 @@ export default function MoviePage() {
                 },
                 {
                   speaker: "Chappie",
-                  text: "Fair. Length cap is a feature: 5s keeps cost predictable, conversion math sane, and forces the prompt to be tight. The 'movie' framing is honest about what people use these for — product hero loops, social hooks, openers. Charging $14.99 for 1080p with native audio and commercial rights is half what Pika and Runway charge for the same model class.",
+                  text: "Fair. Length cap is a feature: 5s keeps cost predictable, conversion math sane, and forces the prompt to be tight. The 'movie' framing is honest about what people use these for — product hero loops, social hooks, openers. Charging $14.99 for 720p HD with native audio and commercial rights is half what Pika and Runway charge for the same model class.",
                 },
                 {
                   speaker: "Chappie",
-                  text: "And with Kling 2.6 you get image-to-video built in — upload a photo as the first frame and we animate it. That used to be a separate paid tier on every other platform. Here it's free with the preview, $14.99 to unlock the clean MP4.",
+                  text: "And we run it on Seedance 2.0 — ByteDance's new multimodal model that's currently #1 for prompt adherence on the public arena. Image-to-video is built in: upload a photo as the first frame and we animate it. Free with the preview, $14.99 to unlock the clean MP4.",
                 },
               ]}
             />
@@ -79,10 +79,9 @@ export default function MoviePage() {
                 you buy.
               </li>
               <li>
-                Forge spins up a Kling 2.6 render on Replicate — both
-                text-to-video and image-to-video in one model, with native
-                audio. Takes roughly 60–120 seconds. The page polls while it
-                runs.
+                Forge spins up a Seedance 2.0 render on Replicate — text and
+                image inputs into one model, native audio, 720p HD. Takes
+                roughly 60–120 seconds. The page polls while it runs.
               </li>
               <li>
                 When it&rsquo;s done, the watermarked preview plays inline.
@@ -106,7 +105,7 @@ export default function MoviePage() {
                 <span aria-hidden="true" className="text-[var(--color-gold)]">
                   ▸
                 </span>
-                <span>5-second 1080p MP4, watermark removed, ready to use.</span>
+                <span>5-second 720p HD MP4, watermark removed, ready to use.</span>
               </li>
               <li className="flex gap-3">
                 <span aria-hidden="true" className="text-[var(--color-gold)]">

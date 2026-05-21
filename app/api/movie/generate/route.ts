@@ -31,9 +31,11 @@ const ALLOWED_IMAGE_TYPES = new Set([
   "image/webp",
 ]);
 
-// Kling 2.6 on Replicate — text-to-video AND image-to-video in one model,
-// native audio generation, supports 5s and 10s durations.
-const MODEL = "kwaivgi/kling-v2.6" as `${string}/${string}`;
+// Seedance 2.0 on Replicate — ByteDance's multimodal video model. Currently
+// #1 on the Artificial Analysis prompt-adherence leaderboard for both T2V
+// and I2V. Same Replicate SDK as Kling, similar input schema. 720p keeps
+// per-clip cost predictable across the 5s and 10s tiers.
+const MODEL = "bytedance/seedance-2.0" as `${string}/${string}`;
 
 // Pull the last frame from a video at a public URL and return it as a PNG
 // buffer. Used by extension mode to seed the next 10s with the final frame
@@ -234,10 +236,11 @@ export async function POST(req: Request) {
       prompt,
       duration,
       aspect_ratio: "16:9",
-      audio: true,
+      resolution: "720p",
+      generate_audio: true,
     };
     if (startImageUrl) {
-      input.start_image = startImageUrl;
+      input.image = startImageUrl;
     }
 
     const prediction = await replicate.predictions.create({
