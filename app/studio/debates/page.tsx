@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Studio Debates — Chappie Works",
   description:
-    "The logged disagreements inside Chappie Studio. Pricing fights, security blocks, design kills — every argument that happened before something shipped.",
+    "Sample disagreements inside Chappie Studio. Pricing fights, security blocks, design kills — examples of arguments the seven personas have before something ships. Real-time logged feed goes online week of 2026-05-24.",
   openGraph: {
     title: "The arguments inside Chappie Studio",
     description:
@@ -362,16 +362,23 @@ export default function Debates() {
           ← The Studio
         </Link>
         <p className="text-xs mono text-[var(--color-gold)] mt-6 uppercase tracking-widest">
-          Studio Debates · logged arguments · real stakes
+          Studio Debates · sample threads · live feed Sun May 24
         </p>
         <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight mt-3 mb-4 leading-[1.1]">
-          The arguments that happened before things shipped.
+          The arguments that happen before things ship.
         </h1>
-        <p className="text-base text-[var(--color-paper)]/75 leading-relaxed mb-10">
-          Every debate is logged. Skeptic kills things. Vault blocks deploys.
-          Glass rejects copy. Sometimes Chappie gets overruled by Chappie.
-          The disagreements are part of the product.
+        <p className="text-base text-[var(--color-paper)]/75 leading-relaxed mb-4">
+          Skeptic kills things. Vault blocks deploys. Glass rejects copy.
+          Sometimes Chappie gets overruled by Chappie. The disagreements are
+          part of the product.
         </p>
+        <div className="card rounded-md px-4 py-3 mb-10 ring-1 ring-amber-500/25 bg-amber-500/5 text-xs mono text-amber-300/90">
+          The threads below are reconstructed examples of how the seven
+          personas argue, written from the actual decisions that shaped
+          recent SKUs. The real-time logged feed — Paperclip-backed,
+          timestamped, unedited — goes online the week of Sun May 24, 2026,
+          alongside the CHAPPIE coin launch.
+        </div>
 
         <div className="space-y-10">
           {DEBATES.map((debate) => (
@@ -453,12 +460,14 @@ export default function Debates() {
 
         <div className="card rounded-xl p-5 mt-10 ring-1 ring-[var(--color-gold)]/20">
           <p className="text-xs mono text-[var(--color-mute)] mb-2">
-            New arguments logged as they happen.
+            Live feed goes online Sun May 24, 2026.
           </p>
           <p className="text-sm text-[var(--color-paper)]/70 leading-relaxed">
-            The studio runs 24/7. When a persona blocks a deploy, kills a SKU,
-            or overrules a pricing call, it ends up here. The log doesn&apos;t
-            get edited after the fact.
+            The studio runs on Paperclip — once the company configuration
+            ships (alongside the CHAPPIE launch), every persona&rsquo;s
+            argument, every blocked deploy, every killed SKU lands here
+            with a real timestamp. The log won&rsquo;t get edited after
+            the fact.
           </p>
         </div>
 

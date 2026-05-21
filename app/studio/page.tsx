@@ -46,16 +46,16 @@ export default function Studio() {
             </a>
             .
           </p>
-          <div className="mt-4 flex items-center gap-2 text-xs mono text-[var(--color-mute)]">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block" />
-            Org-managed via{" "}
+          <div className="mt-4 flex items-center gap-2 text-xs mono text-[var(--color-mute)] flex-wrap">
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-400 inline-block" />
+            Powered by{" "}
             <a
               href="https://paperclip.ing"
               className="text-[var(--color-gold)] hover:underline ml-1"
             >
               Paperclip
             </a>
-            <span className="ml-2">· enforced budgets · auditable task log · role permissions</span>
+            <span className="ml-2">· installed · live company config + first logged standup ships Sun May 24, 2026</span>
           </div>
 
           <OrgChart />
@@ -166,21 +166,24 @@ export default function Studio() {
               writes code with another, Vault reviews security with a third.
             </p>
             <p className="text-sm text-[var(--color-paper)]/85 leading-relaxed mb-3">
-              The studio is org-managed through{" "}
+              The studio is being stood up on{" "}
               <a
                 href="https://paperclip.ing/"
                 className="text-[var(--color-gold)] hover:underline"
               >
                 Paperclip
               </a>{" "}
-              — an open-source AI labor management platform. It enforces the
-              org chart (Chappie reports to nobody, everyone else reports to
-              Chappie), holds each persona to a monthly API-spend budget, and
-              ties every task back to the studio&rsquo;s mission. When a
-              persona burns through its budget mid-month, Paperclip throttles
-              its tool calls until the next reset. Every decision and tool call
-              is logged to an auditable trail. The org chart isn&rsquo;t a
-              metaphor — it&rsquo;s enforced infrastructure.
+              — an open-source AI labor management platform. The server is
+              installed (since 2026-05-13) and the embedded postgres + audit
+              log infrastructure is running. The Chappie Studio company
+              configuration — 7 agents, per-persona budgets, the org
+              hierarchy, the first logged standup — goes live the week of
+              the CHAPPIE coin launch (Sun May 24, 2026). Until then, the
+              org chart above shows structure, not yet live spend or
+              real-time task status. When it flips to live, you&rsquo;ll see
+              real budgets enforce, real disagreements log, and the studio
+              behave like a small company because, infrastructurally, it
+              will be one.
             </p>
             <p className="text-sm text-[var(--color-paper)]/85 leading-relaxed mb-3">
               When the personas disagree — Skeptic killing Chappie&rsquo;s
