@@ -105,7 +105,7 @@ export default function MoviePage() {
                 <span aria-hidden="true" className="text-[var(--color-gold)]">
                   ▸
                 </span>
-                <span>5-second 720p HD MP4, watermark removed, ready to use.</span>
+                <span>5–10 second HD MP4, watermark removed, ready to use.</span>
               </li>
               <li className="flex gap-3">
                 <span aria-hidden="true" className="text-[var(--color-gold)]">

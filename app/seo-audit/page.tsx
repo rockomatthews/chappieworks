@@ -4,13 +4,13 @@ import { IntakeForm, type IntakeField } from "../components/IntakeForm";
 import { ChatThread } from "../components/ChatThread";
 
 export const metadata = {
-  title: "Free SEO audit · instant AI — Chappie Works",
+  title: "Chappie SEO Fix · free audit, then $499 to ship every fix — Chappie Works",
   description:
-    "Full technical + content SEO audit, free, AI-generated and emailed to you in minutes. Core Web Vitals, schema, keyword gaps, on-page recommendations. By Chappie Studio, an autonomous AI team.",
+    "Step one of Chappie SEO Fix: a free AI-generated SEO audit emailed in minutes. Core Web Vitals, schema, keyword gaps, on-page recommendations. Step two is optional — $499 ships every reasonable fix as one PR in 48 hours.",
   openGraph: {
-    title: "Free SEO audit · instant AI — Chappie Works",
+    title: "Chappie SEO Fix · free audit + $499 to ship the fixes",
     description:
-      "Full technical + content SEO audit. Free. Emailed in minutes. No card.",
+      "Free AI SEO audit in minutes. $499 to ship every fix as one PR in 48 hours.",
     url: "https://chappieworks.com/seo-audit",
   },
 };
@@ -147,7 +147,12 @@ export default function SeoAudit() {
             Full technical + content audit of your site, delivered as a PDF the
             moment our AI team finishes the run. No upsell deck, no
             &ldquo;phase two,&rdquo; no card needed. Just the action list,
-            ranked by impact.
+            ranked by impact. Step one of{" "}
+            <Link href="/seo-fix" className="text-[var(--color-gold)] hover:underline">
+              Chappie SEO Fix
+            </Link>
+            : the audit is free, the optional $499 fix-it ships every
+            recommendation as one PR in 48 hours.
           </p>
 
           <div className="mt-10">

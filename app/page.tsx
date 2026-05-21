@@ -1,33 +1,37 @@
 import Link from "next/link";
 import Image from "next/image";
 
-const AUDITS = [
+const PROJECT_SKUS = [
   {
-    slug: "seo-audit",
-    name: "SEO audit",
+    slug: "seo-fix",
+    name: "SEO Fix",
     blurb:
-      "Full technical + content audit. Core Web Vitals, schema, keyword gaps, on-page action list. AI-generated PDF.",
-    turnaround: "Minutes",
-  },
-  {
-    slug: "photoshoot",
-    name: "Brand visuals preview",
-    blurb:
-      "3 brand-aligned images from your brief — hero banner, social card, moodboard. 2K PNGs, commercial rights yours.",
-    turnaround: "Minutes",
+      "Free AI-generated SEO audit emailed in minutes. $499 to hand us your repo — every reasonable fix ships as one PR in 24–48 hours.",
+    price: "Free audit · $499 to ship the fixes",
+    turnaround: "Minutes / 48 hours",
   },
   {
     slug: "movie",
     name: "Make a movie",
     blurb:
-      "5-second cinematic clip from a prompt. Watermarked preview free, $14.99 unlocks the unwatermarked HD MP4. Commercial rights yours.",
-    turnaround: "90 seconds",
+      "Prompt or upload a photo. Seedance 2.0 renders a 5–10 second HD clip with native audio. Watermarked preview free, $14.99 unlocks the clean MP4.",
+    price: "Free preview · $14.99 unlock",
+    turnaround: "~90 seconds",
+  },
+  {
+    slug: "photoshoot",
+    name: "Brand visuals",
+    blurb:
+      "30-second brief → 3 brand-aligned 2K images in your inbox in minutes. $49 unlocks the 10-image Brand Aesthetic Pack across 7 modes.",
+    price: "Free 3-image preview · $49 full pack",
+    turnaround: "Minutes",
   },
   {
     slug: "ads-audit",
     name: "Paid ads audit",
     blurb:
-      "250+ checks across Google, Meta, TikTok, LinkedIn, Microsoft. Wasted spend, creative fatigue, kill/scale calls.",
+      "250+ checks across Google, Meta, TikTok, LinkedIn, Microsoft. Wasted spend, creative fatigue, kill/scale calls. Free, 48-hour turnaround.",
+    price: "Free",
     turnaround: "48 hours",
   },
 ];
@@ -55,15 +59,17 @@ function Hero() {
           $CHAPPIE launches Sat May 24 — read the announcement →
         </Link>
         <p className="text-xs sm:text-sm mono text-[var(--color-gold)] mb-5 uppercase tracking-widest">
-          Custom AI agents · 5–7 days · free audits in 48hr
+          Agents · websites · movies · brand visuals · SEO fixes · audits
         </p>
         <h1 className="text-4xl sm:text-5xl lg:text-6xl tracking-tight font-semibold leading-[1.08] mb-6">
           AI work, productized.
         </h1>
         <p className="text-base sm:text-lg text-[var(--color-paper)]/85 leading-relaxed max-w-2xl mx-auto">
-          Custom AI agents built in a week, $500 to $1,500. A daily AI-agency
-          intel brief, $29/mo. Free SEO and paid-ads audits in 48 hours, no
-          card needed. Run by{" "}
+          Custom AI agents built in a week ($500–$1,500). A website you can
+          chat-edit ($99 + $49/mo). Cinematic clips from a prompt ($14.99).
+          Brand visuals in minutes. SEO fixes shipped as one PR ($499). Free
+          SEO and paid-ads audits in 48 hours. A daily intel brief in your
+          inbox. Run by{" "}
           <a
             href="https://chappiethebot.com?utm_source=chappieworks&utm_medium=site&utm_campaign=hero"
             className="text-[var(--color-gold)] hover:underline"
@@ -213,19 +219,19 @@ function Slate() {
 
         <div id="audits" className="mt-12 scroll-mt-20">
           <p className="text-xs mono text-[var(--color-gold)] uppercase tracking-widest mb-3 text-center">
-            Or start free
+            Per-project work
           </p>
           <h3 className="text-xl sm:text-2xl font-semibold tracking-tight mb-2 text-center">
-            Four free previews. Minutes to 48 hours.
+            Free previews. Paid upgrades. Minutes to 48 hours.
           </h3>
           <p className="text-sm text-[var(--color-mute)] text-center mb-8 max-w-xl mx-auto">
-            We do these free because the buyers we want next are the ones who
-            need an agent built after. No card, no upsell deck — just the
-            preview and an honest read on whether automation actually fits your
-            shop.
+            Every SKU starts free — an audit, a watermarked preview, a brief
+            in your inbox. Like what you see? Pay the unlock, keep the work,
+            full commercial rights. We do it this way so you only buy when
+            the studio&rsquo;s actually delivered.
           </p>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {AUDITS.map((a) => (
+            {PROJECT_SKUS.map((a) => (
               <Link
                 key={a.slug}
                 href={`/${a.slug}`}
@@ -233,10 +239,10 @@ function Slate() {
               >
                 <div className="flex items-baseline justify-between mb-3">
                   <h4 className="font-semibold text-lg">{a.name}</h4>
-                  <span className="text-[var(--color-gold)] font-semibold">
-                    Free
-                  </span>
                 </div>
+                <p className="text-xs mono text-[var(--color-gold)] mb-3">
+                  {a.price}
+                </p>
                 <p className="text-sm text-[var(--color-paper)]/80 leading-relaxed mb-5 flex-1">
                   {a.blurb}
                 </p>
@@ -245,12 +251,22 @@ function Slate() {
                     {a.turnaround}
                   </span>
                   <span className="text-[var(--color-gold)]">
-                    Get yours →
+                    Start →
                   </span>
                 </div>
               </Link>
             ))}
           </div>
+          <p className="text-xs mono text-[var(--color-mute)] text-center mt-6">
+            Also:{" "}
+            <Link href="/shop" className="text-[var(--color-gold)] hover:underline">
+              shop merch
+            </Link>{" "}
+            ·{" "}
+            <Link href="/coin" className="text-[var(--color-gold)] hover:underline">
+              $CHAPPIE launches May 24
+            </Link>
+          </p>
         </div>
       </div>
     </section>

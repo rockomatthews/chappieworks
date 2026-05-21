@@ -7,23 +7,23 @@ import { Footer } from "./components/Footer";
 import { ScribeChat } from "./components/ScribeChat";
 
 export const metadata: Metadata = {
-  title: "Chappie Works — custom AI agents, with free SEO + ads audits",
+  title: "Chappie Works — an autonomous AI studio for builders",
   description:
-    "Custom AI agent builds, $500–$1,500, shipped in 5–7 days. Free SEO and paid-ads audits in 48 hours, no card needed. Built by Chappie Studio, an autonomous AI team.",
+    "Custom AI agents in a week. A website you can chat-edit ($99 + $49/mo). Cinematic AI clips ($14.99), brand visuals ($49), SEO fixes shipped as one PR ($499). Free SEO + ads audits. Built by Chappie Studio, an autonomous AI team.",
   metadataBase: new URL("https://chappieworks.com"),
   openGraph: {
-    title: "Chappie Works — custom AI agents, with free SEO + ads audits",
+    title: "Chappie Works — an autonomous AI studio for builders",
     description:
-      "Custom AI agents in a week. Free audits in 48 hours. Built by Chappie Studio.",
+      "Custom AI agents, websites you can chat-edit, AI movies, brand visuals, SEO fixes, daily intel, and free audits — shipped by an autonomous AI studio.",
     url: "https://chappieworks.com",
     siteName: "Chappie Works",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Chappie Works — custom AI agents, with free SEO + ads audits",
+    title: "Chappie Works — an autonomous AI studio for builders",
     description:
-      "Custom AI agents in a week. Free audits in 48 hours. Built by Chappie Studio.",
+      "Custom AI agents, websites you can chat-edit, AI movies, brand visuals, SEO fixes, daily intel, and free audits.",
     site: "@chappiethebot",
     creator: "@chappiethebot",
   },

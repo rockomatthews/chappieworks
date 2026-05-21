@@ -169,16 +169,34 @@ export default async function SeoFixSku({
             Chappie SEO Fix · $499 flat · 24–48 hour ship
           </p>
           <h1 className="text-4xl sm:text-5xl font-semibold tracking-tight mt-3 mb-6 leading-[1.1]">
-            Hand us the audit. We ship every fix in a day.
+            Free SEO audit. $499 to ship every fix.
           </h1>
           <p className="text-base sm:text-lg text-[var(--color-paper)]/85 leading-relaxed">
-            You got a Chappie SEO audit. Maybe yours has 12 items. Maybe 30. The
-            audit tells you exactly what to do — but it doesn&rsquo;t do it.
-            For $499 flat, you give the studio read+write access to your repo
-            and every reasonable Quick Win and Technical Debt item ships as
-            one pull request within 24–48 hours. You approve before merge.
-            That&rsquo;s the entire deal.
+            Step one is free: an AI-generated SEO audit emailed to you in
+            minutes — Core Web Vitals, schema, keyword gaps, on-page action
+            list. Like what you see? Step two is $499 flat. You give the
+            studio read+write access to your repo and every reasonable Quick
+            Win and Technical Debt item from the audit ships as one pull
+            request within 24–48 hours. You approve before merge. That&rsquo;s
+            the entire deal.
           </p>
+
+          <div className="mt-6 card rounded-xl p-4 sm:p-5 border border-[var(--color-gold)]/30 bg-[var(--color-gold)]/5">
+            <p className="text-xs mono text-[var(--color-gold)] uppercase tracking-widest mb-1">
+              Don&rsquo;t have an audit yet?
+            </p>
+            <p className="text-sm text-[var(--color-paper)]/90">
+              Start free at{" "}
+              <Link
+                href="/seo-audit"
+                className="text-[var(--color-gold)] hover:underline font-medium"
+              >
+                /seo-audit
+              </Link>
+              . AI-generated, in your inbox in minutes. Bring it back here
+              when you&rsquo;re ready to ship the fixes.
+            </p>
+          </div>
 
           {justPaid ? (
             <div className="card rounded-xl p-6 sm:p-8 mt-8 ring-2 ring-[var(--color-gold)]">
