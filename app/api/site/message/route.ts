@@ -34,10 +34,20 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: "Not signed in" }, { status: 401 });
   }
 
-  const updated = await appendMessage(slug, {
+  const afterCustomer = await appendMessage(slug, {
     from: "customer",
     body,
     statusChange: site.status === "shipped" ? "received" : undefined,
+  });
+  if (!afterCustomer) {
+    return NextResponse.json({ ok: false, error: "Save failed" }, { status: 500 });
+  }
+
+  // Auto-acknowledge so the chat doesn't feel like shouting into the void.
+  // The studio operator gets pinged via email and replies as a real human.
+  const updated = await appendMessage(slug, {
+    from: "system",
+    body: "Studio notified — a real reply lands here within 24 hours.",
   });
   if (!updated) {
     return NextResponse.json({ ok: false, error: "Save failed" }, { status: 500 });

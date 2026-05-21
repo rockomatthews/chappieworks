@@ -41,6 +41,44 @@ async function sendResend(payload: {
   }
 }
 
+export async function sendWelcomeDashboard(opts: {
+  to: string;
+  slug: string;
+  token: string;
+  businessName: string;
+  ownerName: string;
+}): Promise<SendResult> {
+  const from = process.env.INTAKE_FROM_EMAIL ?? FROM_DEFAULT;
+  const baseUrl =
+    process.env.NEXT_PUBLIC_SITE_URL ?? "https://chappieworks.com";
+  const link = `${baseUrl}/api/site/verify?token=${encodeURIComponent(opts.token)}`;
+  const dashboardUrl = `${baseUrl}/site/${opts.slug}`;
+  const firstName = (opts.ownerName || "").split(" ")[0] || "there";
+
+  const html = `<!DOCTYPE html><html><body style="font-family: -apple-system, system-ui, sans-serif; background:#0b0b0c; color:#faf7ee; padding:32px 16px; margin:0;">
+<div style="max-width:560px; margin:0 auto;">
+<div style="border-bottom:2px solid #c9a437; padding-bottom:14px; margin-bottom:24px;">
+  <div style="font-family:'SF Mono', monospace; font-size:11px; color:#c9a437; letter-spacing:0.12em; text-transform:uppercase;">Chappie Site · Your dashboard is ready</div>
+  <h1 style="font-size:22px; margin:8px 0 0; font-weight:600;">Hey ${escapeHtml(firstName)} — chat with the studio about ${escapeHtml(opts.businessName)}.</h1>
+</div>
+<p style="font-size:15px; line-height:1.6; color:rgba(250,247,238,0.85);">Your private edit dashboard is live. Open it, and you&rsquo;ll see the studio&rsquo;s welcome note + a message box where you can ask anything about the build, share assets, or describe changes once your site ships.</p>
+<p style="font-size:15px; line-height:1.6; color:rgba(250,247,238,0.85);">A Stripe link for the $99 launch fee is coming separately. While you wait, drop any questions or extra context in the dashboard.</p>
+<p style="margin: 28px 0;">
+  <a href="${link}" style="display:inline-block; background:#c9a437; color:#0b0b0c; padding:12px 24px; border-radius:6px; text-decoration:none; font-weight:600; font-size:15px;">Open my dashboard →</a>
+</p>
+<p style="font-size:13px; line-height:1.55; color:rgba(250,247,238,0.55);">The link above signs you in directly for the next 7 days. After that, visit <a href="${dashboardUrl}" style="color:#c9a437;">${escapeHtml(dashboardUrl)}</a> and we&rsquo;ll email you a fresh sign-in link.</p>
+</div>
+</body></html>`;
+
+  return sendResend({
+    from: `Chappie Works <${from}>`,
+    to: [opts.to],
+    reply_to: from,
+    subject: `Your Chappie Site dashboard is ready — ${opts.businessName}`,
+    html,
+  });
+}
+
 export async function sendMagicLink(opts: {
   to: string;
   slug: string;

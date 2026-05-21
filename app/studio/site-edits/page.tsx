@@ -2,7 +2,6 @@ import Link from "next/link";
 import { isOperator } from "../../lib/siteAuth";
 import { EDIT_STATUS_LABELS, listSites, type EditStatus } from "../../lib/sites";
 import { OperatorLogin } from "./OperatorLogin";
-import { CreateSiteForm } from "./CreateSiteForm";
 
 export const dynamic = "force-dynamic";
 
@@ -57,18 +56,17 @@ export default async function SiteEditsInbox() {
           <p className="text-xs mono text-[var(--color-gold)] mt-6 uppercase tracking-widest">
             Studio · site edits inbox
           </p>
-          <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight mt-3 mb-8 leading-[1.1]">
+          <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight mt-3 mb-3 leading-[1.1]">
             Site edits.
           </h1>
-
-          <div className="mb-10">
-            <CreateSiteForm />
-          </div>
+          <p className="text-sm text-[var(--color-paper)]/70 mb-10 leading-relaxed">
+            Every <Link href="/website" className="text-[var(--color-gold)] hover:underline">/website</Link> brief auto-provisions a dashboard for the customer. Replies here go straight to their inbox.
+          </p>
 
           {idx.slugs.length === 0 ? (
             <p className="text-sm text-[var(--color-mute)]">
-              No sites provisioned yet. Use the form above after a customer pays
-              the $99 launch fee.
+              No sites yet. They show up here automatically when someone
+              submits a /website brief.
             </p>
           ) : (
             <div className="space-y-3">

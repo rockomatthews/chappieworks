@@ -3,6 +3,9 @@
 import { createHmac } from "crypto";
 import { after } from "next/server";
 import { revalidatePath } from "next/cache";
+import { createSite } from "../lib/sites";
+import { makeMagicToken, WELCOME_TOKEN_TTL_MS } from "../lib/siteAuth";
+import { sendWelcomeDashboard } from "../lib/siteNotify";
 
 export type IntakeFormType =
   | "agents"
@@ -44,7 +47,7 @@ const SUCCESS_COPY: Record<IntakeFormType, string> = {
   photoshoot:
     "Got it. The studio is generating your 3-image preview right now. Look for it in your inbox in 2–3 minutes from intake@chappieworks.com — check spam just in case.",
   website:
-    "Got it. The studio has your brief. You'll get a Stripe link for the $99 launch fee within a few hours from intake@chappieworks.com — check spam just in case. Pay it and your site goes live within 48 hours.",
+    "Got it. The studio has your brief. Look for two emails from intake@chappieworks.com — your private edit dashboard link (chat with the studio there), and the $99 Stripe launch link. Both arrive within a few hours; check spam just in case. Pay the $99 and your site goes live within 48 hours.",
   "seo-fix":
     "Got it. The studio has your repo info. Once you've paid the $499 launch fee and granted GitHub access, the fix clock starts — every reasonable item from your audit ships within 24–48 hours as a single PR. Look for instructions in your inbox from intake@chappieworks.com.",
   coin:
@@ -127,6 +130,12 @@ export async function submitIntake(
   // If it's a photoshoot preview, kick off the image-generation pipeline.
   if (formType === "photoshoot" && submission.fields.brand_description) {
     after(() => triggerPhotoshoot(submission));
+  }
+
+  // If it's a website brief, auto-provision the private edit dashboard and
+  // email the customer their sign-in link.
+  if (formType === "website") {
+    after(() => provisionSiteFromBrief(submission));
   }
 
   revalidatePath(`/${formType === "agents" ? "agents" : formType}`);
@@ -305,5 +314,69 @@ async function tryNotifyByResend(submission: {
     }
   } catch (err) {
     console.error("[chappieworks:intake] resend send threw", err);
+  }
+}
+
+async function provisionSiteFromBrief(submission: {
+  formType: IntakeFormType;
+  name: string;
+  email: string;
+  fields: Record<string, string>;
+}) {
+  try {
+    const businessName =
+      submission.fields.business_name?.trim() || submission.name.trim();
+    const briefParts: string[] = [];
+    if (submission.fields.business_description) {
+      briefParts.push(`What it does: ${submission.fields.business_description}`);
+    }
+    if (submission.fields.site_type) {
+      briefParts.push(`Site type: ${submission.fields.site_type}`);
+    }
+    if (submission.fields.vibe) {
+      briefParts.push(`Aesthetic: ${submission.fields.vibe}`);
+    }
+    if (submission.fields.reference_url) {
+      briefParts.push(`Reference: ${submission.fields.reference_url}`);
+    }
+    if (submission.fields.domain) {
+      briefParts.push(`Domain: ${submission.fields.domain}`);
+    }
+    if (submission.fields.notes) {
+      briefParts.push(`Notes: ${submission.fields.notes}`);
+    }
+
+    const site = await createSite({
+      ownerEmail: submission.email,
+      ownerName: submission.name,
+      businessName,
+      brief: briefParts.join("\n") || undefined,
+    });
+
+    const token = makeMagicToken(site.slug, site.ownerEmail, WELCOME_TOKEN_TTL_MS);
+    const result = await sendWelcomeDashboard({
+      to: site.ownerEmail,
+      slug: site.slug,
+      token,
+      businessName: site.businessName,
+      ownerName: site.ownerName,
+    });
+    if (!result.ok) {
+      console.error(
+        "[chappieworks:intake] welcome email failed",
+        site.slug,
+        "error",
+        result.error,
+      );
+    } else {
+      console.log(
+        "[chappieworks:intake] site provisioned",
+        site.slug,
+        "for",
+        site.ownerEmail,
+      );
+    }
+  } catch (err) {
+    console.error("[chappieworks:intake] provision threw", err);
   }
 }

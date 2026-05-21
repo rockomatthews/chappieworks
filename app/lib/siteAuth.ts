@@ -37,16 +37,22 @@ function sign(payloadB64: string): string {
   return b64urlEncode(createHmac("sha256", getSecret()).update(payloadB64).digest());
 }
 
-export function makeMagicToken(slug: string, email: string): string {
+export function makeMagicToken(
+  slug: string,
+  email: string,
+  ttlMs: number = MAGIC_TTL_MS,
+): string {
   const payload: TokenPayload = {
     kind: "magic",
     slug,
     email: email.toLowerCase(),
-    exp: Date.now() + MAGIC_TTL_MS,
+    exp: Date.now() + ttlMs,
   };
   const body = b64urlEncode(Buffer.from(JSON.stringify(payload)));
   return `${body}.${sign(body)}`;
 }
+
+export const WELCOME_TOKEN_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
 export function makeSessionToken(slug: string, email: string): string {
   const payload: TokenPayload = {
