@@ -122,6 +122,18 @@ export default async function CoinPage({
           >
             ← chappieworks
           </Link>
+          <div className="mt-8 flex justify-center">
+            <video
+              className="w-full max-w-md rounded-2xl"
+              src="/brand/chappie-spin.mp4"
+              poster="/brand/chappie-logo.png"
+              autoPlay
+              loop
+              muted
+              playsInline
+              aria-label="CHAPPIE coin"
+            />
+          </div>
           <p className="text-xs mono text-[var(--color-gold)] mt-6 uppercase tracking-widest">
             $CHAPPIE · utility token on Base · {isLive ? "live now" : "Sat May 23 · noon MDT"}
           </p>
