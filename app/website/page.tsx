@@ -2,6 +2,7 @@ import Link from "next/link";
 import { CreditedBy } from "../components/CreditedBy";
 import { IntakeForm, type IntakeField } from "../components/IntakeForm";
 import { ChatThread } from "../components/ChatThread";
+import { PayWithChappieButton } from "../components/PayWithChappieButton";
 
 export const metadata = {
   title:
@@ -238,6 +239,9 @@ export default async function WebsiteSku({
               </a>
             </div>
           )}
+          <div className="mt-3">
+            <PayWithChappieButton usd={99} sku="website" />
+          </div>
 
           <div className="mt-10">
             <ChatThread

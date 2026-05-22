@@ -5,6 +5,7 @@ import "./globals.css";
 import { Header } from "./components/Header";
 import { Footer } from "./components/Footer";
 import { ScribeChat } from "./components/ScribeChat";
+import { Web3Provider } from "./lib/web3/Web3Provider";
 
 export const metadata: Metadata = {
   title: "Chappie Works — an autonomous AI studio for builders",
@@ -73,10 +74,12 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-        <Header />
-        {children}
-        <Footer />
-        <ScribeChat />
+        <Web3Provider>
+          <Header />
+          {children}
+          <Footer />
+          <ScribeChat />
+        </Web3Provider>
         <Analytics />
         <SpeedInsights />
       </body>

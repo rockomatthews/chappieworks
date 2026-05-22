@@ -2,6 +2,7 @@ import Link from "next/link";
 import { CreditedBy } from "../components/CreditedBy";
 import { IntakeForm, type IntakeField } from "../components/IntakeForm";
 import { ChatThread } from "../components/ChatThread";
+import { PayWithChappieButton } from "../components/PayWithChappieButton";
 
 export const metadata = {
   title:
@@ -220,20 +221,25 @@ export default async function SeoFixSku({
               </a>
             </div>
           ) : (
-            <div className="mt-8 flex flex-col sm:flex-row gap-3">
-              <a
-                href={stripeLink}
-                className="flex-1 flex items-center justify-center px-6 py-4 rounded-md bg-[var(--color-gold)] text-[var(--color-ink)] font-medium hover:opacity-90 transition"
-              >
-                Pay $499 — start the 24hr clock →
-              </a>
-              <a
-                href="#intake"
-                className="flex-1 flex items-center justify-center px-6 py-4 rounded-md border border-white/15 hover:border-[var(--color-gold)] hover:text-[var(--color-gold)] transition"
-              >
-                Send a brief first (free)
-              </a>
-            </div>
+            <>
+              <div className="mt-8 flex flex-col sm:flex-row gap-3">
+                <a
+                  href={stripeLink}
+                  className="flex-1 flex items-center justify-center px-6 py-4 rounded-md bg-[var(--color-gold)] text-[var(--color-ink)] font-medium hover:opacity-90 transition"
+                >
+                  Pay $499 — start the 24hr clock →
+                </a>
+                <a
+                  href="#intake"
+                  className="flex-1 flex items-center justify-center px-6 py-4 rounded-md border border-white/15 hover:border-[var(--color-gold)] hover:text-[var(--color-gold)] transition"
+                >
+                  Send a brief first (free)
+                </a>
+              </div>
+              <div className="mt-3">
+                <PayWithChappieButton usd={499} sku="seo-fix" />
+              </div>
+            </>
           )}
 
           <div className="mt-10">
