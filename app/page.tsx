@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import { Countdown, LAUNCH_ISO } from "./coin/Countdown";
 
 const PROJECT_SKUS = [
   {
@@ -53,11 +54,14 @@ function Hero() {
       <div className="max-w-3xl mx-auto text-center">
         <Link
           href="/coin"
-          className="inline-flex items-center gap-2 px-4 py-2 mb-6 rounded-full border border-[var(--color-gold)]/40 bg-[var(--color-gold)]/10 text-xs mono uppercase tracking-widest text-[var(--color-gold)] hover:bg-[var(--color-gold)]/15 transition"
+          className="inline-flex items-center gap-2 px-4 py-2 mb-6 rounded-full bg-[#00e676] text-xs mono uppercase tracking-widest text-black font-semibold hover:opacity-90 transition"
         >
-          <span className="inline-block w-1.5 h-1.5 rounded-full bg-[var(--color-gold)] animate-pulse" />
+          <span className="inline-block w-1.5 h-1.5 rounded-full bg-black animate-pulse" />
           $CHAPPIE launches Sat May 23 — read the announcement →
         </Link>
+        <div className="max-w-md mx-auto mb-8">
+          <Countdown targetIso={LAUNCH_ISO} />
+        </div>
         <p className="text-xs sm:text-sm mono text-[var(--color-gold)] mb-5 uppercase tracking-widest">
           Agents · websites · movies · brand visuals · SEO fixes · audits
         </p>

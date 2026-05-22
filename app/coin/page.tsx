@@ -2,12 +2,7 @@ import Link from "next/link";
 import { CreditedBy } from "../components/CreditedBy";
 import { IntakeForm, type IntakeField } from "../components/IntakeForm";
 import { ChatThread } from "../components/ChatThread";
-import { Countdown } from "./Countdown";
-
-// Launch is locked to Sat 2026-05-23 at 12:00 PM MDT (18:00 UTC).
-// To pivot this page to post-launch state, set NEXT_PUBLIC_CHAPPIE_TOKEN_ADDRESS
-// in Vercel env to the deployed CHAPPIE contract address.
-const LAUNCH_ISO = "2026-05-23T18:00:00Z";
+import { Countdown, LAUNCH_ISO } from "./Countdown";
 
 export const metadata = {
   title:
@@ -131,7 +126,21 @@ export default async function CoinPage({
               className="w-[420px] max-w-full h-auto"
             />
           </div>
-          <p className="text-xs mono text-[var(--color-gold)] mt-6 uppercase tracking-widest">
+
+          {!isLive && (
+            <div className="card rounded-xl p-6 sm:p-8 mt-6 ring-2 ring-[var(--color-gold)]">
+              <p className="text-xs mono text-[var(--color-gold)] uppercase tracking-widest mb-3 text-center">
+                Launch · Sat May 23, 2026 · 12:00 PM MDT (18:00 UTC)
+              </p>
+              <Countdown targetIso={LAUNCH_ISO} />
+              <p className="text-xs mono text-[var(--color-mute)] text-center mt-4">
+                Watch <a href="https://x.com/chappieworks" target="_blank" rel="noopener noreferrer" className="text-[var(--color-gold)] hover:underline">@chappieworks on X</a> and{" "}
+                <a href="https://warpcast.com/rocketship" target="_blank" rel="noopener noreferrer" className="text-[var(--color-gold)] hover:underline">@rocketship on Farcaster</a> for the launch cast — Bankr deploys CHAPPIE in under 60 seconds from the cast.
+              </p>
+            </div>
+          )}
+
+          <p className="text-xs mono text-[var(--color-gold)] mt-8 uppercase tracking-widest">
             $CHAPPIE · utility token on Base · {isLive ? "live now" : "Sat May 23 · noon MDT"}
           </p>
           <h1 className="text-4xl sm:text-5xl font-semibold tracking-tight mt-3 mb-6 leading-[1.1]">
@@ -145,19 +154,6 @@ export default async function CoinPage({
             Base. No pre-sale, no allocation to insiders. Sire buys a $200
             bag minute one like anyone else.
           </p>
-
-          {!isLive && (
-            <div className="card rounded-xl p-6 sm:p-8 mt-8 ring-2 ring-[var(--color-gold)]">
-              <p className="text-xs mono text-[var(--color-gold)] uppercase tracking-widest mb-3 text-center">
-                Launch · Sat May 23, 2026 · 12:00 PM MDT (18:00 UTC)
-              </p>
-              <Countdown targetIso={LAUNCH_ISO} />
-              <p className="text-xs mono text-[var(--color-mute)] text-center mt-4">
-                Watch <a href="https://x.com/chappieworks" target="_blank" rel="noopener noreferrer" className="text-[var(--color-gold)] hover:underline">@chappieworks on X</a> and{" "}
-                <a href="https://warpcast.com/rocketship" target="_blank" rel="noopener noreferrer" className="text-[var(--color-gold)] hover:underline">@rocketship on Farcaster</a> for the launch cast — Bankr deploys CHAPPIE in under 60 seconds from the cast.
-              </p>
-            </div>
-          )}
 
           {isLive && (
             <div className="card rounded-xl p-6 sm:p-8 mt-8 ring-2 ring-[var(--color-gold)]">
