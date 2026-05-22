@@ -123,15 +123,12 @@ export default async function CoinPage({
             ← chappieworks
           </Link>
           <div className="mt-8 flex justify-center">
-            <video
-              className="w-full max-w-md rounded-2xl"
-              src="/brand/chappie-spin.mp4"
-              poster="/brand/chappie-logo.png"
-              autoPlay
-              loop
-              muted
-              playsInline
-              aria-label="CHAPPIE coin"
+            <img
+              src="/brand/chappie-logo.png"
+              alt="CHAPPIE coin"
+              width={420}
+              height={420}
+              className="w-[420px] max-w-full h-auto"
             />
           </div>
           <p className="text-xs mono text-[var(--color-gold)] mt-6 uppercase tracking-widest">
