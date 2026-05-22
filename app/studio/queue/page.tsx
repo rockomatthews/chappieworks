@@ -61,6 +61,8 @@ const QUEUE: QueueItem[] = [
       "✓ Launch copy drafted — X thread (6 tweets), Farcaster cast, LinkedIn post, T+24h follow-up — see LAUNCH_COPY.md",
       "✓ Pay-with-CHAPPIE checkout component live (Wagmi + viem) — pre-launch state on /seo-fix + /website; flips active once NEXT_PUBLIC_CHAPPIE_TOKEN_ADDRESS env var is set Saturday",
       "✓ Starter bag funded — $200 ETH on Base in signer 1 wallet",
+      "✓ /stake page shipped — STAKR vault integration; depositAndLock + harvest + unlockAndRedeem wired; auto-detects staker vs holder tier in Pay-with-CHAPPIE quote",
+      "Sat after launch: deploy STAKR vault via StakrVaultFactory.createStakrVault(CHAPPIE, \"Staked CHAPPIE\", \"sCHAPPIE\", \"...\", TREASURY_SAFE, address(0)) — set NEXT_PUBLIC_STAKR_VAULT_ADDRESS on Vercel; fund first reward stream with CHAPPIE via addRewardToken",
       "Launch-day blog post (Scribe writes Saturday morning, dates 2026-05-23)",
       "Day 3: @bankr launch + @stakrbot vault deploy",
       "Day 4 (Sat 2026-05-23, 12pm MDT): public launch push",

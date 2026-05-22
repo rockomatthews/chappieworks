@@ -47,7 +47,6 @@ export function PayWithChappieButton({
 
   const [quote, setQuote] = useState<Quote | null>(null);
   const [quoteError, setQuoteError] = useState<string | null>(null);
-  const [tier] = useState<Tier>("holder");
   const [confirmStatus, setConfirmStatus] = useState<
     "idle" | "verifying" | "ok" | "error"
   >("idle");
@@ -72,7 +71,9 @@ export function PayWithChappieButton({
     let cancelled = false;
     (async () => {
       try {
-        const r = await fetch(`/api/pay-with-chappie/quote?usd=${usd}&tier=${tier}`);
+        const params = new URLSearchParams({ usd: String(usd) });
+        if (address) params.set("address", address);
+        const r = await fetch(`/api/pay-with-chappie/quote?${params}`);
         if (!r.ok) throw new Error(await r.text());
         const data = (await r.json()) as Quote;
         if (!cancelled) setQuote(data);
@@ -84,7 +85,7 @@ export function PayWithChappieButton({
     return () => {
       cancelled = true;
     };
-  }, [usd, tier, isLive]);
+  }, [usd, address, isLive]);
 
   useEffect(() => {
     if (!isMined || !txHash || !quote) return;
@@ -203,7 +204,8 @@ export function PayWithChappieButton({
             </div>
             <div className="flex justify-between">
               <span className="text-[var(--color-mute)]">
-                {tier} discount ({tier === "staker" ? "25%" : "15%"})
+                {quote.tier} discount (
+                {quote.tier === "staker" ? "25%" : "15%"})
               </span>
               <span>-${(usd - quote.discountedUsd).toFixed(2)}</span>
             </div>

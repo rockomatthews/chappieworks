@@ -310,14 +310,12 @@ export default async function CoinPage({
             >
               Bankr — the launchpad →
             </a>
-            <a
-              href="https://stakrbot.xyz/"
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              href="/stake"
               className="inline-flex items-center justify-center px-6 py-3 rounded-md border border-white/15 hover:border-[var(--color-gold)] hover:text-[var(--color-gold)] transition text-sm"
             >
-              STAKR — the staking vault →
-            </a>
+              Stake CHAPPIE — 25% off SKUs →
+            </Link>
             <Link
               href="/studio/queue"
               className="inline-flex items-center justify-center px-6 py-3 rounded-md border border-white/15 hover:border-[var(--color-gold)] hover:text-[var(--color-gold)] transition text-sm"

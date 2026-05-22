@@ -270,6 +270,10 @@ function Slate() {
             ·{" "}
             <Link href="/coin" className="text-[var(--color-gold)] hover:underline">
               $CHAPPIE launches May 23
+            </Link>{" "}
+            ·{" "}
+            <Link href="/stake" className="text-[var(--color-gold)] hover:underline">
+              stake for 25% off
             </Link>
           </p>
         </div>

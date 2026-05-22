@@ -17,6 +17,9 @@ export function Footer() {
           <Link className="hover:text-[var(--color-gold)]" href="/coin">
             $chappie
           </Link>
+          <Link className="hover:text-[var(--color-gold)]" href="/stake">
+            stake
+          </Link>
           <Link className="hover:text-[var(--color-gold)]" href="/agents">
             agents
           </Link>
