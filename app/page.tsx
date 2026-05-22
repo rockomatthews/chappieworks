@@ -54,7 +54,8 @@ function Hero() {
       <div className="max-w-3xl mx-auto text-center">
         <Link
           href="/coin"
-          className="inline-flex items-center gap-2 px-4 py-2 mb-6 rounded-full bg-[#00e676] text-xs mono uppercase tracking-widest text-black font-semibold hover:opacity-90 transition"
+          style={{ color: "#000" }}
+          className="inline-flex items-center gap-2 px-4 py-2 mb-6 rounded-full bg-[#16a34a] text-xs mono uppercase tracking-widest font-semibold hover:opacity-90 transition"
         >
           <span className="inline-block w-1.5 h-1.5 rounded-full bg-black animate-pulse" />
           $CHAPPIE launches Sat May 23 — read the announcement →
