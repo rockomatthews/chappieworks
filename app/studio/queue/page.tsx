@@ -60,7 +60,7 @@ const QUEUE: QueueItem[] = [
       "✓ /studio/finance live — treasury balance fetched from Base RPC, per-persona budget caps, milestones",
       "✓ Launch copy drafted — X thread (6 tweets), Farcaster cast, LinkedIn post, T+24h follow-up — see LAUNCH_COPY.md",
       "✓ Pay-with-CHAPPIE checkout component live (Wagmi + viem) — pre-launch state on /seo-fix + /website; flips active once NEXT_PUBLIC_CHAPPIE_TOKEN_ADDRESS env var is set Saturday",
-      "Sire: fund signer 1 wallet with $200 of ETH on Base for starter bag",
+      "✓ Starter bag funded — $200 ETH on Base in signer 1 wallet",
       "Launch-day blog post (Scribe writes Saturday morning, dates 2026-05-23)",
       "Day 3: @bankr launch + @stakrbot vault deploy",
       "Day 4 (Sat 2026-05-23, 12pm MDT): public launch push",
