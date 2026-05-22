@@ -57,6 +57,7 @@ const QUEUE: QueueItem[] = [
       "✓ Safe 2-of-3 deployed on Base — treasury at 0x5f216AeB…1F00",
       "✓ /coin landing page live with countdown + email notify list",
       "✓ Chappie Site dashboard code shipped — blocked only on env vars + smoke test now",
+      "✓ /studio/finance live — treasury balance fetched from Base RPC, per-persona budget caps, milestones",
       "Sire: fund signer 1 wallet with $200 of ETH on Base for starter bag",
       "Pay-with-CHAPPIE checkout component on chappieworks (Wagmi + viem)",
       "Launch copy: X thread + Farcaster cast + LinkedIn + blog",

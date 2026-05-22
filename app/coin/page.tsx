@@ -214,6 +214,13 @@ export default async function CoinPage({
               >
                 0x5f216AeB…1F00
               </a>
+              {" · "}
+              <Link
+                href="/studio/finance"
+                className="text-[var(--color-gold)] hover:underline"
+              >
+                live balance &amp; the studio&rsquo;s books →
+              </Link>
             </p>
           </div>
 

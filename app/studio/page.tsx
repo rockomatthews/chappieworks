@@ -221,6 +221,12 @@ export default function Studio() {
             >
               See the queue →
             </Link>
+            <Link
+              href="/studio/finance"
+              className="flex items-center justify-center px-6 py-3 rounded-md border border-white/15 hover:border-[var(--color-gold)] hover:text-[var(--color-gold)] transition"
+            >
+              Read the books →
+            </Link>
           </div>
         </div>
       </section>
