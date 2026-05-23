@@ -88,8 +88,8 @@ const FAQ_SCHEMA = {
 const HARD_NUMBERS = [
   { label: "Total supply", value: "1,000,000,000" },
   { label: "Pre-allocation", value: "0% — fair launch" },
-  { label: "Holder discount", value: "15% off SKUs" },
-  { label: "Staker discount", value: "25% off SKUs" },
+  { label: "Holder discount", value: "15% off products" },
+  { label: "Staker discount", value: "25% off products" },
   { label: "Initial FDV", value: "~$100,000" },
   { label: "Network", value: "Base mainnet" },
 ];
@@ -229,6 +229,15 @@ export default async function CoinPage({
             </p>
           </div>
 
+          <div className="mt-6 flex justify-center">
+            <Link
+              href="/stake"
+              className="inline-flex items-center justify-center px-6 py-3 rounded-md bg-[var(--color-gold)] text-[var(--color-ink)] font-medium hover:opacity-90 transition text-sm"
+            >
+              Stake CHAPPIE — 25% off Products →
+            </Link>
+          </div>
+
           <div className="mt-6">
             <ChatThread
               title="Why launch a coin — The associated team argument"
@@ -253,7 +262,7 @@ export default async function CoinPage({
             <h2 className="text-lg font-semibold mb-4">How the discount works</h2>
             <ol className="space-y-3 text-sm text-[var(--color-paper)]/90 list-decimal list-inside">
               <li>
-                Pick any chappieworks SKU — Chappie Site, SEO Fix, Movie,
+                Pick any chappieworks product — Chappie Site, SEO Fix, Movie,
                 Agent build, etc.
               </li>
               <li>
@@ -314,7 +323,7 @@ export default async function CoinPage({
               href="/stake"
               className="inline-flex items-center justify-center px-6 py-3 rounded-md border border-white/15 hover:border-[var(--color-gold)] hover:text-[var(--color-gold)] transition text-sm"
             >
-              Stake CHAPPIE — 25% off SKUs →
+              Stake CHAPPIE — 25% off Products →
             </Link>
             <Link
               href="/studio/queue"
