@@ -196,7 +196,7 @@ export function StakeUI() {
           Staking vault deploys at launch
         </p>
         <p className="text-sm text-[var(--color-paper)]/85 leading-relaxed text-center">
-          The STAKR vault deploys right after CHAPPIE launches on Sat May 23,
+          The STAKR vault deploys right after CHAPPIE launches on Sun May 24,
           2026 at 12:00 PM MDT. Once the contract address is set, this page
           will flip live and you&rsquo;ll be able to lock CHAPPIE for the 25%
           discount tier and a share of treasury reward streams.

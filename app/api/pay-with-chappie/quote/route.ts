@@ -95,6 +95,6 @@ export async function GET(req: Request) {
     source: live ? "placeholder-pre-uniswap" : "pre-launch",
     notice: live
       ? "Price is placeholder. Real Uniswap V4 quote endpoint goes live with the launch."
-      : "Token not yet deployed. CHAPPIE lands Sat May 23, 2026 at 12:00 PM MDT.",
+      : "Token not yet deployed. CHAPPIE lands Sun May 24, 2026 at 12:00 PM MDT.",
   });
 }

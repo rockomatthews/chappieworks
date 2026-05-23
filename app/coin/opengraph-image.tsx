@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
-export const alt = "$CHAPPIE — utility token on Base, launching May 23";
+export const alt = "$CHAPPIE — utility token on Base, launching May 24";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -66,7 +66,7 @@ export default function CoinOG() {
               marginBottom: 28,
             }}
           >
-            $CHAPPIE · Base · Sat May 23
+            $CHAPPIE · Base · Sun May 24
           </div>
           <div
             style={{

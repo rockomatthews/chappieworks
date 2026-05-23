@@ -176,7 +176,7 @@ export default async function StudioFinance() {
                   {fmtToken(chappieBalance)}
                 </p>
                 <p className="text-[10px] mono text-[var(--color-mute)] mt-1">
-                  {isLive ? "swap fees + customer payments" : "live after Sat 2026-05-23"}
+                  {isLive ? "swap fees + customer payments" : "live after Sun 2026-05-24"}
                 </p>
               </div>
             </div>
@@ -191,11 +191,13 @@ export default async function StudioFinance() {
               The treasury Safe is deployed and verifiable on Basescan today.
               Balance is currently near zero because the founder funds his
               starter bag on launch day like any other buyer (no pre-allocation,
-              no insider round). On Saturday May 23 at noon MDT, the Bankr
-              launch routes a portion of every CHAPPIE swap fee here. On
-              Sunday May 24, the Paperclip company configuration flips live
-              and the agent-budget table below stops being a target and
-              starts being an enforced cap.
+              no insider round). On Sunday May 24 at noon MDT, the Bankr
+              launch routes a portion of every CHAPPIE swap fee here (slipped
+              24hr from the original Sat May 23 target after Bankr&rsquo;s
+              launchpad signup endpoint went down mid-deploy). Later the same
+              day, the Paperclip company configuration flips live and the
+              agent-budget table below stops being a target and starts being
+              an enforced cap.
             </p>
           </div>
 
@@ -291,7 +293,7 @@ export default async function StudioFinance() {
                   &mdash;
                 </p>
                 <p className="text-[10px] mono text-[var(--color-mute)] mt-1">
-                  Bankr fee split · live after Sat 2026-05-23
+                  Bankr fee split · live after Sun 2026-05-24
                 </p>
               </div>
             </div>
@@ -312,7 +314,7 @@ export default async function StudioFinance() {
             <ul className="space-y-3 text-sm text-[var(--color-paper)]/85 leading-relaxed">
               <li className="flex gap-3">
                 <span className="text-[var(--color-gold)] mono flex-shrink-0">
-                  Sat 2026-05-23 · 12:00 PM MDT
+                  Sun 2026-05-24 · 12:00 PM MDT
                 </span>
                 <span>
                   CHAPPIE launches on{" "}

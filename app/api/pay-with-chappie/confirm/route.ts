@@ -28,7 +28,7 @@ export async function POST(req: Request) {
     return NextResponse.json(
       {
         error:
-          "Token not deployed. Pay-with-CHAPPIE confirmation is offline until Sat May 23 launch.",
+          "Token not deployed. Pay-with-CHAPPIE confirmation is offline until Sun May 24 launch.",
       },
       { status: 503 },
     );

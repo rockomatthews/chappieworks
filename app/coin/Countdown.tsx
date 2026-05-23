@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from "react";
 
-// Shared launch timestamp — Sat 2026-05-23 at 12:00 PM MDT (18:00 UTC).
-// To flip post-launch state on /coin, set NEXT_PUBLIC_CHAPPIE_TOKEN_ADDRESS
-// in Vercel env to the deployed CHAPPIE contract address.
-export const LAUNCH_ISO = "2026-05-23T18:00:00Z";
+// Shared launch timestamp — Sun 2026-05-24 at 12:00 PM MDT (18:00 UTC).
+// Slipped 24hr from the original Sat May 23 target after the Bankr launchpad
+// signup endpoint went down mid-launch. To flip post-launch state on /coin,
+// set NEXT_PUBLIC_CHAPPIE_TOKEN_ADDRESS in Vercel env to the deployed contract.
+export const LAUNCH_ISO = "2026-05-24T18:00:00Z";
 
 type Parts = {
   days: number;
