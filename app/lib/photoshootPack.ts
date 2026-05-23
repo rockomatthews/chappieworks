@@ -380,6 +380,8 @@ export async function generatePackAndEmail(
 
     // Parallel image generation. allSettled so one timeout doesn't blow the
     // whole pack. After we have results, fail loudly if too many missed.
+    // Each settle also patches state with the new image so the live thanks
+    // page can render visuals as they land instead of waiting for all 10.
     const results = await Promise.allSettled(
       PACK_MODES.map(async (mode) => {
         const spec = PACK_SPECS[mode];
@@ -395,7 +397,27 @@ export async function generatePackAndEmail(
             allowOverwrite: true,
           },
         );
-        return { mode, label: spec.label, size: spec.size, url: blob.url };
+        const img = { mode, label: spec.label, size: spec.size, url: blob.url };
+        try {
+          const current = await readPackState(packId);
+          if (current) {
+            const existing = current.images ?? [];
+            const next = [
+              ...existing.filter((i) => i.mode !== mode),
+              img,
+            ];
+            await writePackState({ ...current, images: next });
+          }
+        } catch (e) {
+          // Best-effort streaming update. The final write below catches up.
+          console.warn(
+            "[chappieworks:pack] incremental state write failed",
+            packId,
+            mode,
+            e instanceof Error ? e.message : e,
+          );
+        }
+        return img;
       }),
     );
 

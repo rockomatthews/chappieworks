@@ -1,12 +1,22 @@
 import Link from "next/link";
+import { PackThanksLive } from "./PackThanksLive";
 
 export const metadata = {
   title: "Order received · Brand Aesthetic Pack — Chappie Works",
   description:
-    "Your Brand Aesthetic Pack order is in. The studio is generating your 10 visuals now.",
+    "Your Brand Aesthetic Pack order is in. Visuals render here as the studio finishes each one — full pack also lands in your inbox.",
 };
 
-export default function PhotoshootThanks() {
+export const dynamic = "force-dynamic";
+
+export default async function PhotoshootThanks({
+  searchParams,
+}: {
+  searchParams: Promise<{ pack?: string; bypass?: string }>;
+}) {
+  const params = await searchParams;
+  const packId = params.pack?.trim();
+
   return (
     <main>
       <section className="px-6 sm:px-10 py-16 sm:py-20">
@@ -24,26 +34,36 @@ export default function PhotoshootThanks() {
             Order in. The studio is on it.
           </h1>
           <p className="text-base sm:text-lg text-[var(--color-paper)]/85 leading-relaxed">
-            Thanks for buying the Brand Aesthetic Pack. The team kicks off your
-            10 visuals now: hero banner, social cards (3 variations), moodboard,
-            ad creative pack (Meta + TikTok), brand pattern, and a vertical
-            poster.
+            Thanks for buying the Brand Aesthetic Pack. Your 10 visuals render
+            below as each one finishes — hero banner, social cards (3
+            variations), moodboard, ad creative (Meta + TikTok), brand pattern,
+            and a vertical poster. The full pack also lands in your inbox as a
+            backup.
           </p>
+
+          {packId && (
+            <div className="mt-8">
+              <PackThanksLive packId={packId} />
+            </div>
+          )}
 
           <div className="card rounded-xl p-6 sm:p-8 mt-8">
             <h2 className="text-lg font-semibold mb-3">What happens next</h2>
             <ol className="space-y-3 text-sm text-[var(--color-paper)]/90 list-decimal list-inside">
               <li>
-                Stripe sends you a receipt + your order details to the email you
-                used at checkout.
+                Stripe sends you a receipt to the email you used at checkout.
               </li>
               <li>
                 Scribe translates your brief into 10 image prompts. Forge runs
                 each through gpt-image-1 at 2K. Glass picks the modes.
               </li>
               <li>
-                10 PNGs land in your inbox in 2–5 minutes from
-                intake@chappieworks.com. 2K resolution, commercial rights yours.
+                Visuals appear above as each one renders — typically all 10
+                within 2–5 minutes. Download what you want with the PNG link
+                on each image. Commercial rights yours.
+              </li>
+              <li>
+                Backup copy lands in your inbox from intake@chappieworks.com.
                 Check spam just in case.
               </li>
               <li>
