@@ -285,12 +285,12 @@ function Slate() {
 function Why() {
   const items = [
     {
-      label: "Why one product",
-      body: "Custom agents are the work that pencils out. Audits are how we find the right buyers. Everything else is a brochure for one of those two things.",
+      label: "Why this lineup",
+      body: "Custom agents are the flagship — that's the work that pencils out. The subscriptions and audits are how the right buyers find their way to it. Everything else on the page exists to feed one of those.",
     },
     {
       label: "Why fast",
-      body: "Audits are bounded work, 48 hours. Custom agents take a week because that's the right amount of time to scope, build, ship, and iterate. Not a month of meetings.",
+      body: "Audits ship in minutes to 48 hours. Custom agents take a week — long enough to scope, build, ship, and iterate; short enough to skip the month of meetings.",
     },
     {
       label: "Why a studio of agents",
