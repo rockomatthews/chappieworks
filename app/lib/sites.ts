@@ -1,4 +1,4 @@
-import { put, list } from "@vercel/blob";
+import { get, put } from "@vercel/blob";
 
 export type EditStatus = "received" | "in_progress" | "shipped" | "needs_info";
 
@@ -35,7 +35,7 @@ const INDEX_KEY = "sites/_index.json";
 
 type SiteIndex = {
   updatedAt: string;
-  slugs: { slug: string; businessName: string; ownerEmail: string; updatedAt: string; status: EditStatus }[];
+  slugs: { slug: string; businessName: string; updatedAt: string; status: EditStatus }[];
 };
 
 export function newSlug(): string {
@@ -55,18 +55,15 @@ export function normalizeEmail(email: string): string {
 }
 
 export async function readSite(slug: string): Promise<SiteRecord | null> {
-  const { blobs } = await list({ prefix: STATE_KEY(slug) });
-  const blob = blobs.find((b) => b.pathname === STATE_KEY(slug));
-  if (!blob) return null;
-  const res = await fetch(blob.url, { cache: "no-store" });
-  if (!res.ok) return null;
-  return (await res.json()) as SiteRecord;
+  const result = await get(STATE_KEY(slug), { access: "private", useCache: false });
+  if (!result || result.statusCode !== 200) return null;
+  return (await new Response(result.stream).json()) as SiteRecord;
 }
 
 export async function writeSite(site: SiteRecord): Promise<void> {
   const updated: SiteRecord = { ...site, updatedAt: new Date().toISOString() };
   await put(STATE_KEY(site.slug), JSON.stringify(updated, null, 2), {
-    access: "public",
+    access: "private",
     contentType: "application/json",
     addRandomSuffix: false,
     allowOverwrite: true,
@@ -127,12 +124,11 @@ export async function createSite(input: {
 }
 
 export async function listSites(): Promise<SiteIndex> {
-  const { blobs } = await list({ prefix: INDEX_KEY });
-  const blob = blobs.find((b) => b.pathname === INDEX_KEY);
-  if (!blob) return { updatedAt: new Date().toISOString(), slugs: [] };
-  const res = await fetch(blob.url, { cache: "no-store" });
-  if (!res.ok) return { updatedAt: new Date().toISOString(), slugs: [] };
-  return (await res.json()) as SiteIndex;
+  const result = await get(INDEX_KEY, { access: "private", useCache: false });
+  if (!result || result.statusCode !== 200) {
+    return { updatedAt: new Date().toISOString(), slugs: [] };
+  }
+  return (await new Response(result.stream).json()) as SiteIndex;
 }
 
 async function touchIndex(site: SiteRecord): Promise<void> {
@@ -140,7 +136,6 @@ async function touchIndex(site: SiteRecord): Promise<void> {
   const entry = {
     slug: site.slug,
     businessName: site.businessName,
-    ownerEmail: site.ownerEmail,
     updatedAt: site.updatedAt,
     status: site.status,
   };
@@ -149,7 +144,7 @@ async function touchIndex(site: SiteRecord): Promise<void> {
     slugs: [entry, ...idx.slugs.filter((s) => s.slug !== site.slug)],
   };
   await put(INDEX_KEY, JSON.stringify(next, null, 2), {
-    access: "public",
+    access: "private",
     contentType: "application/json",
     addRandomSuffix: false,
     allowOverwrite: true,

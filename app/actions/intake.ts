@@ -45,7 +45,7 @@ const SUCCESS_COPY: Record<IntakeFormType, string> = {
   "ads-audit":
     "Got it. Audit lands in your inbox in 48 hours. I'll ping within 24 to confirm access.",
   photoshoot:
-    "Got it. The studio is generating your 3-image preview right now. Look for it in your inbox in 2–3 minutes from intake@chappieworks.com — check spam just in case.",
+    "Got it. The studio is generating your 3-image preview — it renders on the page in 2–3 minutes.",
   website:
     "Got it. The studio has your brief. Look for two emails from intake@chappieworks.com — your private edit dashboard link (chat with the studio there), and the $99 Stripe launch link. Both arrive within a few hours; check spam just in case. Pay the $99 and your site goes live within 48 hours.",
   "seo-fix":
@@ -127,11 +127,6 @@ export async function submitIntake(
     after(() => triggerSeoAudit(submission));
   }
 
-  // If it's a photoshoot preview, kick off the image-generation pipeline.
-  if (formType === "photoshoot" && submission.fields.brand_description) {
-    after(() => triggerPhotoshoot(submission));
-  }
-
   // If it's a website brief, auto-provision the private edit dashboard and
   // email the customer their sign-in link.
   if (formType === "website") {
@@ -194,64 +189,6 @@ async function triggerSeoAudit(submission: {
     }
   } catch (err) {
     console.error("[chappieworks:intake] audit trigger threw", err);
-  }
-}
-
-async function triggerPhotoshoot(submission: {
-  formType: IntakeFormType;
-  name: string;
-  email: string;
-  fields: Record<string, string>;
-}) {
-  const secret = process.env.INTAKE_WEBHOOK_SECRET;
-  if (!secret) {
-    console.error(
-      "[chappieworks:intake] INTAKE_WEBHOOK_SECRET not set — cannot trigger photoshoot",
-    );
-    return;
-  }
-  const baseUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL
-    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-    : process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}`
-      : "http://localhost:3000";
-
-  const payload = {
-    name: submission.name,
-    email: submission.email,
-    brand_name: submission.fields.brand_name,
-    brand_description: submission.fields.brand_description,
-    industry: submission.fields.industry,
-    vibe: submission.fields.vibe,
-    color_palette: submission.fields.color_palette,
-    reference_url: submission.fields.reference_url,
-  };
-  const body = JSON.stringify(payload);
-  const sig = createHmac("sha256", secret).update(body).digest("hex");
-
-  try {
-    const res = await fetch(`${baseUrl}/api/photoshoot/run`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-chappie-sig": sig,
-      },
-      body,
-    });
-    if (!res.ok) {
-      console.error(
-        "[chappieworks:intake] photoshoot trigger failed",
-        res.status,
-        await res.text(),
-      );
-    } else {
-      console.log(
-        "[chappieworks:intake] photoshoot triggered for",
-        submission.email,
-      );
-    }
-  } catch (err) {
-    console.error("[chappieworks:intake] photoshoot trigger threw", err);
   }
 }
 

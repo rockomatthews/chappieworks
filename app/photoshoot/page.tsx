@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { CreditedBy } from "../components/CreditedBy";
-import { IntakeForm, type IntakeField } from "../components/IntakeForm";
 import { ChatThread } from "../components/ChatThread";
 import { PackBuyForm } from "./PackBuyForm";
+import { PhotoshootGenerator } from "./PhotoshootGenerator";
 
 export const metadata = {
   title: "Free brand visuals · 3-image preview in minutes — Chappie Works",
@@ -15,70 +15,6 @@ export const metadata = {
     url: "https://chappieworks.com/photoshoot",
   },
 };
-
-const PHOTOSHOOT_FIELDS: IntakeField[] = [
-  {
-    kind: "text",
-    name: "brand_name",
-    label: "Brand or company name",
-    placeholder: "Acme Coffee Roasters",
-    required: true,
-  },
-  {
-    kind: "textarea",
-    name: "brand_description",
-    label: "What does your brand do? (2–4 sentences)",
-    placeholder:
-      "We roast small-batch single-origin coffee in Brooklyn. Direct trade, focused on Ethiopian and Colombian beans. Our customers are weekend brewers who care about origin stories.",
-    required: true,
-    rows: 4,
-  },
-  {
-    kind: "select",
-    name: "industry",
-    label: "Industry",
-    options: [
-      "DTC product / e-commerce",
-      "SaaS / software",
-      "Restaurant / food / beverage",
-      "Fashion / apparel",
-      "Health / wellness / fitness",
-      "Beauty / skincare",
-      "Agency / professional services",
-      "Crypto / fintech",
-      "Real estate",
-      "Other",
-    ],
-    required: true,
-  },
-  {
-    kind: "select",
-    name: "vibe",
-    label: "Aesthetic / vibe",
-    options: [
-      "Modern minimal — clean, white space, refined",
-      "Bold + maximal — saturated, playful, energetic",
-      "Luxe / premium — moody, deep tones, cinematic",
-      "Earthy / organic — natural, grounded, warm",
-      "Tech / editorial — futuristic, sharp, monochrome",
-      "Retro / nostalgic — film grain, faded, throwback",
-      "Surreal / conceptual — dreamlike, abstract",
-    ],
-    required: true,
-  },
-  {
-    kind: "text",
-    name: "color_palette",
-    label: "Color preferences (optional)",
-    placeholder: "deep green + cream + brass · or any hex codes you love",
-  },
-  {
-    kind: "text",
-    name: "reference_url",
-    label: "Reference site or Pinterest board (optional)",
-    placeholder: "https://...",
-  },
-];
 
 const FAQ_SCHEMA = {
   "@context": "https://schema.org",
@@ -113,7 +49,7 @@ const FAQ_SCHEMA = {
       name: "How long does it take?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Minutes. Scribe writes the prompts, Forge runs them through gpt-image-1, the images land in your inbox typically under 5 minutes from submission.",
+        text: "Minutes. Scribe writes the prompts, Forge runs them through gpt-image-1, and the three images render right here on the page as they finish — typically under 3 minutes total.",
       },
     },
     {
@@ -161,10 +97,10 @@ export default function Photoshoot() {
           </h1>
           <p className="text-base sm:text-lg text-[var(--color-paper)]/85 leading-relaxed">
             Send a 30-second brief. Our autonomous AI team turns it into three
-            brand visuals — hero banner, social card, moodboard — and emails
-            them to you as 2K PNG attachments. No card, no signup. If you want
-            the full pack (10 visuals across 7 modes), it&rsquo;s $49 and lands
-            the same way.
+            brand visuals — hero banner, social card, moodboard — and renders
+            them right here on the page in minutes. Download the PNGs from the
+            result. No card, no signup. If you want the full pack (10 visuals
+            across 7 modes), it&rsquo;s $49 and lands in your inbox.
           </p>
 
           <div className="mt-10">
@@ -217,13 +153,14 @@ export default function Photoshoot() {
                 banner, social card, moodboard.
               </li>
               <li>
-                3 PNGs land in your inbox in minutes from
-                intake@chappieworks.com. Use them however you want — site, ads,
-                social, decks. Commercial rights yours.
+                Each PNG renders right here on the page as it finishes —
+                typically under 3 minutes total. Download what you like. Use
+                them however you want — site, ads, social, decks. Commercial
+                rights yours.
               </li>
               <li>
-                Liked them? Buy the full 10-pack with all 7 modes for $49. Link
-                is in the email.
+                Loved them? Buy the full 10-pack with all 7 modes for $49 —
+                that one lands in your inbox.
               </li>
               <li>
                 Want the studio to do this monthly for your brand?{" "}
@@ -243,14 +180,10 @@ export default function Photoshoot() {
               Get your free 3-image preview.
             </h2>
             <p className="text-sm text-[var(--color-mute)] mb-6">
-              Fills in 30 seconds. 3 brand visuals land in your inbox in
+              Fills in 30 seconds. 3 brand visuals render right here in
               minutes.
             </p>
-            <IntakeForm
-              formType="photoshoot"
-              fields={PHOTOSHOOT_FIELDS}
-              submitLabel="Generate my free preview →"
-            />
+            <PhotoshootGenerator />
           </div>
 
           <div id="pack" className="mt-10 scroll-mt-20">

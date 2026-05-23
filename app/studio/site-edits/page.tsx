@@ -79,7 +79,7 @@ export default async function SiteEditsInbox() {
                   <div>
                     <div className="text-base font-semibold">{s.businessName}</div>
                     <div className="text-xs mono text-[var(--color-mute)] mt-1">
-                      {s.ownerEmail} · updated{" "}
+                      updated{" "}
                       {new Date(s.updatedAt).toLocaleString("en-US", {
                         month: "short",
                         day: "numeric",

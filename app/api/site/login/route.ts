@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { readSite, normalizeEmail } from "../../../lib/sites";
 import { makeMagicToken } from "../../../lib/siteAuth";
 import { sendMagicLink } from "../../../lib/siteNotify";
+import { checkLoginRateLimit } from "../../../lib/siteRateLimit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -21,6 +22,15 @@ export async function POST(req: Request) {
   const email = normalizeEmail(body.email ?? "");
   if (!slug || !email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return NextResponse.json({ ok: false, error: "Missing slug or email" }, { status: 400 });
+  }
+
+  const rl = await checkLoginRateLimit(slug, email);
+  if (!rl.ok) {
+    const res = NextResponse.json(
+      { ok: true, message: GENERIC_OK },
+      { headers: { "Retry-After": String(rl.retryAfterSec) } },
+    );
+    return res;
   }
 
   const site = await readSite(slug);
