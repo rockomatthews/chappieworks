@@ -69,6 +69,32 @@ const QUEUE: QueueItem[] = [
     ],
   },
   {
+    id: "photoshoot-render-on-page",
+    title: "/photoshoot — render the free 3 images on the page, not in email",
+    status: "queued",
+    added: "2026-05-23",
+    blurb:
+      "Today the free 3-image brand preview emails the customer a link to view the images. That's a friction step. Sire's call: render the 3 images directly on the /photoshoot page the way /movie renders the watermarked preview clip. The email becomes the deliverable only when the customer pays for the $49 Brand Aesthetic Pack media kit — at that point the email carries the full-resolution unwatermarked assets + license + style notes. Free preview = on-page, paid purchase = email media kit. Same pattern as /movie + /spokesperson.",
+    ref: { label: "/photoshoot", href: "/photoshoot" },
+    workItems: [
+      "Move free 3-image generation result from email-only delivery to on-page render (mirror /movie's render-on-page pattern)",
+      "Keep generation async (gpt-image-1 takes 30–60s) — show a 'rendering' state with progress, then swap in the images when ready",
+      "Watermark the free 3 images on the page (consistent with /movie + /spokesperson)",
+      "Show the $49 Brand Aesthetic Pack CTA below the rendered previews — Stripe payment link",
+      "On purchase, email the full media kit (unwatermarked images + style guide + license) — that's now the email-deliverable moment, not the free preview",
+      "Update homepage + OG metadata for the new flow per the chappieworks-homepage-metadata rule",
+    ],
+  },
+  {
+    id: "paperclip-integration",
+    title: "Paperclip integration — make paperclip.ing the studio's task system of record",
+    status: "queued",
+    added: "2026-05-23",
+    blurb:
+      "True Paperclip integration. paperclip.ing is the canonical task/queue/work-management platform for the Chappie Studio — per-persona budgets, role permissions, the first logged standup, the public ledger referenced in /studio/finance and the Sunday Studio-flip blog post. Today the studio queue lives in this hand-maintained TSX file; under Paperclip it becomes a live read of the actual system of record. Need: scope the Paperclip API/webhooks, design the studio↔Paperclip mapping (which persona owns which board, how budgets sync), wire the /studio/queue page to read from Paperclip instead of the static QUEUE constant, and route agent task assignments through it. This is the milestone called 'company configuration goes live in Paperclip' on /studio/finance.",
+    ref: { label: "paperclip.ing", href: "https://paperclip.ing" },
+  },
+  {
     id: "gitbank-integration",
     title: "gitbank.io — GitHub bounty bank on Base, scope CHAPPIE + /seo-fix fit",
     status: "queued",
