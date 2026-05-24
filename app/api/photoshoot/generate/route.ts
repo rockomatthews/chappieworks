@@ -20,8 +20,6 @@ export const maxDuration = 300;
 export const dynamic = "force-dynamic";
 
 type Body = {
-  name?: string;
-  email?: string;
   brand_name?: string;
   brand_description?: string;
   industry?: string;
@@ -38,17 +36,9 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "invalid json" }, { status: 400 });
   }
 
-  const name = (body.name ?? "").trim();
-  const email = (body.email ?? "").trim().toLowerCase();
   const brandName = (body.brand_name ?? "").trim();
   const brandDescription = (body.brand_description ?? "").trim();
 
-  if (!name || name.length < 2) {
-    return NextResponse.json({ error: "please include your name" }, { status: 400 });
-  }
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return NextResponse.json({ error: "valid email is required" }, { status: 400 });
-  }
   if (!brandName || !brandDescription) {
     return NextResponse.json(
       { error: "brand name and description are required" },
@@ -67,8 +57,6 @@ export async function POST(req: Request) {
   const state: PhotoshootState = {
     jobId,
     createdAt: new Date().toISOString(),
-    email,
-    name,
     brand_name: brandName,
     brand_description: brandDescription,
     industry: body.industry?.trim() || undefined,
@@ -84,7 +72,7 @@ export async function POST(req: Request) {
     console.error("[chappieworks:photoshoot] runGeneration threw", jobId, err);
   }));
 
-  console.log("[chappieworks:photoshoot] queued job", jobId, "for", email);
+  console.log("[chappieworks:photoshoot] queued job", jobId, brandName);
   return NextResponse.json({ jobId });
 }
 

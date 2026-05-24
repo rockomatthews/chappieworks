@@ -52,8 +52,6 @@ const STATUS_COPY: Record<JobStatus["status"], string> = {
 };
 
 export function PhotoshootGenerator() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
   const [brandName, setBrandName] = useState("");
   const [brandDescription, setBrandDescription] = useState("");
   const [industry, setIndustry] = useState("");
@@ -123,14 +121,6 @@ export function PhotoshootGenerator() {
     e.preventDefault();
     setError(null);
 
-    if (!name.trim() || name.trim().length < 2) {
-      setError("Please include your name.");
-      return;
-    }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setError("Please include a valid email.");
-      return;
-    }
     if (!brandName.trim() || !brandDescription.trim()) {
       setError("Brand name and description are required.");
       return;
@@ -151,8 +141,6 @@ export function PhotoshootGenerator() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: name.trim(),
-          email: email.trim().toLowerCase(),
           brand_name: brandName.trim(),
           brand_description: brandDescription.trim(),
           industry: industry.trim() || undefined,
@@ -191,47 +179,6 @@ export function PhotoshootGenerator() {
     <div className="space-y-6">
       {showForm && (
         <form onSubmit={submit} className="card rounded-xl p-6 sm:p-8 space-y-5">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label
-                htmlFor="ps-name"
-                className="block text-xs mono text-[var(--color-gold)] uppercase tracking-widest mb-2"
-              >
-                Your name *
-              </label>
-              <input
-                id="ps-name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Alex Chen"
-                required
-                autoComplete="name"
-                className="w-full bg-[var(--color-ink)] border border-white/15 rounded-md px-3 py-2 text-base sm:text-sm text-[var(--color-paper)] placeholder:text-[var(--color-mute)] focus:outline-none focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/50"
-                style={{ fontSize: "16px" }}
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="ps-email"
-                className="block text-xs mono text-[var(--color-gold)] uppercase tracking-widest mb-2"
-              >
-                Email *
-              </label>
-              <input
-                id="ps-email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@company.com"
-                required
-                autoComplete="email"
-                inputMode="email"
-                className="w-full bg-[var(--color-ink)] border border-white/15 rounded-md px-3 py-2 text-base sm:text-sm text-[var(--color-paper)] placeholder:text-[var(--color-mute)] focus:outline-none focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/50"
-                style={{ fontSize: "16px" }}
-              />
-            </div>
-          </div>
-
           <div>
             <label
               htmlFor="ps-brand"

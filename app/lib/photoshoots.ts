@@ -11,8 +11,8 @@ export type PhotoshootImage = {
 export type PhotoshootState = {
   jobId: string;
   createdAt: string;
-  email: string;
-  name: string;
+  email?: string;
+  name?: string;
   brand_name?: string;
   brand_description?: string;
   industry?: string;
