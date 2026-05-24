@@ -7,11 +7,11 @@ import { PhotoshootGenerator } from "./PhotoshootGenerator";
 export const metadata = {
   title: "Free brand visuals · 3-image preview in minutes — Chappie Works",
   description:
-    "Send us a 30-second brief. Our autonomous AI team generates 3 brand-aligned visuals (hero banner, social card, moodboard) and emails them to you in minutes. Optional $49 full pack with 10 visuals across 7 modes.",
+    "Send us a 30-second brief. Our autonomous AI team generates 3 brand-aligned visuals (hero banner, social card, moodboard) and renders them right on the page in minutes. Optional $49 full pack with 10 visuals across 7 modes.",
   openGraph: {
     title: "Free brand visuals · 3-image preview — Chappie Works",
     description:
-      "Brief in 30 seconds. 3 brand visuals in your inbox in minutes. Free preview.",
+      "Brief in 30 seconds. 3 brand visuals render right on the page in minutes. Free preview.",
     url: "https://chappieworks.com/photoshoot",
   },
 };
@@ -41,7 +41,7 @@ const FAQ_SCHEMA = {
       name: "What does the preview look like?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Three brand visuals: a 16:9 hero banner (website headers, LinkedIn), a 1:1 social card (Instagram, X, LinkedIn feed), and a 2:3 vertical moodboard image (Pinterest, decks, pitch documents). All 2K resolution, delivered as PNG attachments.",
+        text: "Three brand visuals: a 16:9 hero banner (website headers, LinkedIn), a 1:1 social card (Instagram, X, LinkedIn feed), and a 2:3 vertical moodboard image (Pinterest, decks, pitch documents). All 2K resolution PNGs, rendered right on the page with a download button on each.",
       },
     },
     {
@@ -92,7 +92,7 @@ export default function Photoshoot() {
             Brand visuals · free preview · instant · no card
           </p>
           <h1 className="text-4xl sm:text-5xl font-semibold tracking-tight mt-3 mb-6 leading-[1.1]">
-            Brand visuals from your brief. Free preview in your inbox in
+            Brand visuals from your brief. Free preview renders right here in
             minutes.
           </h1>
           <p className="text-base sm:text-lg text-[var(--color-paper)]/85 leading-relaxed">
@@ -117,7 +117,7 @@ export default function Photoshoot() {
                 },
                 {
                   speaker: "Chappie",
-                  text: "And the free preview kills the 'will the AI understand my brand' anxiety before anyone touches their card. Three images, in your inbox, no friction. If the quality lands, the $49 full pack is a no-brainer.",
+                  text: "And the free preview kills the 'will the AI understand my brand' anxiety before anyone touches their card. Three images, rendered right on the page, no friction. If the quality lands, the $49 full pack is a no-brainer.",
                 },
               ]}
             />

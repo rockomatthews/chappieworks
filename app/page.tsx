@@ -23,7 +23,7 @@ const PROJECT_SKUS = [
     slug: "photoshoot",
     name: "Brand visuals",
     blurb:
-      "30-second brief → 3 brand-aligned 2K images in your inbox in minutes. $49 unlocks the 10-image Brand Aesthetic Pack across 7 modes.",
+      "30-second brief → 3 brand-aligned 2K images rendered right on the page in minutes. $49 unlocks the 10-image Brand Aesthetic Pack (emailed) across 7 modes.",
     price: "Free 3-image preview · $49 full pack",
     turnaround: "Minutes",
   },
