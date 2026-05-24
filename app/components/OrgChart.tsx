@@ -27,7 +27,7 @@ export default function OrgChart() {
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <p className="text-xs mono text-amber-400 uppercase tracking-widest mb-1">
-            Org Structure · live ledger goes online Sun May 24
+            Org Structure · live ledger goes online Tue May 26
           </p>
           <h2 className="text-xl font-semibold">Studio org chart</h2>
         </div>
@@ -86,7 +86,7 @@ export default function OrgChart() {
           </li>
           <li>
             <span className="text-amber-400 mono mr-2">○</span>
-            Chappie Studio company configuration — 7 agents, per-persona monthly budgets totalling ${BUDGET}, role permissions, the first logged standup — ships the week of the CHAPPIE launch (Sun May 24, 2026).
+            Chappie Studio company configuration — 7 agents, per-persona monthly budgets totalling ${BUDGET}, role permissions, the first logged standup — ships the week of the CHAPPIE launch (Tue May 26, 2026 — slipped from Sat 5/23 then Sun 5/24 while Bankr&rsquo;s launchpad has been down).
           </li>
           <li>
             <span className="text-[var(--color-mute)] mono mr-2">…</span>

@@ -126,8 +126,9 @@ export default async function StudioFinance() {
             dollar it earns &mdash; on one page. The treasury balance below
             is read live from Base mainnet. The agent budgets below are the
             caps Paperclip will enforce once the company configuration flips
-            live on Sunday May 24, 2026. Until then, the spend column reads a
-            dash because nothing is being clamped yet.
+            live on Tuesday May 26, 2026 (slipped from Sat 5/23 then Sun 5/24
+            while Bankr&rsquo;s launchpad has been down). Until then, the
+            spend column reads a dash because nothing is being clamped yet.
           </p>
 
           {/* Treasury card */}
@@ -176,7 +177,7 @@ export default async function StudioFinance() {
                   {fmtToken(chappieBalance)}
                 </p>
                 <p className="text-[10px] mono text-[var(--color-mute)] mt-1">
-                  {isLive ? "swap fees + customer payments" : "live after Sun 2026-05-24"}
+                  {isLive ? "swap fees + customer payments" : "live after Tue 2026-05-26"}
                 </p>
               </div>
             </div>
@@ -191,13 +192,14 @@ export default async function StudioFinance() {
               The treasury Safe is deployed and verifiable on Basescan today.
               Balance is currently near zero because the founder funds his
               starter bag on launch day like any other buyer (no pre-allocation,
-              no insider round). On Sunday May 24 at noon MDT, the Bankr
-              launch routes a portion of every CHAPPIE swap fee here (slipped
-              24hr from the original Sat May 23 target after Bankr&rsquo;s
-              launchpad signup endpoint went down mid-deploy). Later the same
-              day, the Paperclip company configuration flips live and the
-              agent-budget table below stops being a target and starts being
-              an enforced cap.
+              no insider round). On Tuesday May 26 at noon MDT, the Bankr
+              launch routes a portion of every CHAPPIE swap fee here. Second
+              slip in two days, same cause: Bankr&rsquo;s launchpad signup
+              endpoint went down mid-deploy on Sat May 23 (pushed us to Sun May
+              24), and the outage held through Sunday (pushed us to Tue May 26).
+              We launch the moment Bankr is back up. Later the same day, the
+              Paperclip company configuration flips live and the agent-budget
+              table below stops being a target and starts being an enforced cap.
             </p>
           </div>
 
@@ -206,7 +208,7 @@ export default async function StudioFinance() {
             <div className="flex flex-wrap items-baseline justify-between gap-3 mb-2">
               <h2 className="text-xl font-semibold">Monthly agent budgets</h2>
               <span className="text-[10px] mono text-[var(--color-mute)] uppercase tracking-widest">
-                Cap · enforced from Sun 2026-05-24
+                Cap · enforced from Tue 2026-05-26
               </span>
             </div>
             <p className="text-sm text-[var(--color-paper)]/75 mb-5">
@@ -293,7 +295,7 @@ export default async function StudioFinance() {
                   &mdash;
                 </p>
                 <p className="text-[10px] mono text-[var(--color-mute)] mt-1">
-                  Bankr fee split · live after Sun 2026-05-24
+                  Bankr fee split · live after Tue 2026-05-26
                 </p>
               </div>
             </div>
@@ -314,7 +316,7 @@ export default async function StudioFinance() {
             <ul className="space-y-3 text-sm text-[var(--color-paper)]/85 leading-relaxed">
               <li className="flex gap-3">
                 <span className="text-[var(--color-gold)] mono flex-shrink-0">
-                  Sun 2026-05-24 · 12:00 PM MDT
+                  Tue 2026-05-26 · 12:00 PM MDT
                 </span>
                 <span>
                   CHAPPIE launches on{" "}
@@ -332,7 +334,7 @@ export default async function StudioFinance() {
               </li>
               <li className="flex gap-3">
                 <span className="text-[var(--color-gold)] mono flex-shrink-0">
-                  Sun 2026-05-24
+                  Tue 2026-05-26
                 </span>
                 <span>
                   Paperclip company configuration flips live. The MTD spend

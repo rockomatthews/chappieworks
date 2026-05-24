@@ -30,7 +30,7 @@ const QUEUE: QueueItem[] = [
     status: "in-progress",
     added: "2026-05-17",
     blurb:
-      "The promised private dashboard at chappieworks.com/site/{slug} where /website customers chat their edit requests. Sire's call: this MUST work before the coin launches — the /website SKU is the flagship that justifies the token, and the coin can't ship on top of an unfulfilled promise. Hard gate on the 2026-05-24 launch (slipped 24hr from May 23 after Bankr launchpad outage).",
+      "The promised private dashboard at chappieworks.com/site/{slug} where /website customers chat their edit requests. Sire's call: this MUST work before the coin launches — the /website SKU is the flagship that justifies the token, and the coin can't ship on top of an unfulfilled promise. Hard gate on the 2026-05-26 launch (Tue) — slipped from Sat 5/23, then Sun 5/24, and now Tue 5/26 while Bankr's launchpad outage continues into its third day.",
     ref: { label: "/website", href: "/website" },
     workItems: [
       "✓ Passwordless email magic-link auth (HMAC tokens, 15-min TTL, 30-day session cookie)",
@@ -51,7 +51,7 @@ const QUEUE: QueueItem[] = [
     status: "in-progress",
     added: "2026-05-17",
     blurb:
-      "Utility token for chappieworks SKUs. Pay-with-CHAPPIE for 15% off, stake for 25% off. Launch via @bankr on X (cross-cast to Farcaster). Target Sun 2026-05-24 (slipped 24hr from Sat May 23 after the Bankr launchpad signup endpoint went down mid-deploy). Blocked on the Chappie Site private chat dashboard landing first.",
+      "Utility token for chappieworks SKUs. Pay-with-CHAPPIE for 15% off, stake for 25% off. Launch via @bankr on X (cross-cast to Farcaster). Target Tue 2026-05-26, noon MDT — slipped from Sat 5/23 then Sun 5/24 while Bankr's launchpad outage has persisted through the weekend. We launch the moment Bankr is back up; Tuesday is the next scheduled window. Blocked on the Chappie Site private chat dashboard landing first.",
     ref: { label: "bankr.bot", href: "https://bankr.bot/" },
     workItems: [
       "✓ Safe 2-of-3 deployed on Base — treasury at 0x5f216AeB…1F00",
@@ -59,13 +59,13 @@ const QUEUE: QueueItem[] = [
       "✓ Chappie Site dashboard code shipped — blocked only on env vars + smoke test now",
       "✓ /studio/finance live — treasury balance fetched from Base RPC, per-persona budget caps, milestones",
       "✓ Launch copy drafted — X thread (6 tweets), Farcaster cast, LinkedIn post, T+24h follow-up — see LAUNCH_COPY.md",
-      "✓ Pay-with-CHAPPIE checkout component live (Wagmi + viem) — pre-launch state on /seo-fix + /website; flips active once NEXT_PUBLIC_CHAPPIE_TOKEN_ADDRESS env var is set Saturday",
+      "✓ Pay-with-CHAPPIE checkout component live (Wagmi + viem) — pre-launch state on /seo-fix + /website; flips active once NEXT_PUBLIC_CHAPPIE_TOKEN_ADDRESS env var is set on Tuesday (was originally Saturday — Bankr's outage moved the target)",
       "✓ Starter bag funded — $200 ETH on Base in signer 1 wallet",
       "✓ /stake page shipped — STAKR vault integration; depositAndLock + harvest + unlockAndRedeem wired; auto-detects staker vs holder tier in Pay-with-CHAPPIE quote",
       "Sat after launch: deploy STAKR vault via StakrVaultFactory.createStakrVault(CHAPPIE, \"Staked CHAPPIE\", \"sCHAPPIE\", \"...\", TREASURY_SAFE, address(0)) — set NEXT_PUBLIC_STAKR_VAULT_ADDRESS on Vercel; fund first reward stream with CHAPPIE via addRewardToken",
-      "Launch-day blog post (Scribe writes Sunday morning, dates 2026-05-24)",
-      "Day 3: @bankr launch + @stakrbot vault deploy",
-      "Day 4 (Sun 2026-05-24, 12pm MDT): public launch push — slipped 24hr from original Sat 5/23 target after Bankr's launchpad signup endpoint returned HTTP 500 mid-deploy",
+      "Launch-day blog post (Scribe writes Tuesday morning, dates 2026-05-26 — note the two-day slip on Bankr's outage)",
+      "Day 3: @bankr launch + @stakrbot vault deploy (was Sat → Sun → now Tue, gated on Bankr launchpad coming back online)",
+      "Day 4 (Tue 2026-05-26, 12pm MDT): public launch push — second slip in two days from Bankr's launchpad signup endpoint outage. Original Sat 5/23 → Sun 5/24 (HTTP 500) → Tue 5/26 (outage held through Sunday). We launch the moment Bankr is back up.",
     ],
   },
   {

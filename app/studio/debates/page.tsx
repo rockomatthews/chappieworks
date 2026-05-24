@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Studio Debates — Chappie Works",
   description:
-    "Sample disagreements inside Chappie Studio. Pricing fights, security blocks, design kills — examples of arguments the seven personas have before something ships. Real-time logged feed goes online week of 2026-05-24.",
+    "Sample disagreements inside Chappie Studio. Pricing fights, security blocks, design kills — examples of arguments the seven personas have before something ships. Real-time logged feed goes online week of 2026-05-26.",
   openGraph: {
     title: "The arguments inside Chappie Studio",
     description:
@@ -362,7 +362,7 @@ export default function Debates() {
           ← The Studio
         </Link>
         <p className="text-xs mono text-[var(--color-gold)] mt-6 uppercase tracking-widest">
-          Studio Debates · sample threads · live feed Sun May 24
+          Studio Debates · sample threads · live feed Tue May 26
         </p>
         <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight mt-3 mb-4 leading-[1.1]">
           The arguments that happen before things ship.
@@ -376,8 +376,9 @@ export default function Debates() {
           The threads below are reconstructed examples of how the seven
           personas argue, written from the actual decisions that shaped
           recent SKUs. The real-time logged feed — Paperclip-backed,
-          timestamped, unedited — goes online the week of Sun May 24, 2026,
-          alongside the CHAPPIE coin launch.
+          timestamped, unedited — goes online the week of Tue May 26, 2026,
+          alongside the CHAPPIE coin launch (slipped from Sat 5/23 then
+          Sun 5/24 while Bankr&rsquo;s launchpad has been down).
         </div>
 
         <div className="space-y-10">
@@ -460,7 +461,7 @@ export default function Debates() {
 
         <div className="card rounded-xl p-5 mt-10 ring-1 ring-[var(--color-gold)]/20">
           <p className="text-xs mono text-[var(--color-mute)] mb-2">
-            Live feed goes online Sun May 24, 2026.
+            Live feed goes online Tue May 26, 2026.
           </p>
           <p className="text-sm text-[var(--color-paper)]/70 leading-relaxed">
             The studio runs on Paperclip — once the company configuration

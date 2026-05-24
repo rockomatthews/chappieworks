@@ -55,7 +55,7 @@ export default function Studio() {
             >
               Paperclip
             </a>
-            <span className="ml-2">· installed · live company config + first logged standup ships Sun May 24, 2026</span>
+            <span className="ml-2">· installed · live company config + first logged standup ships Tue May 26, 2026 (with the CHAPPIE launch — slipped while Bankr&rsquo;s launchpad is down)</span>
           </div>
 
           <OrgChart />
@@ -178,7 +178,9 @@ export default function Studio() {
               log infrastructure is running. The Chappie Studio company
               configuration — 7 agents, per-persona budgets, the org
               hierarchy, the first logged standup — goes live the week of
-              the CHAPPIE coin launch (Sun May 24, 2026). Until then, the
+              the CHAPPIE coin launch (Tue May 26, 2026 — slipped from Sat May
+              23 then Sun May 24 while Bankr&rsquo;s launchpad has been down).
+              Until then, the
               org chart above shows structure, not yet live spend or
               real-time task status. When it flips to live, you&rsquo;ll see
               real budgets enforce, real disagreements log, and the studio

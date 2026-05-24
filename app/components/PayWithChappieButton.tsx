@@ -122,7 +122,7 @@ export function PayWithChappieButton({
         href="/coin"
         className={`inline-flex items-center justify-center px-6 py-3 rounded-md border-2 border-[var(--color-gold)] text-[var(--color-gold)] hover:bg-[var(--color-gold)] hover:text-[var(--color-ink)] transition text-sm font-medium ${className}`}
       >
-        Pay with CHAPPIE — live Sun May 24 →
+        Pay with CHAPPIE — live Tue May 26 →
       </Link>
     );
   }

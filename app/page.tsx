@@ -58,7 +58,7 @@ function Hero() {
           className="inline-flex items-center gap-2 px-4 py-2 mb-6 rounded-full bg-[#16a34a] text-xs mono uppercase tracking-widest font-semibold hover:opacity-90 transition"
         >
           <span className="inline-block w-1.5 h-1.5 rounded-full bg-black animate-pulse" />
-          $CHAPPIE launches Sun May 24 — read the announcement →
+          $CHAPPIE launches Tue May 26 — read the announcement →
         </Link>
         <div className="max-w-md mx-auto mb-8">
           <Countdown targetIso={LAUNCH_ISO} />
@@ -269,7 +269,7 @@ function Slate() {
             </Link>{" "}
             ·{" "}
             <Link href="/coin" className="text-[var(--color-gold)] hover:underline">
-              $CHAPPIE launches May 24
+              $CHAPPIE launches Tue May 26
             </Link>{" "}
             ·{" "}
             <Link href="/stake" className="text-[var(--color-gold)] hover:underline">

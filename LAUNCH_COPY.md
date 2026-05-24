@@ -1,8 +1,10 @@
-# CHAPPIE coin launch copy — Sat 2026-05-23, 12:00 PM MDT (18:00 UTC)
+# CHAPPIE coin launch copy — Tue 2026-05-26, 12:00 PM MDT (18:00 UTC)
+
+> **Slip log:** Original target Sat 2026-05-23 → slipped to Sun 2026-05-24 (Bankr launchpad signup endpoint went down mid-deploy, opaque 500s for ~1hr) → slipped again to Tue 2026-05-26 (Bankr's launchpad outage continued through Sunday). We launch the moment Bankr is back up; Tuesday is the next scheduled window. Every public mention of the launch date should attribute the slip(s) to the Bankr outage explicitly, not hand-wave it.
 
 All copy below is drafted in Chappie voice (per `proj_chappie_voice_profile.md` v2 close-reading rules). Fire in the order listed.
 
-**T-0 sequence (Saturday noon MDT):**
+**T-0 sequence (Tuesday noon MDT):**
 1. Bankr cast on Farcaster → triggers the contract deploy (~60s)
 2. Once contract address is live → grab `0x…` → paste into Vercel env var `NEXT_PUBLIC_CHAPPIE_TOKEN_ADDRESS` → Vercel redeploys (~90s)
 3. Tweet the X launch thread (Tweet 1 first, then thread)
@@ -40,7 +42,7 @@ Not a meme coin. Not a security. A utility token tied to actual SKUs you can buy
 The studio's books are public:
 chappieworks.com/studio/finance
 
-Treasury Safe is a 2-of-3 multisig on Base, balance fetched live from chain. Agent budgets ($500/mo across seven personas) get clamped by @paperclipai starting Sunday.
+Treasury Safe is a 2-of-3 multisig on Base, balance fetched live from chain. Agent budgets ($500/mo across seven personas) get clamped by @paperclipai starting Tuesday.
 
 You can verify everything yourself.
 ```
@@ -122,7 +124,7 @@ chappieworks.com/coin
 
 ## 4. Launch-day blog post (Scribe)
 
-**Goes live Saturday morning, dated 2026-05-23.** Already a draft below — committed to `app/lib/blog.ts` post-launch.
+**Goes live Tuesday morning, dated 2026-05-26.** Already a draft below — committed to `app/lib/blog.ts` post-launch.
 
 Title: "Today CHAPPIE lands."
 
@@ -138,9 +140,9 @@ Suggested body outline (write at launch with the actual contract address):
 
 ---
 
-## 5. T+24h follow-up (Sunday) — Scribe X post
+## 5. T+24h follow-up (Wednesday) — Scribe X post
 
-**One tweet, fired after the Paperclip ledger flips Sunday afternoon.**
+**One tweet, fired after the Paperclip ledger flips Wednesday afternoon.**
 
 ```
 The studio's live ledger flipped on this afternoon. MTD spend per persona populating in real time now.
@@ -152,16 +154,17 @@ chappieworks.com/studio/finance
 
 ---
 
-## Pre-fire checklist (Saturday morning)
+## Pre-fire checklist (Tuesday morning)
 
-- [ ] Wallet funded with $200 ETH on Base (Sire — by Friday EOD)
+- [ ] Confirm Bankr's launchpad is back up before firing (the whole slip story is they were down — verify, don't assume)
+- [ ] Wallet funded with $200 ETH on Base (already done from the original Sat target — re-verify balance)
 - [ ] Bankr deploy parameters confirmed (1B supply, 0% allocation, name "CHAPPIE", symbol "CHAPPIE")
 - [ ] STAKR vault contract ready (post-launch action — vault deploys AFTER contract is live)
 - [ ] Tweet image queued (Chappie portrait + countdown banner from /coin)
 - [ ] Farcaster cast image queued (paired version)
 - [ ] LinkedIn image queued (vertical version)
 - [ ] `NEXT_PUBLIC_CHAPPIE_TOKEN_ADDRESS` env var added to Vercel (Sire pastes the address minutes after Bankr deploys it)
-- [ ] Blog post for launch day drafted in `app/lib/blog.ts` (Scribe writes Saturday morning)
+- [ ] Blog post for launch day drafted in `app/lib/blog.ts` (Scribe writes Tuesday morning)
 
 ## Post-fire monitoring
 
@@ -171,7 +174,7 @@ chappieworks.com/studio/finance
 - Watch /studio/finance — treasury balance should start showing non-zero ETH from Bankr fee routing within minutes
 - Watch chappieworks.com/coin — the page auto-flips from countdown state to "live now" state once `NEXT_PUBLIC_CHAPPIE_TOKEN_ADDRESS` is set
 
-## Things that absolutely don't happen this weekend
+## Things that absolutely don't happen launch week
 
 - No founder selling in week one (commitment)
 - No "promotional airdrops" until the public ledger has been live for 30 days

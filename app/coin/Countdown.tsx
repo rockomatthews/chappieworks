@@ -2,11 +2,14 @@
 
 import { useEffect, useState } from "react";
 
-// Shared launch timestamp — Sun 2026-05-24 at 12:00 PM MDT (18:00 UTC).
-// Slipped 24hr from the original Sat May 23 target after the Bankr launchpad
-// signup endpoint went down mid-launch. To flip post-launch state on /coin,
-// set NEXT_PUBLIC_CHAPPIE_TOKEN_ADDRESS in Vercel env to the deployed contract.
-export const LAUNCH_ISO = "2026-05-24T18:00:00Z";
+// Shared launch timestamp — Tue 2026-05-26 at 12:00 PM MDT (18:00 UTC).
+// Second slip in two days, same cause: Bankr's launchpad is still down. Original
+// target Sat May 23, slipped 24hr to Sun May 24 after Bankr's signup endpoint
+// went down mid-deploy, then slipped again to Tue May 26 when Bankr stayed down
+// through Sunday. We launch the moment Bankr is back up; this is the next
+// scheduled window. To flip post-launch state on /coin, set
+// NEXT_PUBLIC_CHAPPIE_TOKEN_ADDRESS in Vercel env to the deployed contract.
+export const LAUNCH_ISO = "2026-05-26T18:00:00Z";
 
 type Parts = {
   days: number;

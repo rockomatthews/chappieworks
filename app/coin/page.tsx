@@ -6,11 +6,11 @@ import { Countdown, LAUNCH_ISO } from "./Countdown";
 
 export const metadata = {
   title:
-    "$CHAPPIE — utility token on Base, launching May 24 — Chappie Works",
+    "$CHAPPIE — utility token on Base, launching Tue May 26 — Chappie Works",
   description:
-    "CHAPPIE is the utility token for chappieworks AI work. Pay for SEO audits, websites, agent builds, and movies in CHAPPIE for 15% off. Stake for 25% off permanently. Fair launch via Bankr on Base, Sunday May 24, 2026.",
+    "CHAPPIE is the utility token for chappieworks AI work. Pay for SEO audits, websites, agent builds, and movies in CHAPPIE for 15% off. Stake for 25% off permanently. Fair launch via Bankr on Base, Tuesday May 26, 2026 — slipped from earlier targets while Bankr's launchpad is down.",
   openGraph: {
-    title: "$CHAPPIE — launching May 24 on Base",
+    title: "$CHAPPIE — launching Tue May 26 on Base",
     description:
       "Utility token for chappieworks. Pay for AI work in CHAPPIE at a discount. Stake for more. Fair launch via Bankr.",
     url: "https://chappieworks.com/coin",
@@ -39,7 +39,7 @@ const FAQ_SCHEMA = {
       name: "When does CHAPPIE launch?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Sunday, May 24, 2026 at 12:00 PM Mountain Time (18:00 UTC). Originally scheduled for Saturday May 23 — slipped 24 hours when the Bankr launchpad signup endpoint went down mid-deploy. Launch happens on Bankr (bankr.bot) — Base's leading X-and-Farcaster-native launch protocol. The contract address and buy link will be posted on @chappieworks on X and @rocketship on Farcaster the moment it goes live.",
+        text: "Tuesday, May 26, 2026 at 12:00 PM Mountain Time (18:00 UTC). Second slip in two days — same cause both times. Original target was Saturday May 23. Slipped 24 hours to Sunday May 24 after the Bankr launchpad signup endpoint went down mid-deploy. Slipped again to Tuesday May 26 when Bankr's outage extended through Sunday. We launch the moment Bankr is back up — Tuesday is the next scheduled window. Launch happens on Bankr (bankr.bot), Base's leading X-and-Farcaster-native launch protocol. The contract address and buy link will be posted on @chappieworks on X and @rocketship on Farcaster the moment it goes live.",
       },
     },
     {
@@ -130,11 +130,11 @@ export default async function CoinPage({
           {!isLive && (
             <div className="card rounded-xl p-6 sm:p-8 mt-6 ring-2 ring-[var(--color-gold)]">
               <p className="text-xs mono text-[var(--color-gold)] uppercase tracking-widest mb-3 text-center">
-                Launch · Sun May 24, 2026 · 12:00 PM MDT (18:00 UTC)
+                Launch · Tue May 26, 2026 · 12:00 PM MDT (18:00 UTC)
               </p>
               <Countdown targetIso={LAUNCH_ISO} />
               <p className="text-xs mono text-[var(--color-mute)] text-center mt-4">
-                Slipped 24hr from the original Sat May 23 target — Bankr&rsquo;s launchpad signup endpoint went down mid-deploy. Watch{" "}
+                Second slip in two days — Bankr&rsquo;s launchpad is still down. Original target was Sat May 23, slipped to Sun May 24 after their signup endpoint went down mid-deploy, then slipped to Tue May 26 when the outage held through Sunday. We launch the moment Bankr is back up. Watch{" "}
                 <a href="https://x.com/chappieworks" target="_blank" rel="noopener noreferrer" className="text-[var(--color-gold)] hover:underline">@chappieworks on X</a> and{" "}
                 <a href="https://warpcast.com/rocketship" target="_blank" rel="noopener noreferrer" className="text-[var(--color-gold)] hover:underline">@rocketship on Farcaster</a> for the launch cast.
               </p>
@@ -142,7 +142,7 @@ export default async function CoinPage({
           )}
 
           <p className="text-xs mono text-[var(--color-gold)] mt-8 uppercase tracking-widest">
-            $CHAPPIE · utility token on Base · {isLive ? "live now" : "Sun May 24 · noon MDT"}
+            $CHAPPIE · utility token on Base · {isLive ? "live now" : "Tue May 26 · noon MDT"}
           </p>
           <h1 className="text-4xl sm:text-5xl font-semibold tracking-tight mt-3 mb-6 leading-[1.1]">
             Pay the AI studio. In its own coin. At a discount.
@@ -300,7 +300,7 @@ export default async function CoinPage({
               </h2>
               <p className="text-sm text-[var(--color-mute)] mb-6">
                 Drop your email and we&rsquo;ll send the contract address +
-                Bankr buy link the moment CHAPPIE goes live on Sunday. No
+                Bankr buy link the moment CHAPPIE goes live on Tuesday. No
                 spam, just the launch heads-up.
               </p>
               <IntakeForm
