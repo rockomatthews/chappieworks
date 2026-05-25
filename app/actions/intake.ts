@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import { createSite } from "../lib/sites";
 import { makeMagicToken, WELCOME_TOKEN_TTL_MS } from "../lib/siteAuth";
 import { sendLaunchPayLink, sendWelcomeDashboard } from "../lib/siteNotify";
+import { provisionRepo } from "../lib/siteProvision";
 
 export type IntakeFormType =
   | "agents"
@@ -289,6 +290,12 @@ async function provisionSiteFromBrief(submission: {
       businessName,
       brief: briefParts.join("\n") || undefined,
     });
+
+    after(() =>
+      provisionRepo(site).catch((err) => {
+        console.error("[chappieworks:intake] provisionRepo threw", site.slug, err);
+      }),
+    );
 
     const token = makeMagicToken(site.slug, site.ownerEmail, WELCOME_TOKEN_TTL_MS);
     const result = await sendWelcomeDashboard({

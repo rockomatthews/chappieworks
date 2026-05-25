@@ -28,6 +28,9 @@ export type SiteRecord = {
   createdAt: string;
   updatedAt: string;
   messages: SiteMessage[];
+  githubRepo?: string;       // e.g. "Chappieworks-sites/acme-a1b2c3"
+  vercelProjectId?: string;  // Vercel project id for auto-deploys
+  vercelUrl?: string;        // e.g. "acme-a1b2c3.vercel.app"
 };
 
 const STATE_KEY = (slug: string) => `sites/${slug}/state.json`;

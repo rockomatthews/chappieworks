@@ -7,7 +7,8 @@ export type MovieState = {
   prompt: string;
   email: string;
   createdAt: string;
-  replicateId?: string;
+  replicateId?: string;        // legacy Seedance jobs
+  openaiVideoId?: string;      // Sora 2 jobs
   status: "pending" | "generating" | "watermarking" | "ready" | "failed";
   failureReason?: string;
   previewUrl?: string;

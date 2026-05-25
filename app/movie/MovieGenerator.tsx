@@ -341,7 +341,7 @@ export function MovieGenerator() {
     }
   }
 
-  const showForm = !job || job.status === "failed";
+  const showForm = !job;
   const isRendering =
     job &&
     (job.status === "pending" ||
@@ -687,6 +687,9 @@ export function MovieGenerator() {
             onClick={() => {
               setJob(null);
               setError(null);
+              setPrompt("");
+              setEmail("");
+              clearUpload();
               stopPolling();
             }}
             className="w-full text-sm text-[var(--color-paper)]/70 hover:text-[var(--color-gold)] underline underline-offset-4 transition"
@@ -697,14 +700,29 @@ export function MovieGenerator() {
       )}
 
       {job && job.status === "failed" && (
-        <div className="card rounded-xl p-6 ring-1 ring-[var(--color-rust)]/40">
-          <p className="text-xs mono text-[var(--color-rust)] uppercase tracking-widest mb-2">
-            Render failed
-          </p>
-          <p className="text-sm text-[var(--color-paper)]/85">
-            {job.failureReason ??
-              "Something went sideways on Replicate. Try a slightly different prompt."}
-          </p>
+        <div className="card rounded-xl p-6 ring-1 ring-[var(--color-rust)]/40 space-y-4">
+          <div>
+            <p className="text-xs mono text-[var(--color-rust)] uppercase tracking-widest mb-2">
+              Render failed
+            </p>
+            <p className="text-sm text-[var(--color-paper)]/85">
+              {job.failureReason ??
+                "The generation didn't complete. Try a slightly different prompt."}
+            </p>
+          </div>
+          <button
+            onClick={() => {
+              setJob(null);
+              setError(null);
+              setPrompt("");
+              setEmail("");
+              clearUpload();
+              stopPolling();
+            }}
+            className="w-full px-4 py-2 text-sm font-medium rounded-md bg-[var(--color-rust)]/20 text-[var(--color-rust)] hover:bg-[var(--color-rust)]/30 transition"
+          >
+            Try again with a new prompt
+          </button>
         </div>
       )}
     </div>

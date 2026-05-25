@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { put } from "@vercel/blob";
+import OpenAI from "openai";
 import Replicate from "replicate";
 import ffmpegPath from "ffmpeg-static";
 import ffmpeg from "fluent-ffmpeg";
@@ -79,6 +80,139 @@ async function burnWatermark(cleanMp4: Buffer): Promise<Buffer> {
   }
 }
 
+async function pollSora(state: MovieState): Promise<NextResponse> {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey || !state.openaiVideoId) {
+    return NextResponse.json(publicView(state));
+  }
+  const openai = new OpenAI({ apiKey });
+
+  let video: OpenAI.Videos.Video;
+  try {
+    video = await openai.videos.retrieve(state.openaiVideoId);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "unknown";
+    console.error(
+      "[chappieworks:movie] sora retrieve failed",
+      state.jobId,
+      message,
+    );
+    return NextResponse.json(publicView(state));
+  }
+
+  if (video.status === "queued" || video.status === "in_progress") {
+    const newStatus: MovieState["status"] = "generating";
+    if (state.status !== newStatus) {
+      await writeState({ ...state, status: newStatus });
+    }
+    return NextResponse.json({ ...publicView(state), status: newStatus });
+  }
+
+  if (video.status === "failed") {
+    const raw = video.error?.message ?? "sora generation failed";
+    const code = video.error?.code ?? "";
+    const isPolicy =
+      /policy|moderation|safety|content/i.test(raw) || /policy/i.test(code);
+    const friendly = isPolicy
+      ? "Sora flagged this prompt under its content policy (real public figures, branded IP, graphic content, etc.). Rephrase and try again."
+      : raw;
+    const failed: MovieState = {
+      ...state,
+      status: "failed",
+      failureReason: friendly,
+    };
+    await writeState(failed);
+    return NextResponse.json(publicView(failed));
+  }
+
+  if (video.status === "completed") {
+    await writeState({ ...state, status: "watermarking" });
+    console.log(
+      "[chappieworks:movie] downloading sora video",
+      state.jobId,
+      video.id,
+    );
+    let cleanBuffer: Buffer;
+    try {
+      const res = await openai.videos.downloadContent(video.id, {
+        variant: "video",
+      });
+      const ab = await res.arrayBuffer();
+      cleanBuffer = Buffer.from(ab);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "unknown";
+      console.error(
+        "[chappieworks:movie] sora download failed",
+        state.jobId,
+        message,
+      );
+      const failed: MovieState = {
+        ...state,
+        status: "failed",
+        failureReason: "couldn't download generated video",
+      };
+      await writeState(failed);
+      return NextResponse.json(publicView(failed));
+    }
+
+    return await finalizeReady(state, cleanBuffer);
+  }
+
+  return NextResponse.json(publicView(state));
+}
+
+async function finalizeReady(
+  state: MovieState,
+  cleanBuffer: Buffer,
+): Promise<NextResponse> {
+  const jobId = state.jobId;
+  const cleanBlob = await put(CLEAN_KEY(jobId), cleanBuffer, {
+    access: "public",
+    contentType: "video/mp4",
+    addRandomSuffix: false,
+    allowOverwrite: true,
+  });
+
+  let previewUrl = cleanBlob.url;
+  if (state.mode === "video") {
+    try {
+      const watermarked = await burnWatermark(cleanBuffer);
+      const previewBlob = await put(PREVIEW_KEY(jobId), watermarked, {
+        access: "public",
+        contentType: "video/mp4",
+        addRandomSuffix: false,
+        allowOverwrite: true,
+      });
+      previewUrl = previewBlob.url;
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "unknown";
+      console.error(
+        "[chappieworks:watermark] burn failed, falling back to clean",
+        jobId,
+        message,
+      );
+    }
+  }
+
+  const ready: MovieState = {
+    ...state,
+    status: "ready",
+    previewUrl,
+    cleanUrl: cleanBlob.url,
+    durationSec: state.durationSec ?? 4,
+  };
+  await writeState(ready);
+  console.log(
+    "[chappieworks:movie] job ready",
+    jobId,
+    "mode",
+    state.mode ?? "text",
+    "duration",
+    ready.durationSec,
+  );
+  return NextResponse.json(publicView(ready));
+}
+
 export async function GET(
   _req: Request,
   ctx: { params: Promise<{ jobId: string }> },
@@ -93,6 +227,22 @@ export async function GET(
     return NextResponse.json(publicView(state));
   }
 
+  // Sora 2 path (new jobs)
+  if (state.openaiVideoId) {
+    try {
+      return await pollSora(state);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "unknown";
+      console.error(
+        "[chappieworks:movie] sora poll threw",
+        jobId,
+        message,
+      );
+      return NextResponse.json(publicView(state));
+    }
+  }
+
+  // Legacy Replicate path (existing jobs created before Sora migration)
   const apiToken = process.env.REPLICATE_API_TOKEN;
   if (!apiToken || !state.replicateId) {
     return NextResponse.json(publicView(state));
@@ -116,10 +266,6 @@ export async function GET(
     if (prediction.status === "failed" || prediction.status === "canceled") {
       const rawError =
         prediction.error?.toString() ?? `replicate ${prediction.status}`;
-      // Seedance's safety filter (E005) flags inputs or outputs that ByteDance
-      // considers sensitive — public figures, brand IP, violence, suggestive
-      // content, etc. Surface that clearly so the customer rephrases instead
-      // of staring at a cryptic ModelError.
       const isSensitive =
         /E005|flagged as sensitive|content[\s_-]*polic/i.test(rawError);
       const friendly = isSensitive

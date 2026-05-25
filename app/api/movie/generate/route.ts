@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import Replicate from "replicate";
+import OpenAI from "openai";
 import { put } from "@vercel/blob";
 import ffmpegPath from "ffmpeg-static";
 import ffmpeg from "fluent-ffmpeg";
@@ -31,11 +31,14 @@ const ALLOWED_IMAGE_TYPES = new Set([
   "image/webp",
 ]);
 
-// Seedance 2.0 on Replicate — ByteDance's multimodal video model. Currently
-// #1 on the Artificial Analysis prompt-adherence leaderboard for both T2V
-// and I2V. Same Replicate SDK as Kling, similar input schema. 720p keeps
-// per-clip cost predictable across the 5s and 10s tiers.
-const MODEL = "bytedance/seedance-2.0" as `${string}/${string}`;
+const SORA_MODEL = "sora-2";
+const SORA_SIZE = "1280x720";
+
+function mapDurationToSora(d: number): "4" | "8" | "12" {
+  if (d >= 10) return "12";
+  if (d >= 7) return "8";
+  return "4";
+}
 
 // Pull the last frame from a video at a public URL and return it as a PNG
 // buffer. Used by extension mode to seed the next 10s with the final frame
@@ -163,16 +166,16 @@ export async function POST(req: Request) {
     duration = 10;
   }
 
-  const apiToken = process.env.REPLICATE_API_TOKEN;
-  if (!apiToken) {
-    console.error("[chappieworks:movie] REPLICATE_API_TOKEN missing");
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    console.error("[chappieworks:movie] OPENAI_API_KEY missing");
     return NextResponse.json(
       { error: "generator offline — try again shortly" },
       { status: 503 },
     );
   }
 
-  const replicate = new Replicate({ auth: apiToken });
+  const openai = new OpenAI({ apiKey });
   const jobId = newJobId();
 
   let startImageUrl: string | undefined;
@@ -232,52 +235,51 @@ export async function POST(req: Request) {
   }
 
   try {
-    const input: Record<string, unknown> = {
+    const seconds = mapDurationToSora(duration);
+
+    const params: OpenAI.Videos.VideoCreateParams = {
+      model: SORA_MODEL,
       prompt,
-      duration,
-      aspect_ratio: "16:9",
-      resolution: "720p",
-      generate_audio: true,
+      seconds,
+      size: SORA_SIZE,
     };
     if (startImageUrl) {
-      input.image = startImageUrl;
+      params.input_reference = { image_url: startImageUrl };
     }
 
-    const prediction = await replicate.predictions.create({
-      model: MODEL,
-      input,
-    });
+    const video = await openai.videos.create(params);
 
     const state: MovieState = {
       jobId,
       prompt,
       email,
       createdAt: new Date().toISOString(),
-      replicateId: prediction.id,
-      status: "generating",
+      openaiVideoId: video.id,
+      status: video.status === "failed" ? "failed" : "generating",
       paid: false,
-      durationSec: duration,
+      durationSec: Number(seconds),
       mode,
       startImageUrl,
       inputVideoUrl,
+      failureReason: video.error?.message,
     };
     await writeState(state);
 
     console.log(
       "[chappieworks:movie] created job",
       jobId,
-      "replicate",
-      prediction.id,
+      "sora",
+      video.id,
       "mode",
       mode,
-      "duration",
-      duration,
+      "seconds",
+      seconds,
     );
 
     return NextResponse.json({ jobId });
   } catch (err) {
     const message = err instanceof Error ? err.message : "unknown";
-    console.error("[chappieworks:movie] create prediction failed", message);
+    console.error("[chappieworks:movie] create sora video failed", message);
     return NextResponse.json(
       { error: `couldn't start generation: ${message}` },
       { status: 502 },

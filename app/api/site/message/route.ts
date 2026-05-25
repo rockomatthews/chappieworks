@@ -3,6 +3,7 @@ import { after } from "next/server";
 import { appendMessage, readSite } from "../../../lib/sites";
 import { readSessionFor } from "../../../lib/siteAuth";
 import { notifyOperatorOfMessage } from "../../../lib/siteNotify";
+import { autoApplyEdit } from "../../../lib/siteAutoApply";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -43,21 +44,32 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: "Save failed" }, { status: 500 });
   }
 
-  // Auto-acknowledge so the chat doesn't feel like shouting into the void.
-  // The studio operator gets pinged via email and replies as a real human.
+  const canAutoApply = !!site.githubRepo && !!process.env.ANTHROPIC_API_KEY;
+
   const updated = await appendMessage(slug, {
     from: "system",
-    body: "Studio notified — a real reply lands here within 24 hours.",
+    body: canAutoApply
+      ? "On it — the studio agent is working on this now. New deploy lands in a few minutes."
+      : "Studio notified — a real reply lands here within 24 hours.",
+    statusChange: canAutoApply ? "in_progress" : undefined,
   });
   if (!updated) {
     return NextResponse.json({ ok: false, error: "Save failed" }, { status: 500 });
   }
 
-  after(() =>
-    notifyOperatorOfMessage({ site: updated, body }).catch((err) => {
-      console.error("[chappieworks:site-message] notify threw", err);
-    }),
-  );
+  if (canAutoApply) {
+    after(() =>
+      autoApplyEdit({ site: updated, request: body }).catch((err) => {
+        console.error("[chappieworks:site-message] autoApplyEdit threw", err);
+      }),
+    );
+  } else {
+    after(() =>
+      notifyOperatorOfMessage({ site: updated, body }).catch((err) => {
+        console.error("[chappieworks:site-message] notify threw", err);
+      }),
+    );
+  }
 
   return NextResponse.json({ ok: true, site: updated });
 }
