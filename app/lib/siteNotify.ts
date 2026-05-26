@@ -44,14 +44,14 @@ async function sendResend(payload: {
 export async function sendWelcomeDashboard(opts: {
   to: string;
   slug: string;
-  token: string;
+  link: string;
   businessName: string;
   ownerName: string;
 }): Promise<SendResult> {
   const from = process.env.INTAKE_FROM_EMAIL ?? FROM_DEFAULT;
   const baseUrl =
     process.env.NEXT_PUBLIC_SITE_URL ?? "https://chappieworks.com";
-  const link = `${baseUrl}/api/site/verify?token=${encodeURIComponent(opts.token)}`;
+  const link = opts.link;
   const dashboardUrl = `${baseUrl}/site/${opts.slug}`;
   const firstName = (opts.ownerName || "").split(" ")[0] || "there";
 
@@ -66,7 +66,7 @@ export async function sendWelcomeDashboard(opts: {
 <p style="margin: 28px 0;">
   <a href="${link}" style="display:inline-block; background:#c9a437; color:#0b0b0c; padding:12px 24px; border-radius:6px; text-decoration:none; font-weight:600; font-size:15px;">Open my dashboard →</a>
 </p>
-<p style="font-size:13px; line-height:1.55; color:rgba(250,247,238,0.55);">The link above signs you in directly for the next 7 days. After that, visit <a href="${dashboardUrl}" style="color:#c9a437;">${escapeHtml(dashboardUrl)}</a> and we&rsquo;ll email you a fresh sign-in link.</p>
+<p style="font-size:13px; line-height:1.55; color:rgba(250,247,238,0.55);">The link above signs you in. Anytime after, visit <a href="${dashboardUrl}" style="color:#c9a437;">${escapeHtml(dashboardUrl)}</a> and we&rsquo;ll email you a fresh sign-in link.</p>
 </div>
 </body></html>`;
 
@@ -116,14 +116,11 @@ export async function sendLaunchPayLink(opts: {
 
 export async function sendMagicLink(opts: {
   to: string;
-  slug: string;
-  token: string;
+  link: string;
   businessName: string;
 }): Promise<SendResult> {
   const from = process.env.INTAKE_FROM_EMAIL ?? FROM_DEFAULT;
-  const baseUrl =
-    process.env.NEXT_PUBLIC_SITE_URL ?? "https://chappieworks.com";
-  const link = `${baseUrl}/api/site/verify?token=${encodeURIComponent(opts.token)}`;
+  const link = opts.link;
 
   const html = `<!DOCTYPE html><html><body style="font-family: -apple-system, system-ui, sans-serif; background:#0b0b0c; color:#faf7ee; padding:32px 16px; margin:0;">
 <div style="max-width:560px; margin:0 auto;">
@@ -131,7 +128,7 @@ export async function sendMagicLink(opts: {
   <div style="font-family:'SF Mono', monospace; font-size:11px; color:#c9a437; letter-spacing:0.12em; text-transform:uppercase;">Chappie Site · Sign-in</div>
   <h1 style="font-size:22px; margin:8px 0 0; font-weight:600;">Open your edit dashboard for ${escapeHtml(opts.businessName)}</h1>
 </div>
-<p style="font-size:15px; line-height:1.6; color:rgba(250,247,238,0.85);">Click the button below to sign in to your private edit thread with the studio. This link is good for 15 minutes.</p>
+<p style="font-size:15px; line-height:1.6; color:rgba(250,247,238,0.85);">Click the button below to sign in to your private edit thread with the studio. This link expires shortly — request a fresh one any time.</p>
 <p style="margin: 28px 0;">
   <a href="${link}" style="display:inline-block; background:#c9a437; color:#0b0b0c; padding:12px 24px; border-radius:6px; text-decoration:none; font-weight:600; font-size:15px;">Open my dashboard →</a>
 </p>

@@ -1,13 +1,12 @@
 import { NextResponse } from "next/server";
-import { readSite, normalizeEmail } from "../../../lib/sites";
-import { makeMagicToken } from "../../../lib/siteAuth";
-import { sendMagicLink } from "../../../lib/siteNotify";
-import { checkLoginRateLimit } from "../../../lib/siteRateLimit";
+import { readSite, normalizeEmail } from "../../../../lib/sites";
+import { checkLoginRateLimit } from "../../../../lib/siteRateLimit";
+import { mintSiteMagicLink } from "../../../../lib/supabase/magiclink";
+import { sendMagicLink } from "../../../../lib/siteNotify";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-// Generic success copy regardless of match — prevents email enumeration.
 const GENERIC_OK =
   "If that email matches the owner on file, a sign-in link is on its way. Check your inbox (and spam) within a minute.";
 
@@ -21,38 +20,48 @@ export async function POST(req: Request) {
   const slug = (body.slug ?? "").trim();
   const email = normalizeEmail(body.email ?? "");
   if (!slug || !email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return NextResponse.json({ ok: false, error: "Missing slug or email" }, { status: 400 });
+    return NextResponse.json(
+      { ok: false, error: "Missing slug or email" },
+      { status: 400 },
+    );
   }
 
   const rl = await checkLoginRateLimit(slug, email);
   if (!rl.ok) {
-    const res = NextResponse.json(
+    return NextResponse.json(
       { ok: true, message: GENERIC_OK },
       { headers: { "Retry-After": String(rl.retryAfterSec) } },
     );
-    return res;
   }
 
   const site = await readSite(slug);
-  if (!site) {
-    // Don't reveal whether the slug exists.
-    return NextResponse.json({ ok: true, message: GENERIC_OK });
-  }
-  if (site.ownerEmail !== email) {
+  if (!site || site.ownerEmail !== email) {
     return NextResponse.json({ ok: true, message: GENERIC_OK });
   }
 
-  const token = makeMagicToken(slug, email);
+  const baseUrl =
+    process.env.NEXT_PUBLIC_SITE_URL ?? "https://chappieworks.com";
+
+  const minted = await mintSiteMagicLink({ email, slug, baseUrl });
+  if (!minted.ok) {
+    return NextResponse.json(
+      { ok: false, error: "Could not create sign-in link — please try again." },
+      { status: 500 },
+    );
+  }
+
   const result = await sendMagicLink({
     to: email,
-    slug,
-    token,
+    link: minted.link,
     businessName: site.businessName,
   });
   if (!result.ok) {
-    console.error("[chappieworks:site-login] email send failed", result.error);
+    console.error(
+      "[chappieworks:site-auth-login] email send failed",
+      result.error,
+    );
     return NextResponse.json(
-      { ok: false, error: "Could not send sign-in email — please try again in a minute." },
+      { ok: false, error: "Could not send sign-in email — please try again." },
       { status: 500 },
     );
   }

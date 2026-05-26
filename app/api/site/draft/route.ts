@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { readSite } from "../../../lib/sites";
-import { readSessionFor } from "../../../lib/siteAuth";
+import { createSupabaseServerClient } from "../../../lib/supabase/server";
 
 export const runtime = "nodejs";
 export const maxDuration = 30;
@@ -64,12 +64,16 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "missing slug" }, { status: 400 });
   }
 
-  const session = await readSessionFor(slug);
-  if (!session) {
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const sessionEmail = user?.email?.toLowerCase() ?? null;
+  if (!sessionEmail) {
     return NextResponse.json({ error: "not signed in" }, { status: 401 });
   }
   const site = await readSite(slug);
-  if (!site || site.ownerEmail !== session.email) {
+  if (!site || site.ownerEmail !== sessionEmail) {
     return NextResponse.json({ error: "not signed in" }, { status: 401 });
   }
 

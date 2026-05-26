@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { readSite } from "../../lib/sites";
-import { readSessionFor } from "../../lib/siteAuth";
+import { createSupabaseServerClient } from "../../lib/supabase/server";
 import { SiteLogin } from "./SiteLogin";
 import { SiteDashboard } from "./SiteDashboard";
 
@@ -32,8 +32,12 @@ export default async function SiteDashboardPage({
   const site = await readSite(slug);
   if (!site) return notFound();
 
-  const session = await readSessionFor(slug);
-  const authenticated = !!session && session.email === site.ownerEmail;
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const sessionEmail = user?.email?.toLowerCase() ?? null;
+  const authenticated = !!sessionEmail && sessionEmail === site.ownerEmail;
 
   return (
     <main>
@@ -69,7 +73,7 @@ export default async function SiteDashboardPage({
             {authenticated ? (
               <SiteDashboard initialSite={site} />
             ) : (
-              <SiteLogin slug={slug} ownerHint={site.ownerEmail} />
+              <SiteLogin slug={slug} />
             )}
           </div>
         </div>

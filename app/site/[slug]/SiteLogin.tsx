@@ -2,27 +2,11 @@
 
 import { useState } from "react";
 
-export function SiteLogin({
-  slug,
-  ownerHint,
-}: {
-  slug: string;
-  ownerHint: string;
-}) {
+export function SiteLogin({ slug }: { slug: string }) {
   const [email, setEmail] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-
-  // Mask the hint: r***@d***.com
-  const masked = (() => {
-    const [u, d] = ownerHint.split("@");
-    if (!u || !d) return "";
-    const [domain, ...rest] = d.split(".");
-    const tld = rest.join(".");
-    const m = (s: string) => (s.length <= 1 ? s : s[0] + "***");
-    return `${m(u)}@${m(domain)}${tld ? "." + tld : ""}`;
-  })();
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -30,12 +14,16 @@ export function SiteLogin({
     setError(null);
     setMessage(null);
     try {
-      const res = await fetch("/api/site/login", {
+      const res = await fetch("/api/site/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ slug, email }),
       });
-      const data = (await res.json()) as { ok: boolean; message?: string; error?: string };
+      const data = (await res.json()) as {
+        ok: boolean;
+        message?: string;
+        error?: string;
+      };
       if (!data.ok) {
         setError(data.error ?? "Something went wrong.");
       } else {
@@ -53,13 +41,8 @@ export function SiteLogin({
       <h2 className="text-lg font-semibold mb-2">Sign in</h2>
       <p className="text-sm text-[var(--color-paper)]/75 mb-5 leading-relaxed">
         Enter the email tied to this site. We&rsquo;ll send a one-click sign-in
-        link — good for 15 minutes.
+        link.
       </p>
-      {masked ? (
-        <p className="text-xs mono text-[var(--color-mute)] mb-5">
-          Hint: <span className="text-[var(--color-paper)]/70">{masked}</span>
-        </p>
-      ) : null}
       <form onSubmit={submit} className="flex flex-col gap-3">
         <input
           type="email"

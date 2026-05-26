@@ -106,10 +106,9 @@ export function SiteDashboard({ initialSite }: { initialSite: SiteRecord }) {
   }
 
   async function signOut() {
-    await fetch("/api/site/logout", {
+    await fetch("/api/site/auth/logout", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ slug: site.slug }),
     });
     location.reload();
   }

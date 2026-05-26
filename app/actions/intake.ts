@@ -4,7 +4,7 @@ import { createHmac } from "crypto";
 import { after } from "next/server";
 import { revalidatePath } from "next/cache";
 import { createSite } from "../lib/sites";
-import { makeMagicToken, WELCOME_TOKEN_TTL_MS } from "../lib/siteAuth";
+import { mintSiteMagicLink } from "../lib/supabase/magiclink";
 import { sendLaunchPayLink, sendWelcomeDashboard } from "../lib/siteNotify";
 import { provisionRepo } from "../lib/siteProvision";
 
@@ -297,11 +297,28 @@ async function provisionSiteFromBrief(submission: {
       }),
     );
 
-    const token = makeMagicToken(site.slug, site.ownerEmail, WELCOME_TOKEN_TTL_MS);
+    const baseUrl =
+      process.env.NEXT_PUBLIC_SITE_URL ?? "https://chappieworks.com";
+    const minted = await mintSiteMagicLink({
+      email: site.ownerEmail,
+      slug: site.slug,
+      baseUrl,
+    });
+    const welcomeLink = minted.ok
+      ? minted.link
+      : `${baseUrl}/site/${site.slug}`;
+    if (!minted.ok) {
+      console.error(
+        "[chappieworks:intake] welcome magic link failed",
+        site.slug,
+        minted.error,
+      );
+    }
+
     const result = await sendWelcomeDashboard({
       to: site.ownerEmail,
       slug: site.slug,
-      token,
+      link: welcomeLink,
       businessName: site.businessName,
       ownerName: site.ownerName,
     });

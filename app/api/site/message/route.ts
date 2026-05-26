@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { after } from "next/server";
 import { appendMessage, readSite } from "../../../lib/sites";
-import { readSessionFor } from "../../../lib/siteAuth";
+import { createSupabaseServerClient } from "../../../lib/supabase/server";
 import { notifyOperatorOfMessage } from "../../../lib/siteNotify";
 import { autoApplyEdit } from "../../../lib/siteAutoApply";
 
@@ -26,12 +26,16 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: "Message too long" }, { status: 400 });
   }
 
-  const session = await readSessionFor(slug);
-  if (!session) {
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const sessionEmail = user?.email?.toLowerCase() ?? null;
+  if (!sessionEmail) {
     return NextResponse.json({ ok: false, error: "Not signed in" }, { status: 401 });
   }
   const site = await readSite(slug);
-  if (!site || site.ownerEmail !== session.email) {
+  if (!site || site.ownerEmail !== sessionEmail) {
     return NextResponse.json({ ok: false, error: "Not signed in" }, { status: 401 });
   }
 
