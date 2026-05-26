@@ -14,7 +14,7 @@ export async function GET(req: Request) {
   const type = url.searchParams.get("type") as EmailOtpType | null;
   const nextParam = url.searchParams.get("next");
   const next =
-    nextParam && nextParam.startsWith("/") ? nextParam : "/account";
+    nextParam && nextParam.startsWith("/") ? nextParam : "/studio";
 
   if (!tokenHash || !type) {
     return NextResponse.redirect(`${BASE_URL}/signin?error=missing`);

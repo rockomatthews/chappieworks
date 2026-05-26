@@ -27,10 +27,12 @@ export function Header({ userEmail }: { userEmail?: string | null }) {
   }, [pathname]);
 
   const authActive =
-    pathname === "/signin" || pathname === "/account";
+    pathname === "/signin" ||
+    pathname === "/studio" ||
+    pathname === "/account";
 
   const authLink = userEmail
-    ? { href: "/account", label: "Account" }
+    ? { href: "/studio", label: "You" }
     : { href: "/signin", label: "Sign in" };
 
   return (

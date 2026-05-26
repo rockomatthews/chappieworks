@@ -23,7 +23,7 @@ export async function POST(req: Request) {
   const email = normalizeEmail(body.email ?? "");
   const next = typeof body.next === "string" && body.next.startsWith("/")
     ? body.next
-    : "/account";
+    : "/studio";
 
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return NextResponse.json(
