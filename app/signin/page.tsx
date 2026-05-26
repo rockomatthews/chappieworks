@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "../lib/supabase/server";
 import { SignInForm } from "./SignInForm";
+import { SocialButtons } from "./SocialButtons";
 
 export const dynamic = "force-dynamic";
 
@@ -61,9 +62,7 @@ export default async function SignInPage({
 
           <SignInForm next={next} />
 
-          <p className="mt-8 text-xs text-[var(--color-mute)] leading-relaxed">
-            More sign-in options (X, Farcaster, wallet) coming soon.
-          </p>
+          <SocialButtons next={next} />
         </div>
       </section>
     </main>

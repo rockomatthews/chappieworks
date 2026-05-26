@@ -7,6 +7,7 @@ import { createSite } from "../lib/sites";
 import { mintSiteMagicLink } from "../lib/supabase/magiclink";
 import { sendLaunchPayLink, sendWelcomeDashboard } from "../lib/siteNotify";
 import { provisionRepo } from "../lib/siteProvision";
+import { isBypassEmail } from "../lib/movieEmail";
 
 export type IntakeFormType =
   | "agents"
@@ -338,25 +339,32 @@ async function provisionSiteFromBrief(submission: {
       );
     }
 
-    const payResult = await sendLaunchPayLink({
-      to: site.ownerEmail,
-      businessName: site.businessName,
-      ownerName: site.ownerName,
-    });
-    if (!payResult.ok) {
-      console.error(
-        "[chappieworks:intake] stripe pay-link email failed",
+    if (isBypassEmail(site.ownerEmail)) {
+      console.log(
+        "[chappieworks:intake] bypass email — skipping $99 pay link",
         site.slug,
-        "error",
-        payResult.error,
       );
     } else {
-      console.log(
-        "[chappieworks:intake] stripe pay-link emailed",
-        site.slug,
-        "to",
-        site.ownerEmail,
-      );
+      const payResult = await sendLaunchPayLink({
+        to: site.ownerEmail,
+        businessName: site.businessName,
+        ownerName: site.ownerName,
+      });
+      if (!payResult.ok) {
+        console.error(
+          "[chappieworks:intake] stripe pay-link email failed",
+          site.slug,
+          "error",
+          payResult.error,
+        );
+      } else {
+        console.log(
+          "[chappieworks:intake] stripe pay-link emailed",
+          site.slug,
+          "to",
+          site.ownerEmail,
+        );
+      }
     }
   } catch (err) {
     console.error("[chappieworks:intake] provision threw", err);

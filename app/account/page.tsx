@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "../lib/supabase/server";
+import { isBypassEmail } from "../lib/movieEmail";
 import { SignOutButton } from "./SignOutButton";
+import { WalletPanel } from "./WalletPanel";
 
 export const dynamic = "force-dynamic";
 
@@ -29,6 +31,11 @@ export default async function AccountPage() {
 
   const email = user.email.toLowerCase();
   const admin = isAdmin(email);
+  const superUser = isBypassEmail(email);
+  const linkedAddress =
+    typeof user.user_metadata?.wallet_address === "string"
+      ? user.user_metadata.wallet_address.toLowerCase()
+      : null;
 
   return (
     <main>
@@ -47,14 +54,23 @@ export default async function AccountPage() {
           <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight mt-3 mb-2 leading-[1.1]">
             Welcome back.
           </h1>
-          <p className="text-base text-[var(--color-paper)]/85 leading-relaxed mb-8">
+          <p className="text-base text-[var(--color-paper)]/85 leading-relaxed mb-3">
             Signed in as <span className="mono text-[var(--color-gold)]">{email}</span>
+          </p>
+          <div className="flex flex-wrap gap-2 mb-8">
+            {superUser ? (
+              <span className="text-[10px] mono uppercase tracking-widest bg-[var(--color-rust)]/20 border border-[var(--color-rust)]/60 text-[var(--color-rust)] rounded px-2 py-1">
+                Super User · all SKUs unlocked
+              </span>
+            ) : null}
             {admin ? (
-              <span className="ml-2 text-xs mono uppercase tracking-widest bg-[var(--color-gold)]/15 border border-[var(--color-gold)]/40 text-[var(--color-gold)] rounded px-2 py-1">
+              <span className="text-[10px] mono uppercase tracking-widest bg-[var(--color-gold)]/15 border border-[var(--color-gold)]/40 text-[var(--color-gold)] rounded px-2 py-1">
                 Admin
               </span>
             ) : null}
-          </p>
+          </div>
+
+          <WalletPanel linkedAddress={linkedAddress} />
 
           <div className="card rounded-xl p-6 sm:p-8 mb-6">
             <h2 className="text-lg font-semibold mb-3">Your products</h2>
@@ -83,13 +99,30 @@ export default async function AccountPage() {
             </div>
           </div>
 
+          {superUser ? (
+            <div className="card rounded-xl p-6 sm:p-8 mb-6 border-[var(--color-rust)]/40">
+              <h2 className="text-lg font-semibold mb-3 text-[var(--color-rust)]">
+                Super User mode
+              </h2>
+              <p className="text-sm text-[var(--color-paper)]/70 leading-relaxed mb-2">
+                When you submit any paid SKU form with{" "}
+                <span className="mono text-[var(--color-paper)]/85">{email}</span>{" "}
+                as the buyer email, Stripe is bypassed and the unwatermarked /
+                full deliverable is emailed to you direct.
+              </p>
+              <p className="text-xs mono text-[var(--color-mute)]">
+                Configured via <span className="text-[var(--color-paper)]/70">BYPASS_CHECKOUT_EMAIL</span> env var. Wired on /movie + /photoshoot pack. Other SKUs being audited next.
+              </p>
+            </div>
+          ) : null}
+
           {admin ? (
             <div className="card rounded-xl p-6 sm:p-8 mb-6 border-[var(--color-gold)]/30">
               <h2 className="text-lg font-semibold mb-3 text-[var(--color-gold)]">
                 Admin tools
               </h2>
               <p className="text-sm text-[var(--color-paper)]/70 leading-relaxed mb-4">
-                Bypass intake — create sites and example assets directly.
+                Studio control surfaces.
               </p>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-sm">
                 <Link
