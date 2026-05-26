@@ -18,13 +18,20 @@ const NAV = [
   { href: "/shop", label: "Shop" },
 ];
 
-export function Header() {
+export function Header({ userEmail }: { userEmail?: string | null }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
     setOpen(false);
   }, [pathname]);
+
+  const authActive =
+    pathname === "/signin" || pathname === "/account";
+
+  const authLink = userEmail
+    ? { href: "/account", label: "Account" }
+    : { href: "/signin", label: "Sign in" };
 
   return (
     <header className="border-b border-white/5 relative z-50">
@@ -64,6 +71,17 @@ export function Header() {
               </Link>
             );
           })}
+          <Link
+            href={authLink.href}
+            className={
+              authActive
+                ? "text-[var(--color-gold)] border border-[var(--color-gold)] rounded-md px-3 py-1.5"
+                : "rounded-md px-3 py-1.5 border border-white/15 hover:border-[var(--color-gold)] hover:text-[var(--color-gold)] transition"
+            }
+            aria-label={authLink.label}
+          >
+            {authLink.label}
+          </Link>
         </nav>
 
         {/* Hamburger button — mobile only */}
@@ -110,6 +128,21 @@ export function Header() {
               </Link>
             );
           })}
+          <Link
+            href={authLink.href}
+            className={`py-3 text-base mt-2 ${
+              authActive
+                ? "text-[var(--color-gold)]"
+                : "text-[var(--color-gold)] hover:opacity-80"
+            }`}
+          >
+            {authLink.label}
+            {userEmail ? (
+              <span className="block text-xs mono text-[var(--color-mute)] mt-0.5">
+                {userEmail}
+              </span>
+            ) : null}
+          </Link>
         </nav>
       )}
     </header>

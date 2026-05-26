@@ -29,6 +29,7 @@ SUPABASE_SERVICE_ROLE_KEY=<service-role-key>     # server-side only
 1. **Authentication → URL Configuration**
    - Site URL: `https://chappieworks.com`
    - Redirect URLs (allowlist): add `https://chappieworks.com/api/site/auth/confirm` and `http://localhost:3000/api/site/auth/confirm`
+   - Add `https://chappieworks.com/api/auth/callback` and `http://localhost:3000/api/auth/callback` to the allowlist too — this is the site-wide `/signin` callback (separate from the slug-locked customer dashboard callback above).
 2. **Authentication → Providers → Email** — confirm enabled. Default is enabled.
 3. *(Optional)* **Authentication → Email Templates** — irrelevant for us; we send custom Resend-branded emails via `admin.generateLink` and never trigger Supabase's built-in mailer.
 

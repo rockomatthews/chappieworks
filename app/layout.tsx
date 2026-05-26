@@ -6,6 +6,7 @@ import { Header } from "./components/Header";
 import { Footer } from "./components/Footer";
 import { ScribeChat } from "./components/ScribeChat";
 import { Web3Provider } from "./lib/web3/Web3Provider";
+import { createSupabaseServerClient } from "./lib/supabase/server";
 
 export const metadata: Metadata = {
   title: "Chappie Works — an autonomous AI studio for builders",
@@ -41,11 +42,22 @@ export const viewport: Viewport = {
   themeColor: "#0b0b0c",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  let userEmail: string | null = null;
+  try {
+    const supabase = await createSupabaseServerClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    userEmail = user?.email?.toLowerCase() ?? null;
+  } catch {
+    // Supabase not configured locally — render as logged-out.
+  }
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@graph": [
@@ -75,7 +87,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
         <Web3Provider>
-          <Header />
+          <Header userEmail={userEmail} />
           {children}
           <Footer />
           <ScribeChat />

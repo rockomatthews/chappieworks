@@ -4,16 +4,15 @@ export type MagicLinkResult =
   | { ok: true; link: string }
   | { ok: false; error: string };
 
-// Mints a Supabase magic link that lands at our /api/site/auth/confirm route.
-// Idempotently creates the Supabase user if it doesn't exist yet — the
-// dashboard's customers are already vetted (they bought a site), so we mark
-// their email as confirmed up front.
-export async function mintSiteMagicLink(opts: {
+// Generic: mint a Supabase magic link that lands at OUR callback URL.
+// Idempotently creates the user (email_confirm: true skips the verification
+// dance — we trust whoever's clicking the link in their own inbox).
+export async function mintMagicLink(opts: {
   email: string;
-  slug: string;
-  baseUrl: string;
+  callbackUrl: string;  // full URL, e.g. https://chappieworks.com/api/auth/callback
+  callbackExtraParams?: Record<string, string>;  // extra ?k=v appended on the OUR-URL we email
 }): Promise<MagicLinkResult> {
-  const { email, slug, baseUrl } = opts;
+  const { email, callbackUrl, callbackExtraParams } = opts;
   const admin = supabaseAdmin();
 
   const created = await admin.auth.admin.createUser({
@@ -35,7 +34,7 @@ export async function mintSiteMagicLink(opts: {
     type: "magiclink",
     email,
     options: {
-      redirectTo: `${baseUrl}/api/site/auth/confirm?slug=${encodeURIComponent(slug)}`,
+      redirectTo: callbackUrl,
     },
   });
   if (error || !data?.properties?.hashed_token) {
@@ -46,9 +45,25 @@ export async function mintSiteMagicLink(opts: {
     return { ok: false, error: error?.message ?? "no hashed_token" };
   }
 
-  const link = `${baseUrl}/api/site/auth/confirm?token_hash=${encodeURIComponent(
-    data.properties.hashed_token,
-  )}&type=magiclink&slug=${encodeURIComponent(slug)}`;
+  const params = new URLSearchParams({
+    token_hash: data.properties.hashed_token,
+    type: "magiclink",
+    ...(callbackExtraParams ?? {}),
+  });
+  const link = `${callbackUrl}?${params.toString()}`;
 
   return { ok: true, link };
+}
+
+// Slug-locked variant for the /site/{slug} customer dashboard flow.
+export async function mintSiteMagicLink(opts: {
+  email: string;
+  slug: string;
+  baseUrl: string;
+}): Promise<MagicLinkResult> {
+  return mintMagicLink({
+    email: opts.email,
+    callbackUrl: `${opts.baseUrl}/api/site/auth/confirm`,
+    callbackExtraParams: { slug: opts.slug },
+  });
 }
