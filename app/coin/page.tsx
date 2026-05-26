@@ -281,9 +281,12 @@ export default async function CoinPage({
                 you'd paid in dollars via Stripe.
               </li>
               <li>
-                Stakers (via the STAKR vault) get the 25% discount tier
-                instead — the checkout reads your staked balance and applies
-                the deeper discount automatically.
+                Stakers (via the STAKR vault) qualify for the 25% discount tier
+                — the checkout reads your staked balance and applies the deeper
+                discount automatically. In v1, the order still settles from
+                your unstaked wallet balance, so stakers keep a working balance
+                in their wallet for orders (or unstake → buy → restake). v1.1
+                ships a Pay-from-Stake router post-launch.
               </li>
             </ol>
             <p className="text-xs mono text-[var(--color-mute)] mt-5">

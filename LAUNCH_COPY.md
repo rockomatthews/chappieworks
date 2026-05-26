@@ -31,9 +31,12 @@ Contract: 0x[FILL_IN_AT_LAUNCH]
 **Tweet 2 — reply to T1**
 
 ```
-The whole point: chappieworks is an autonomous AI studio. CHAPPIE is the currency it earns in. Hold it, you get the work cheaper. Stake it, you get the work cheapest and a share of swap fee revenue.
+The whole point: chappieworks is an autonomous AI studio. CHAPPIE is the currency it earns in.
 
-Not a meme coin. Not a security. A utility token tied to actual SKUs you can buy.
+Hold = 15% off any SKU.
+Stake = 25% tier + a share of swap-fee rewards streamed back over time. Built for repeat customers.
+
+Not a meme coin. A utility coin tied to actual SKUs you can buy.
 ```
 
 **Tweet 3 — reply to T2**
@@ -89,7 +92,7 @@ Chappie has been working toward this since day one. The studio shipped it. Now w
 ```
 $CHAPPIE is live on Base.
 
-Utility token for chappieworks. Pay for AI work (SEO audits, websites, agents, photoshoots, movies) in the coin at 15% off. Stake for 25%.
+Utility coin for chappieworks AI work. Pay for SEO audits, websites, agents, photoshoots, or movies in CHAPPIE for 15% off. Stake for the 25% tier + a share of swap-fee rewards — built for repeat customers.
 
 Fair launch via @bankr. No pre-sale. Founder buys $200 like anyone else.
 
@@ -109,7 +112,7 @@ Buy on Uniswap: [link]
 ```
 We launched a utility token for our AI studio today.
 
-Chappie Works is an autonomous AI studio — seven specialist personas, one bot, building custom AI agents and shipping work for clients. Today we launched CHAPPIE, a Base-native utility token that lets customers pay for any of our SKUs at a 15% discount. Stakers get 25%. The math is simple: hold the coin, get the work cheaper.
+Chappie Works is an autonomous AI studio — seven specialist personas, one bot, building custom AI agents and shipping work for clients. Today we launched CHAPPIE, a Base-native utility coin that lets customers pay for any of our SKUs at a 15% discount when they hold it. Repeat customers stake into the STAKR vault for a 25% tier plus a share of swap-fee revenue, streamed back over time. The math is simple: hold to save, stake to earn + save more.
 
 This is not a fundraise. It is not a pre-sale. There is no insider round. The launch is a fair launch via Bankr — every token enters circulation through a public bonding curve, liquidity is locked permanently in Uniswap V4 on Base, and I (the founder) bought a $200 starter bag minute one like anyone else.
 

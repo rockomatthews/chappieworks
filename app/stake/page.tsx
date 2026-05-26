@@ -68,6 +68,14 @@ const FAQ_SCHEMA = {
         text: "When you click Pay with CHAPPIE on any chappieworks SKU page, the quote endpoint reads your lockedShares balance from the STAKR vault. Locked > 0 → staker tier (25% off). Locked = 0 but you hold CHAPPIE → holder tier (15% off). No staked balance and no CHAPPIE → USD pricing only via Stripe.",
       },
     },
+    {
+      "@type": "Question",
+      name: "If my CHAPPIE is staked, how do I actually pay for an order?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Honest answer: in v1, your staked CHAPPIE earns the 25% discount tier and a share of swap-fee rewards, but the actual payment for an order still pulls from your unstaked wallet balance. So at checkout you need (a) a positive stake in the STAKR vault to qualify for the 25% tier, plus (b) enough CHAPPIE in your wallet to pay the discounted price. Practical pattern for repeat customers: keep a core position staked for the tier + rewards, top off a working balance in your wallet for orders. If you ever need to spend more than your wallet holds, unstake → buy → restake in two transactions. The vault has no protocol-level lockup, so unstaking is instant. v1.1 ships a Pay-from-Stake router that pulls CHAPPIE directly from your staked balance in one transaction — coming in the weeks after launch.",
+      },
+    },
   ],
 };
 
