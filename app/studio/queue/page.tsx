@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { fetchStudioQueue, type QueueItem, type QueueStatus } from "@/app/lib/paperclip";
 
 export const metadata = {
   title: "The Studio · Queue — projects on deck — Chappie Works",
@@ -11,17 +12,8 @@ export const metadata = {
   },
 };
 
-type QueueStatus = "in-progress" | "queued" | "shipped";
-
-type QueueItem = {
-  id: string;
-  title: string;
-  status: QueueStatus;
-  added: string; // ISO date
-  blurb: string;
-  ref?: { label: string; href: string };
-  workItems?: string[];
-};
+// Revalidate every 60s — picks up Paperclip writes between webhook revalidations.
+export const revalidate = 60;
 
 const QUEUE: QueueItem[] = [
   {
@@ -221,10 +213,13 @@ function dateLabel(iso: string): string {
   });
 }
 
-export default function StudioQueue() {
+export default async function StudioQueue() {
+  const live = await fetchStudioQueue();
+  const items: QueueItem[] = live && live.length > 0 ? live : QUEUE;
+  const source: "paperclip" | "static" = live && live.length > 0 ? "paperclip" : "static";
   const grouped = ORDER.map((status) => ({
     status,
-    items: QUEUE.filter((q) => q.status === status),
+    items: items.filter((q) => q.status === status),
   }));
 
   return (
@@ -246,8 +241,20 @@ export default function StudioQueue() {
           <p className="text-base sm:text-lg text-[var(--color-paper)]/85 leading-relaxed">
             Sire mentions things; they land here until we ship them. Top of the
             list is what&rsquo;s on the bench right now. Shipped items stay for
-            a while so you can see what just landed. Source of truth is the
-            studio&rsquo;s persistent memory — this page is the read-only view.
+            a while so you can see what just landed. Source of truth is{" "}
+            {source === "paperclip" ? (
+              <a
+                href="https://paperclip.ing"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[var(--color-gold)] hover:underline"
+              >
+                paperclip.ing
+              </a>
+            ) : (
+              <span className="text-[var(--color-paper)]/70">the studio&rsquo;s persistent memory</span>
+            )}
+            {" "}— this page is a {source === "paperclip" ? "live read" : "static snapshot"} updated every 60 seconds.
           </p>
 
           {grouped.map(({ status, items }) => {
@@ -272,11 +279,21 @@ export default function StudioQueue() {
                         <h3 className="text-lg sm:text-xl font-semibold">
                           {q.title}
                         </h3>
-                        <span
-                          className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] mono uppercase tracking-widest border ${meta.className}`}
-                        >
-                          {meta.label}
-                        </span>
+                        <div className="flex items-center gap-2">
+                          {q.lead && (
+                            <span
+                              className="inline-flex items-center px-2 py-0.5 rounded text-[10px] mono uppercase tracking-widest border border-white/20 bg-white/5 text-[var(--color-paper)]/80"
+                              title={`Lead persona: ${q.lead}`}
+                            >
+                              {q.lead}
+                            </span>
+                          )}
+                          <span
+                            className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] mono uppercase tracking-widest border ${meta.className}`}
+                          >
+                            {meta.label}
+                          </span>
+                        </div>
                       </div>
                       <p className="text-sm text-[var(--color-paper)]/85 leading-relaxed">
                         {q.blurb}
