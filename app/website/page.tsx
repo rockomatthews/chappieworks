@@ -358,9 +358,9 @@ export default async function WebsiteSku({
               Brief the studio.
             </h2>
             <p className="text-sm text-[var(--color-mute)] mb-6">
-              Two minutes. We&rsquo;ll reply with a Stripe link for the $99
-              launch fee within a few hours. Pay it and your site goes live
-              within 48 hours.
+              {superUser
+                ? "Two minutes. We'll reply with your private edit dashboard link within a few hours — no Stripe link, no $99 charge. Site goes live within 48 hours."
+                : "Two minutes. We'll reply with a Stripe link for the $99 launch fee within a few hours. Pay it and your site goes live within 48 hours."}
             </p>
             <IntakeForm
               formType="website"

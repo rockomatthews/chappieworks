@@ -56,6 +56,15 @@ const SUCCESS_COPY: Record<IntakeFormType, string> = {
     "You're on the list. We'll email you the moment CHAPPIE goes live on Bankr/Base with the exact buy link + contract address. No spam, just the launch heads-up.",
 };
 
+// Override success copy for bypass-email users on paid SKUs — no Stripe
+// language, since sendLaunchPayLink/equivalents are skipped for them.
+const BYPASS_SUCCESS_COPY: Partial<Record<IntakeFormType, string>> = {
+  website:
+    "Got it. The studio has your brief. Look for one email from intake@chappieworks.com with your private edit dashboard link — no Stripe link, no $99 charge. Site goes live within 48 hours.",
+  "seo-fix":
+    "Got it. The studio has your repo info. No Stripe link will be sent — the fix clock starts the moment GitHub access is granted, and every reasonable item ships within 24–48 hours as a single PR.",
+};
+
 export async function submitIntake(
   prevState: IntakeResult | null,
   formData: FormData,
@@ -137,7 +146,10 @@ export async function submitIntake(
 
   revalidatePath(`/${formType === "agents" ? "agents" : formType}`);
 
-  return { ok: true, message: SUCCESS_COPY[formType] };
+  const message = isBypassEmail(email)
+    ? (BYPASS_SUCCESS_COPY[formType] ?? SUCCESS_COPY[formType])
+    : SUCCESS_COPY[formType];
+  return { ok: true, message };
 }
 
 async function triggerSeoAudit(submission: {
