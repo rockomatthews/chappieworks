@@ -3,6 +3,8 @@ import { CreditedBy } from "../components/CreditedBy";
 import { IntakeForm, type IntakeField } from "../components/IntakeForm";
 import { ChatThread } from "../components/ChatThread";
 import { PayWithChappieButton } from "../components/PayWithChappieButton";
+import { createSupabaseServerClient } from "../lib/supabase/server";
+import { isBypassEmail } from "../lib/movieEmail";
 
 export const metadata = {
   title:
@@ -152,6 +154,22 @@ export default async function WebsiteSku({
     process.env.NEXT_PUBLIC_STRIPE_LINK_WEBSITE ||
     "https://buy.stripe.com/9B614nd0m3tH5ax5Rs3oA0c";
 
+  let superUser = false;
+  try {
+    const supabase = await createSupabaseServerClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    superUser = isBypassEmail(user?.email);
+  } catch {
+    // Supabase not configured locally — render public page only.
+  }
+
+  const primaryCtaHref = superUser ? "#intake" : stripeLink;
+  const primaryCtaLabel = superUser
+    ? "Skip checkout — start the brief →"
+    : "Pay $99 + start the $49/mo →";
+
   const included = [
     "Real Next.js + Tailwind code — fast, SEO-friendly, real Lighthouse scores",
     "Mobile-responsive by default — looks right on every screen",
@@ -226,10 +244,10 @@ export default async function WebsiteSku({
           ) : (
             <div className="mt-8 flex flex-col sm:flex-row gap-3">
               <a
-                href={stripeLink}
+                href={primaryCtaHref}
                 className="flex-1 flex items-center justify-center px-6 py-4 rounded-md bg-[var(--color-gold)] text-[var(--color-ink)] font-medium hover:opacity-90 transition"
               >
-                Pay $99 + start the $49/mo →
+                {primaryCtaLabel}
               </a>
               <a
                 href="#intake"

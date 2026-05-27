@@ -3,6 +3,8 @@ import { CreditedBy } from "../components/CreditedBy";
 import { IntakeForm, type IntakeField } from "../components/IntakeForm";
 import { ChatThread } from "../components/ChatThread";
 import { PayWithChappieButton } from "../components/PayWithChappieButton";
+import { createSupabaseServerClient } from "../lib/supabase/server";
+import { isBypassEmail } from "../lib/movieEmail";
 
 export const metadata = {
   title:
@@ -135,6 +137,22 @@ export default async function SeoFixSku({
     process.env.NEXT_PUBLIC_STRIPE_LINK_SEO_FIX ||
     "https://buy.stripe.com/aFa6oH2lI3tH0Uhgw63oA0d";
 
+  let superUser = false;
+  try {
+    const supabase = await createSupabaseServerClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    superUser = isBypassEmail(user?.email);
+  } catch {
+    // Supabase not configured locally — render public page only.
+  }
+
+  const primaryCtaHref = superUser ? "#intake" : stripeLink;
+  const primaryCtaLabel = superUser
+    ? "Skip checkout — start the 24hr clock →"
+    : "Pay $499 — start the 24hr clock →";
+
   const included = [
     "Every Quick Win item from your audit — title tags, meta descriptions, alt text",
     "Every reasonable Technical Debt item — schema, canonicals, sitemap/robots, internal links",
@@ -224,10 +242,10 @@ export default async function SeoFixSku({
             <>
               <div className="mt-8 flex flex-col sm:flex-row gap-3">
                 <a
-                  href={stripeLink}
+                  href={primaryCtaHref}
                   className="flex-1 flex items-center justify-center px-6 py-4 rounded-md bg-[var(--color-gold)] text-[var(--color-ink)] font-medium hover:opacity-90 transition"
                 >
-                  Pay $499 — start the 24hr clock →
+                  {primaryCtaLabel}
                 </a>
                 <a
                   href="#intake"
