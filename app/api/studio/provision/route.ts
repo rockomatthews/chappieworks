@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { createSite } from "../../../lib/sites";
 import { createSupabaseServerClient } from "../../../lib/supabase/server";
+import { mintSiteMagicLink } from "../../../lib/supabase/magiclink";
+import { sendWelcomeDashboard } from "../../../lib/siteNotify";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -60,5 +62,29 @@ export async function POST(req: Request) {
     liveUrl: parsed.liveUrl,
   });
 
-  return NextResponse.json({ ok: true, slug: site.slug });
+  // Auto-send welcome email with magic link so the admin doesn't have to do it manually.
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://chappieworks.com";
+  let welcomed = false;
+  try {
+    const minted = await mintSiteMagicLink({ email: ownerEmail, slug: site.slug, baseUrl });
+    if (minted.ok) {
+      const sent = await sendWelcomeDashboard({
+        to: ownerEmail,
+        slug: site.slug,
+        link: minted.link,
+        businessName,
+        ownerName,
+      });
+      welcomed = sent.ok;
+      if (!sent.ok) {
+        console.warn("[chappieworks:provision] welcome email failed", sent.error);
+      }
+    } else {
+      console.warn("[chappieworks:provision] mint magic link failed", minted.error);
+    }
+  } catch (err) {
+    console.error("[chappieworks:provision] welcome email threw", err);
+  }
+
+  return NextResponse.json({ ok: true, slug: site.slug, welcomed });
 }
