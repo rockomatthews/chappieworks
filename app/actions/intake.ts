@@ -45,7 +45,7 @@ const SUCCESS_COPY: Record<IntakeFormType, string> = {
   "seo-audit":
     "Got it. Audit is running now. PDF lands in your inbox in minutes from intake@chappieworks.com — check spam just in case.",
   "ads-audit":
-    "Got it. Audit lands in your inbox in 48 hours. I'll ping within 24 to confirm access.",
+    "Got it. Your pre-audit briefing PDF is generating now and lands in your inbox in minutes from intake@chappieworks.com — check spam just in case. We'll ping within 24 to confirm account access, and the full access-based audit + Loom lands within 48 hours.",
   photoshoot:
     "Got it. The studio is generating your 3-image preview — it renders on the page in 2–3 minutes.",
   website:
@@ -138,6 +138,13 @@ export async function submitIntake(
     after(() => triggerSeoAudit(submission));
   }
 
+  // Ads audit: kick off the autonomous pre-audit briefing PDF. The full
+  // access-based audit still requires human follow-up — this is the instant
+  // lead-magnet deliverable that proves the 250-check rigor.
+  if (formType === "ads-audit") {
+    after(() => triggerAdsAudit(submission));
+  }
+
   // If it's a website brief, auto-provision the private edit dashboard and
   // email the customer their sign-in link.
   if (formType === "website") {
@@ -203,6 +210,63 @@ async function triggerSeoAudit(submission: {
     }
   } catch (err) {
     console.error("[chappieworks:intake] audit trigger threw", err);
+  }
+}
+
+async function triggerAdsAudit(submission: {
+  formType: IntakeFormType;
+  name: string;
+  email: string;
+  fields: Record<string, string>;
+}) {
+  const secret = process.env.INTAKE_WEBHOOK_SECRET;
+  if (!secret) {
+    console.error(
+      "[chappieworks:intake] INTAKE_WEBHOOK_SECRET not set — cannot trigger ads briefing",
+    );
+    return;
+  }
+  const baseUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : "http://localhost:3000";
+
+  const payload = {
+    name: submission.name,
+    email: submission.email,
+    platforms: submission.fields.platforms,
+    access_method: submission.fields.access_method,
+    monthly_spend: submission.fields.monthly_spend,
+    goals: submission.fields.goals,
+    notes: submission.fields.notes,
+  };
+  const body = JSON.stringify(payload);
+  const sig = createHmac("sha256", secret).update(body).digest("hex");
+
+  try {
+    const res = await fetch(`${baseUrl}/api/ads-audit/run`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-chappie-sig": sig,
+      },
+      body,
+    });
+    if (!res.ok) {
+      console.error(
+        "[chappieworks:intake] ads briefing trigger failed",
+        res.status,
+        await res.text(),
+      );
+    } else {
+      console.log(
+        "[chappieworks:intake] ads briefing triggered for",
+        submission.email,
+      );
+    }
+  } catch (err) {
+    console.error("[chappieworks:intake] ads briefing trigger threw", err);
   }
 }
 

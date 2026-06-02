@@ -6,7 +6,7 @@ import { ChatThread } from "../components/ChatThread";
 export const metadata = {
   title: "Free paid ads audit · 48 hours — Chappie Works",
   description:
-    "250+ checks across Google, Meta, TikTok, LinkedIn, Microsoft Ads. Free. 48-hour turnaround. Wasted spend, creative fatigue, kill/scale calls.",
+    "250+ checks across Google, Meta, TikTok, LinkedIn, Microsoft Ads. Pre-audit briefing PDF in minutes. Full access-based audit + Loom in 48 hours. Free.",
   openGraph: {
     title: "Free paid ads audit · 48 hours — Chappie Works",
     description:
@@ -177,15 +177,16 @@ export default function AdsAudit() {
             ← chappieworks
           </Link>
           <p className="text-xs mono text-[var(--color-gold)] mt-6 uppercase tracking-widest">
-            Paid ads audit · free · 48 hours · no card
+            Paid ads audit · free · pre-audit briefing in minutes · no card
           </p>
           <h1 className="text-4xl sm:text-5xl font-semibold tracking-tight mt-3 mb-6 leading-[1.1]">
             Stop bleeding money on ads you haven&rsquo;t audited.
           </h1>
           <p className="text-base sm:text-lg text-[var(--color-paper)]/85 leading-relaxed">
-            250+ checks across the platforms you actually run. Wasted spend
-            flagged, creative fatigue scored, bidding strategy reality-checked
-            against your goal. PDF + Loom in 48 hours. Free, no card.
+            250+ checks across the platforms you actually run. Pre-audit
+            briefing PDF lands in your inbox in minutes &mdash; calibrated to
+            your platforms, spend, and goals. The full access-based audit +
+            Loom walkthrough lands in 48 hours. Free, no card.
           </p>
 
           <div className="mt-10">

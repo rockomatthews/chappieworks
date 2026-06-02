@@ -6,6 +6,9 @@ const nextConfig = {
     "/api/seo-audit/run": [
       "./node_modules/@sparticuz/chromium/bin/**/*",
     ],
+    "/api/ads-audit/run": [
+      "./node_modules/@sparticuz/chromium/bin/**/*",
+    ],
   },
   images: {
     remotePatterns: [
