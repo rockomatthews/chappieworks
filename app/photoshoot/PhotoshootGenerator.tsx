@@ -439,31 +439,74 @@ export function PhotoshootGenerator() {
   );
 }
 
+function PreviewWatermark() {
+  return (
+    <svg
+      className="absolute inset-0 pointer-events-none z-10"
+      viewBox="0 0 1200 1200"
+      preserveAspectRatio="xMidYMid slice"
+      style={{ width: "100%", height: "100%" }}
+      aria-hidden="true"
+    >
+      <text
+        x="600"
+        y="600"
+        fontSize="110"
+        fontWeight="bold"
+        fill="rgba(255,255,255,0.32)"
+        textAnchor="middle"
+        dominantBaseline="middle"
+        fontFamily="sans-serif"
+        transform="rotate(-22 600 600)"
+      >
+        CHAPPIE WORKS PREVIEW
+      </text>
+      <text
+        x="600"
+        y="1140"
+        fontSize="36"
+        fill="rgba(255,255,255,0.55)"
+        textAnchor="middle"
+        dominantBaseline="middle"
+        fontFamily="monospace"
+      >
+        chappieworks.com/photoshoot · $49 unlocks the clean pack
+      </text>
+    </svg>
+  );
+}
+
 function PreviewImage({ img }: { img: PhotoshootImage }) {
   return (
     <div className="rounded-md overflow-hidden border border-white/10 bg-black/30">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={img.url}
-        alt={`${img.modeLabel} brand visual`}
-        className="block w-full h-auto"
-        loading="lazy"
-      />
+      <div
+        className="relative block bg-black"
+        onContextMenu={(e) => e.preventDefault()}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={img.url}
+          alt={`${img.modeLabel} brand visual — watermarked preview`}
+          className="block w-full h-auto select-none"
+          loading="lazy"
+          draggable={false}
+        />
+        <PreviewWatermark />
+      </div>
       <div className="px-3 py-2 flex flex-wrap items-baseline justify-between gap-2">
         <span className="text-[10px] mono uppercase tracking-widest text-[var(--color-gold)]">
           {img.modeLabel}
         </span>
         <span className="text-[10px] mono text-[var(--color-mute)]">
-          {img.size}
+          {img.size} · watermarked
         </span>
       </div>
-      <div className="px-3 pb-3 flex flex-wrap gap-2">
+      <div className="px-3 pb-3">
         <a
-          href={img.url}
-          download={`${img.mode}.png`}
-          className="text-[10px] mono uppercase tracking-widest text-[var(--color-paper)]/80 hover:text-[var(--color-gold)] underline underline-offset-2"
+          href="#pack"
+          className="text-[10px] mono uppercase tracking-widest text-[var(--color-gold)] hover:underline underline-offset-2"
         >
-          Download PNG
+          Buy clean pack to remove watermark →
         </a>
       </div>
     </div>

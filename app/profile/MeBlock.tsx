@@ -47,13 +47,13 @@ export function MeBlock({ email, admin, superUser, linkedAddress }: Props) {
   return (
     <section className="mb-12 border-b border-white/10 pb-10">
       <p className="text-xs mono text-[var(--color-gold)] uppercase tracking-widest mb-2">
-        You · signed in
+        Your profile
       </p>
       <h2 className="text-2xl font-semibold tracking-tight mb-2 leading-tight">
-        Welcome back to the studio.
+        Welcome back.
       </h2>
       <p className="text-base text-[var(--color-paper)]/85 leading-relaxed mb-5">
-        Your seat in the seven-persona team. Wallet, role, and tools live here.
+        Account, role, linked wallet, and your products in flight.
       </p>
 
       {/* KPI tile row — matches the org-chart stats strip */}
@@ -151,7 +151,11 @@ export function MeBlock({ email, admin, superUser, linkedAddress }: Props) {
               Admin tools
             </h3>
             <p className="text-sm text-[var(--color-paper)]/70 leading-relaxed mb-4">
-              Studio control surfaces — backed by the seven personas below.
+              Studio control surfaces — backed by the seven-persona team at{" "}
+              <Link href="/studio" className="text-[var(--color-gold)] hover:underline">
+                /studio
+              </Link>
+              .
             </p>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-sm">
               <Link

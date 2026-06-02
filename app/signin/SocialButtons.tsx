@@ -16,7 +16,7 @@ export function SocialButtons({ next }: { next?: string }) {
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     );
-    const redirectTo = `${window.location.origin}/api/auth/callback?next=${encodeURIComponent(next ?? "/studio")}`;
+    const redirectTo = `${window.location.origin}/api/auth/callback?next=${encodeURIComponent(next ?? "/profile")}`;
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "twitter",
       options: { redirectTo },

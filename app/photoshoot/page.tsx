@@ -13,6 +13,21 @@ export const metadata = {
     description:
       "Brief in 30 seconds. 3 brand visuals render right on the page in minutes. Free preview.",
     url: "https://chappieworks.com/photoshoot",
+    images: [
+      {
+        url: "https://chappieworks.com/og-photoshoot.png",
+        width: 1200,
+        height: 630,
+        alt: "Brand visuals from your brief",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Free brand visuals · 3-image preview — Chappie Works",
+    description:
+      "Brief in 30 seconds. 3 brand visuals render right on the page in minutes. Free preview.",
+    images: ["https://chappieworks.com/og-photoshoot.png"],
   },
 };
 

@@ -23,7 +23,7 @@ export default async function SignInPage({
     data: { user },
   } = await supabase.auth.getUser();
   if (user) {
-    redirect(next && next.startsWith("/") ? next : "/studio");
+    redirect(next && next.startsWith("/") ? next : "/profile");
   }
 
   const errorCopy =
