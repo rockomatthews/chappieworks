@@ -66,12 +66,25 @@ function parseDescription(desc: string | null): { queueId: string | null; lead: 
   return { queueId: m[1], lead: m[2], blurb: m[3].trim() };
 }
 
+// Paperclip production auth is better-auth (not a static X-API-Key). The exact
+// scheme an external reader uses is env-driven so prod can be matched without a
+// code change: PAPERCLIP_API_KEY is the token; PAPERCLIP_AUTH_HEADER overrides
+// the header name (default "Authorization"); PAPERCLIP_AUTH_SCHEME overrides the
+// prefix (default "Bearer", set empty to send the raw token). Loopback/local
+// trusted mode needs no key at all.
+function authHeaders(): Record<string, string> {
+  const key = process.env.PAPERCLIP_API_KEY;
+  if (!key) return {};
+  const header = process.env.PAPERCLIP_AUTH_HEADER || "Authorization";
+  const scheme = process.env.PAPERCLIP_AUTH_SCHEME ?? "Bearer";
+  return { [header]: scheme ? `${scheme} ${key}` : key };
+}
+
 async function pcFetch<T>(path: string): Promise<T> {
   const base = process.env.PAPERCLIP_URL;
   if (!base) throw new Error("PAPERCLIP_URL not set");
-  const key = process.env.PAPERCLIP_API_KEY;
   const res = await fetch(`${base}${path}`, {
-    headers: key ? { "X-API-Key": key } : {},
+    headers: authHeaders(),
     next: { revalidate: 60 },
   });
   if (!res.ok) throw new Error(`paperclip ${path} → ${res.status}`);
