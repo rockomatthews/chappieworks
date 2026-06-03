@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { fetchStudioQueue, type QueueItem, type QueueStatus } from "@/app/lib/paperclip";
+import StandupFeed from "@/app/components/StandupFeed";
 
 export const metadata = {
   title: "The Studio · Queue — projects on deck — Chappie Works",
@@ -331,6 +332,8 @@ export default async function StudioQueue() {
               </section>
             );
           })}
+
+          <StandupFeed />
 
           <div className="mt-12 text-center">
             <p className="text-xs mono text-[var(--color-mute)]">
