@@ -5,7 +5,7 @@ import { after } from "next/server";
 import { revalidatePath } from "next/cache";
 import { createSite } from "../lib/sites";
 import { mintSiteMagicLink } from "../lib/supabase/magiclink";
-import { sendLaunchPayLink, sendWelcomeDashboard } from "../lib/siteNotify";
+import { sendLaunchPayLink, sendWelcomeDashboard, sendBriefReceived } from "../lib/siteNotify";
 import { provisionRepo } from "../lib/siteProvision";
 import { isBypassEmail } from "../lib/movieEmail";
 
@@ -148,6 +148,20 @@ export async function submitIntake(
   // If it's a website brief, auto-provision the private edit dashboard and
   // email the customer their sign-in link.
   if (formType === "website") {
+    // Immediate confirmation to the requester — decoupled from the heavier
+    // provisioning flow so they always get an email even if provisioning fails.
+    const briefAck = await sendBriefReceived({
+      to: email,
+      ownerName: name,
+      businessName: fields.business_name || name,
+    });
+    if (!briefAck.ok) {
+      console.error(
+        "[chappieworks:intake] brief-received email failed",
+        briefAck.status,
+        briefAck.error,
+      );
+    }
     after(() => provisionSiteFromBrief(submission));
   }
 
