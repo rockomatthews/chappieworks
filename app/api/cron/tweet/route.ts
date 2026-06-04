@@ -10,10 +10,17 @@ import { postTweet, hasXCreds } from "@/app/lib/x";
 // Slot: ?slot=am|pm (or derived from UTC hour). am = what we're shipping;
 // pm = an offer/proof. ?dry=1 generates + returns the draft without posting.
 
+// Accept either the Vercel-cron CRON_SECRET or a dedicated X_AUTOPOST_TOKEN so a
+// Claude Code routine (visible in the routines list, alongside the standup) can
+// trigger this without holding the broader CRON_SECRET. The X creds never leave
+// Vercel — the routine is just the scheduled trigger.
 function isAuthorized(req: Request): boolean {
-  const secret = process.env.CRON_SECRET;
-  if (!secret) return false;
-  return req.headers.get("authorization") === `Bearer ${secret}`;
+  const auth = req.headers.get("authorization");
+  const cron = process.env.CRON_SECRET;
+  const autopost = process.env.X_AUTOPOST_TOKEN;
+  if (cron && auth === `Bearer ${cron}`) return true;
+  if (autopost && auth === `Bearer ${autopost}`) return true;
+  return false;
 }
 
 // Recent shipped work, straight from the public repo (no git in serverless).
