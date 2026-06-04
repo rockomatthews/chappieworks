@@ -115,6 +115,18 @@ export async function postTweet(
 
 export type XTweet = { id: string; text: string; created_at?: string };
 
+// Verify the OAuth1 credentials by asking X who we're authenticated as.
+// Returns the raw status + body so we can distinguish "creds invalid / OAuth1
+// not enabled" (401) from "creds valid but token is read-only" (works here, 403
+// only on write).
+export async function verifyCreds(): Promise<{ status: number; body: string }> {
+  requireCreds();
+  const url = "https://api.twitter.com/2/users/me";
+  const auth = oauth1Header("GET", url, {});
+  const res = await fetch(url, { headers: { Authorization: auth } });
+  return { status: res.status, body: (await res.text()).slice(0, 400) };
+}
+
 // Resolve a @handle to a numeric user id.
 export async function getUserId(username: string): Promise<string> {
   const data = await xGet<{ data?: { id?: string } }>(
