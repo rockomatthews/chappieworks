@@ -5,7 +5,8 @@ import { after } from "next/server";
 import { revalidatePath } from "next/cache";
 import { createSite } from "../lib/sites";
 import { mintSiteMagicLink } from "../lib/supabase/magiclink";
-import { sendLaunchPayLink, sendWelcomeDashboard, sendBriefReceived } from "../lib/siteNotify";
+import { sendLaunchPayLink, sendBriefProposal } from "../lib/siteNotify";
+import { generateBriefProposal } from "../lib/briefProposal";
 import { provisionRepo } from "../lib/siteProvision";
 import { isBypassEmail } from "../lib/movieEmail";
 
@@ -148,20 +149,6 @@ export async function submitIntake(
   // If it's a website brief, auto-provision the private edit dashboard and
   // email the customer their sign-in link.
   if (formType === "website") {
-    // Immediate confirmation to the requester — decoupled from the heavier
-    // provisioning flow so they always get an email even if provisioning fails.
-    const briefAck = await sendBriefReceived({
-      to: email,
-      ownerName: name,
-      businessName: fields.business_name || name,
-    });
-    if (!briefAck.ok) {
-      console.error(
-        "[chappieworks:intake] brief-received email failed",
-        briefAck.status,
-        briefAck.error,
-      );
-    }
     after(() => provisionSiteFromBrief(submission));
   }
 
@@ -406,23 +393,35 @@ async function provisionSiteFromBrief(submission: {
       );
     }
 
-    const result = await sendWelcomeDashboard({
+    const paragraphs = await generateBriefProposal(
+      {
+        businessName: site.businessName,
+        businessDescription: submission.fields.business_description,
+        siteType: submission.fields.site_type,
+        vibe: submission.fields.vibe,
+        referenceUrl: submission.fields.reference_url,
+        domain: submission.fields.domain,
+        notes: submission.fields.notes,
+      },
+      site.ownerName,
+    );
+    const result = await sendBriefProposal({
       to: site.ownerEmail,
-      slug: site.slug,
-      link: welcomeLink,
-      businessName: site.businessName,
       ownerName: site.ownerName,
+      businessName: site.businessName,
+      link: welcomeLink,
+      paragraphs,
     });
     if (!result.ok) {
       console.error(
-        "[chappieworks:intake] welcome email failed",
+        "[chappieworks:intake] proposal email failed",
         site.slug,
         "error",
         result.error,
       );
     } else {
       console.log(
-        "[chappieworks:intake] site provisioned",
+        "[chappieworks:intake] proposal sent",
         site.slug,
         "for",
         site.ownerEmail,
