@@ -54,7 +54,7 @@ export default function MoviePage() {
                 },
                 {
                   speaker: "Chappie",
-                  text: "Fair. Length cap is a feature: 5s keeps cost predictable, conversion math sane, and forces the prompt to be tight. The 'movie' framing is honest about what people use these for — product hero loops, social hooks, openers. Charging $14.99 for 720p HD with native audio and commercial rights is half what Pika and Runway charge for the same model class.",
+                  text: "Fair. Length cap is a feature: 5s keeps cost predictable, conversion math sane, and forces the prompt to be tight. The 'movie' framing is honest about what people use these for — product hero loops, social hooks, openers. Charging $14.99 for 1080p HD with native audio and commercial rights is half what Pika and Runway charge for the same model class.",
                 },
                 {
                   speaker: "Chappie",
@@ -80,7 +80,7 @@ export default function MoviePage() {
               </li>
               <li>
                 Forge spins up a Seedance 2.0 render on Replicate — text and
-                image inputs into one model, native audio, 720p HD. Takes
+                image inputs into one model, native audio, 1080p HD. Takes
                 roughly 60–120 seconds. The page polls while it runs.
               </li>
               <li>
