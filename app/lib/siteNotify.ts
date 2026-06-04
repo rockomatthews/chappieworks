@@ -41,6 +41,37 @@ async function sendResend(payload: {
   }
 }
 
+// Immediate, provisioning-independent confirmation to the requester. Sent
+// synchronously the moment a brief is submitted so the customer always gets
+// SOMETHING, even if the heavier site-provisioning flow later fails.
+export async function sendBriefReceived(opts: {
+  to: string;
+  ownerName: string;
+  businessName: string;
+}): Promise<SendResult> {
+  const from = process.env.INTAKE_FROM_EMAIL ?? FROM_DEFAULT;
+  const firstName = (opts.ownerName || "").split(" ")[0] || "there";
+  const html = `<!DOCTYPE html><html><body style="font-family: -apple-system, system-ui, sans-serif; background:#0b0b0c; color:#faf7ee; padding:32px 16px; margin:0;">
+<div style="max-width:560px; margin:0 auto;">
+<div style="border-bottom:2px solid #c9a437; padding-bottom:14px; margin-bottom:24px;">
+  <div style="font-family:'SF Mono', monospace; font-size:11px; color:#c9a437; letter-spacing:0.12em; text-transform:uppercase;">Chappie Site · Brief received</div>
+  <h1 style="font-size:22px; margin:8px 0 0; font-weight:600;">Got it, ${escapeHtml(firstName)} — the studio has your brief for ${escapeHtml(opts.businessName)}.</h1>
+</div>
+<p style="font-size:15px; line-height:1.6; color:rgba(250,247,238,0.85);">A second email with your private edit-dashboard link is on its way (it can take a few minutes). From there you'll chat with the studio about the build.</p>
+<p style="font-size:15px; line-height:1.6; color:rgba(250,247,238,0.85);">No charge yet — the $99 launch fee comes with a Stripe link only when you're ready. Your site goes live within 48 hours of kickoff.</p>
+<p style="font-size:13px; line-height:1.55; color:rgba(250,247,238,0.55);">Didn't get the dashboard link within ~15 minutes? Just reply to this email and we'll sort it.</p>
+</div>
+</body></html>`;
+
+  return sendResend({
+    from: `Chappie Works <${from}>`,
+    to: [opts.to],
+    reply_to: from,
+    subject: `We got your brief — ${opts.businessName}`,
+    html,
+  });
+}
+
 export async function sendWelcomeDashboard(opts: {
   to: string;
   slug: string;

@@ -150,9 +150,6 @@ export default async function WebsiteSku({
 }) {
   const { paid } = await searchParams;
   const justPaid = paid === "1";
-  const stripeLink =
-    process.env.NEXT_PUBLIC_STRIPE_LINK_WEBSITE ||
-    "https://buy.stripe.com/9B614nd0m3tH5ax5Rs3oA0c";
 
   let superUser = false;
   try {
@@ -164,11 +161,6 @@ export default async function WebsiteSku({
   } catch {
     // Supabase not configured locally — render public page only.
   }
-
-  const primaryCtaHref = superUser ? "#intake" : stripeLink;
-  const primaryCtaLabel = superUser
-    ? "Skip checkout — start the brief →"
-    : "Pay $99 + start the $49/mo →";
 
   const included = [
     "Real Next.js + Tailwind code — fast, SEO-friendly, real Lighthouse scores",
@@ -242,18 +234,12 @@ export default async function WebsiteSku({
               </a>
             </div>
           ) : (
-            <div className="mt-8 flex flex-col sm:flex-row gap-3">
-              <a
-                href={primaryCtaHref}
-                className="flex-1 flex items-center justify-center px-6 py-4 rounded-md bg-[var(--color-gold)] text-[var(--color-ink)] font-medium hover:opacity-90 transition"
-              >
-                {primaryCtaLabel}
-              </a>
+            <div className="mt-8">
               <a
                 href="#intake"
-                className="flex-1 flex items-center justify-center px-6 py-4 rounded-md border border-white/15 hover:border-[var(--color-gold)] hover:text-[var(--color-gold)] transition"
+                className="inline-flex items-center justify-center px-8 py-4 rounded-md bg-[var(--color-gold)] text-[var(--color-ink)] font-medium hover:opacity-90 transition"
               >
-                Brief us first (free)
+                Brief us (free) →
               </a>
             </div>
           )}
