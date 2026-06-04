@@ -55,7 +55,7 @@ async function writeTweet(slot: "am" | "pm", commits: string[]): Promise<string>
       : `Write an OFFER/PROOF tweet: surface one concrete thing a buyer can act on (a custom agent build, a free SEO or paid-ads audit, or a real number). Make it easy to say yes to.`;
 
   const msg = await anthropic.messages.create({
-    model: "claude-opus-4-7",
+    model: "claude-opus-4-8",
     max_tokens: 400,
     messages: [
       {
@@ -99,7 +99,10 @@ export async function GET(req: Request) {
     text = await writeTweet(slot, commits);
   } catch (err) {
     console.error("[tweet:cron] generation failed", err);
-    return NextResponse.json({ error: "generation failed" }, { status: 500 });
+    return NextResponse.json(
+      { error: "generation failed", detail: (err as Error).message },
+      { status: 500 }
+    );
   }
 
   if (dry) {
