@@ -75,7 +75,7 @@ async function distillSignals(stories: Story[], briefDate: string): Promise<stri
     .join("\n");
 
   const msg = await anthropic.messages.create({
-    model: "claude-opus-4-7",
+    model: "claude-opus-4-8",
     max_tokens: 1200,
     messages: [
       {
