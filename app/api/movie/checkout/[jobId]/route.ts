@@ -7,13 +7,19 @@ export const runtime = "nodejs";
 export const maxDuration = 30;
 export const dynamic = "force-dynamic";
 
-// Map of duration → env var holding the Stripe Price ID. Lets us add new
-// tiers (e.g. 15s) by just dropping in another env without code edits.
-function priceIdForDuration(durationSec: number | undefined): string | null {
-  if (durationSec === 10) {
-    return process.env.STRIPE_MOVIE_PRICE_ID_10S ?? null;
-  }
-  return process.env.STRIPE_MOVIE_PRICE_ID ?? null;
+// Inline pricing — no pre-created Stripe product/price needed. The session
+// builds the price on the fly, so checkout works on a fresh Stripe account.
+function videoPrice(durationSec: number | undefined): {
+  unitAmount: number;
+  name: string;
+} {
+  const isExt = durationSec === 10;
+  return {
+    unitAmount: isExt ? 2499 : 1499, // $24.99 extension / $14.99 unlock
+    name: isExt
+      ? "Chappie Video — clean 1080p extension (10s, no watermark)"
+      : "Chappie Video — clean 1080p MP4 (no watermark)",
+  };
 }
 
 export async function POST(
@@ -104,24 +110,23 @@ export async function POST(
   }
 
   const secretKey = process.env.STRIPE_SECRET_KEY;
-  const priceId = priceIdForDuration(state.durationSec);
-  if (!secretKey || !priceId) {
-    console.error(
-      "[chappieworks:movie] checkout missing config",
-      "secretKey?",
-      !!secretKey,
-      "duration",
-      state.durationSec,
-      "priceId?",
-      !!priceId,
-    );
-    return NextResponse.json(
-      { error: "checkout offline" },
-      { status: 503 },
-    );
+  if (!secretKey) {
+    console.error("[chappieworks:movie] checkout missing STRIPE_SECRET_KEY");
+    return NextResponse.json({ error: "checkout offline" }, { status: 503 });
   }
 
   const stripe = new Stripe(secretKey);
+  const price = videoPrice(state.durationSec);
+  const lineItems = [
+    {
+      quantity: 1,
+      price_data: {
+        currency: "usd",
+        unit_amount: price.unitAmount,
+        product_data: { name: price.name },
+      },
+    },
+  ];
 
   try {
     const kind =
@@ -131,7 +136,7 @@ export async function POST(
       const session = await stripe.checkout.sessions.create({
         ui_mode: "embedded_page",
         mode: "payment",
-        line_items: [{ price: priceId, quantity: 1 }],
+        line_items: lineItems,
         customer_email: state.email,
         return_url: `${origin}/m/${jobId}?paid=1&session_id={CHECKOUT_SESSION_ID}`,
         metadata: { jobId, kind },
@@ -145,7 +150,7 @@ export async function POST(
 
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
-      line_items: [{ price: priceId, quantity: 1 }],
+      line_items: lineItems,
       customer_email: state.email,
       success_url: `${origin}/m/${jobId}?paid=1`,
       cancel_url: `${origin}/m/${jobId}`,
