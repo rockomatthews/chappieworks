@@ -22,6 +22,12 @@ export async function POST(
 ) {
   const { jobId } = await ctx.params;
 
+  // Embedded mode keeps the buyer on chappieworks.com (Stripe checkout rendered
+  // in a panel). Falls back to a hosted redirect when the client can't embed
+  // (e.g. NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY not set).
+  const body = (await req.json().catch(() => ({}))) as { embedded?: boolean };
+  const embedded = body?.embedded === true;
+
   const state = await readState(jobId);
   if (!state) {
     return NextResponse.json({ error: "job not found" }, { status: 404 });
@@ -120,6 +126,23 @@ export async function POST(
   try {
     const kind =
       state.durationSec === 10 ? "movie-unwatermark-10s" : "movie-unwatermark";
+
+    if (embedded) {
+      const session = await stripe.checkout.sessions.create({
+        ui_mode: "embedded_page",
+        mode: "payment",
+        line_items: [{ price: priceId, quantity: 1 }],
+        customer_email: state.email,
+        return_url: `${origin}/m/${jobId}?paid=1&session_id={CHECKOUT_SESSION_ID}`,
+        metadata: { jobId, kind },
+        payment_intent_data: { metadata: { jobId, kind } },
+      });
+      return NextResponse.json({
+        clientSecret: session.client_secret,
+        sessionId: session.id,
+      });
+    }
+
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       line_items: [{ price: priceId, quantity: 1 }],
