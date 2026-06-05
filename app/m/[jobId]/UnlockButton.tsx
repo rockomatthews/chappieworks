@@ -1,6 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import {
+  StripeCheckoutModal,
+  canEmbedCheckout,
+} from "@/app/components/StripeCheckoutModal";
 
 export function UnlockButton({
   jobId,
@@ -11,19 +15,36 @@ export function UnlockButton({
 }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
 
   async function startCheckout() {
     setLoading(true);
     setError(null);
     try {
+      const embedded = canEmbedCheckout();
       const res = await fetch(`/api/movie/checkout/${jobId}`, {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ embedded }),
       });
-      const data = (await res.json()) as { url?: string; error?: string };
-      if (!res.ok || !data.url) {
-        throw new Error(data.error ?? "couldn't start checkout");
+      const data = (await res.json()) as {
+        url?: string;
+        clientSecret?: string;
+        error?: string;
+      };
+      if (!res.ok) throw new Error(data.error ?? "couldn't start checkout");
+
+      // Embedded: open the on-page panel. Otherwise fall back to redirect.
+      if (data.clientSecret) {
+        setClientSecret(data.clientSecret);
+        setLoading(false);
+        return;
       }
-      window.location.href = data.url;
+      if (data.url) {
+        window.location.href = data.url;
+        return;
+      }
+      throw new Error("couldn't start checkout");
     } catch (err) {
       setError(err instanceof Error ? err.message : "checkout failed");
       setLoading(false);
@@ -40,12 +61,15 @@ export function UnlockButton({
         {loading ? "Opening checkout…" : `Buy clean HD — ${priceLabel} →`}
       </button>
       {error && (
-        <p
-          role="alert"
-          className="text-sm text-[var(--color-rust)] mt-3"
-        >
+        <p role="alert" className="text-sm text-[var(--color-rust)] mt-3">
           {error}
         </p>
+      )}
+      {clientSecret && (
+        <StripeCheckoutModal
+          clientSecret={clientSecret}
+          onClose={() => setClientSecret(null)}
+        />
       )}
     </div>
   );
