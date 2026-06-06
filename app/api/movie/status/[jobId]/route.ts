@@ -80,42 +80,6 @@ async function burnWatermark(cleanMp4: Buffer): Promise<Buffer> {
   }
 }
 
-// Upscale a clip to 1080p (1920x1080, lanczos). Reliable way to deliver a 1080p
-// MP4 from sora-2's 720p output without the slow pro model. Falls back to the
-// original buffer if ffmpeg fails so a job never gets stuck here.
-async function upscaleTo1080p(input: Buffer): Promise<Buffer> {
-  const workDir = await mkdtemp(path.join(tmpdir(), "movie-up-"));
-  const inPath = path.join(workDir, "in.mp4");
-  const outPath = path.join(workDir, "out.mp4");
-  try {
-    await writeFile(inPath, input);
-    return await new Promise<Buffer>((resolve, reject) => {
-      const timeout = setTimeout(
-        () => reject(new Error("upscale timeout (120s)")),
-        120000,
-      );
-      ffmpeg(inPath)
-        .videoFilters("scale=1920:1080:flags=lanczos")
-        .outputOptions(["-c:a copy", "-preset veryfast", "-crf 20"])
-        .on("end", async () => {
-          clearTimeout(timeout);
-          try {
-            resolve(await readFile(outPath));
-          } catch (err) {
-            reject(err);
-          }
-        })
-        .on("error", (err) => {
-          clearTimeout(timeout);
-          reject(err);
-        })
-        .save(outPath);
-    });
-  } finally {
-    await rm(workDir, { recursive: true, force: true }).catch(() => {});
-  }
-}
-
 async function pollSora(state: MovieState): Promise<NextResponse> {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey || !state.openaiVideoId) {
@@ -199,23 +163,11 @@ async function pollSora(state: MovieState): Promise<NextResponse> {
 
 async function finalizeReady(
   state: MovieState,
-  rawBuffer: Buffer,
+  cleanBuffer: Buffer,
 ): Promise<NextResponse> {
   const jobId = state.jobId;
-
-  // Upscale sora-2's 720p to a 1080p deliverable. Falls back to the original
-  // if ffmpeg fails, so the job still finishes.
-  let cleanBuffer = rawBuffer;
-  try {
-    cleanBuffer = await upscaleTo1080p(rawBuffer);
-  } catch (err) {
-    console.error(
-      "[chappieworks:movie] 1080p upscale failed, using original",
-      jobId,
-      err instanceof Error ? err.message : "unknown",
-    );
-  }
-
+  // Store the native 720p as the preview-quality clip. The 1080p deliverable is
+  // produced from this at purchase time (see lib/movieUpscale).
   const cleanBlob = await put(CLEAN_KEY(jobId), cleanBuffer, {
     access: "public",
     contentType: "video/mp4",

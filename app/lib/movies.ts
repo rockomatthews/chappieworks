@@ -13,6 +13,10 @@ export type MovieState = {
   failureReason?: string;
   previewUrl?: string;
   cleanUrl?: string;
+  // The 1080p deliverable, produced from cleanUrl at purchase time (AI upscale
+  // with an ffmpeg "boost" fallback). Falls back to cleanUrl if not ready yet.
+  hdUrl?: string;
+  hdPending?: boolean;
   durationSec?: number;
   paid: boolean;
   paidAt?: string;
@@ -29,8 +33,9 @@ export type MovieState = {
 const STATE_KEY = (jobId: string) => `movies/${jobId}/state.json`;
 const PREVIEW_KEY = (jobId: string) => `movies/${jobId}/preview.mp4`;
 const CLEAN_KEY = (jobId: string) => `movies/${jobId}/clean.mp4`;
+const HD_KEY = (jobId: string) => `movies/${jobId}/hd.mp4`;
 
-export { STATE_KEY, PREVIEW_KEY, CLEAN_KEY };
+export { STATE_KEY, PREVIEW_KEY, CLEAN_KEY, HD_KEY };
 
 export function newJobId(): string {
   const bytes = new Uint8Array(12);
