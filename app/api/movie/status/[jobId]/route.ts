@@ -117,23 +117,36 @@ async function pollFal(state: MovieState): Promise<NextResponse> {
     return NextResponse.json({ ...publicView(state), status: "generating" });
   }
 
-  if (status === "ERROR") {
+  // COMPLETED or ERROR — resolve the result (or surface the real reason).
+  await writeState({ ...state, status: "watermarking" });
+
+  let videoUrl: string | null = null;
+  let resultError: string | undefined;
+  try {
+    const r = await falVideoResult(state.falResultUrl);
+    videoUrl = r.videoUrl;
+    resultError = r.error;
+  } catch (err) {
+    resultError = err instanceof Error ? err.message : "unknown";
+  }
+
+  if (!videoUrl) {
+    const friendly =
+      resultError === "policy"
+        ? "Flagged by the content checker. Note: fal.ai moderates violent/graphic prompts on every model, including the Raw tier. Rephrase and try again."
+        : resultError ?? "couldn't download generated video";
+    console.error("[chappieworks:movie] fal job failed", state.jobId, friendly);
     const failed: MovieState = {
       ...state,
       status: "failed",
-      failureReason:
-        "The render failed (the model may have flagged the prompt). Try rephrasing.",
+      failureReason: friendly,
     };
     await writeState(failed);
     return NextResponse.json(publicView(failed));
   }
 
-  // COMPLETED
-  await writeState({ ...state, status: "watermarking" });
   let cleanBuffer: Buffer;
   try {
-    const videoUrl = await falVideoResult(state.falResultUrl);
-    if (!videoUrl) throw new Error("no video url in fal result");
     cleanBuffer = await downloadToBuffer(videoUrl);
   } catch (err) {
     console.error(
