@@ -31,11 +31,12 @@ const ALLOWED_IMAGE_TYPES = new Set([
   "image/webp",
 ]);
 
-// 1080p-class output requires sora-2-pro; standard sora-2 caps at 720p
-// (1280x720). 1792x1024 is the pro landscape size — ~2x the pixels of 720p, so
-// it actually matches the "1080p MP4" we advertise on /movie.
-const SORA_MODEL = "sora-2-pro";
-const SORA_SIZE = "1792x1024";
+// sora-2 renders reliably in ~60–120s (sora-2-pro 1080p was too slow and
+// stalled past the client poll budget). We generate at 720p here and upscale
+// the finished clip to 1080p with ffmpeg in the status route, so the deliverable
+// is a 1080p MP4 without depending on the slow pro model.
+const SORA_MODEL = "sora-2";
+const SORA_SIZE = "1280x720";
 
 function mapDurationToSora(d: number): "4" | "8" | "12" {
   if (d >= 10) return "12";

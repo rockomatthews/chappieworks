@@ -569,11 +569,11 @@ export function MovieGenerator() {
       {isRendering && job && (
         <div
           ref={renderPanelRef}
-          className="card rounded-xl p-6 sm:p-8 ring-2 ring-[var(--color-gold)] scroll-mt-24"
+          className="rounded-xl p-6 sm:p-8 ring-2 ring-red-500/80 bg-red-950/50 scroll-mt-24"
         >
           <div className="flex items-center gap-3 mb-3">
-            <span className="inline-block w-2 h-2 rounded-full bg-[var(--color-gold)] animate-pulse" />
-            <p className="text-xs mono text-[var(--color-gold)] uppercase tracking-widest">
+            <span className="inline-block w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+            <p className="text-xs mono text-red-400 uppercase tracking-widest">
               {job.jobId === "starting"
                 ? "Starting render…"
                 : `Rendering · job ${job.jobId.slice(0, 8)}`}
