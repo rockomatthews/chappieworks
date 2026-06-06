@@ -73,15 +73,41 @@ export async function falStatus(statusUrl: string): Promise<FalStatus> {
   return (d.status as FalStatus) ?? "IN_PROGRESS";
 }
 
-// Fetch the finished result and pull out the video URL.
-export async function falVideoResult(resultUrl: string): Promise<string | null> {
+// Fetch the finished result. Returns the video URL on success, or a structured
+// error ("policy" for content-policy flags, else a message) so callers can show
+// a real reason instead of a generic failure.
+export async function falVideoResult(
+  resultUrl: string,
+): Promise<{ videoUrl: string | null; error?: string }> {
   const res = await fetch(resultUrl, {
     headers: { Authorization: `Key ${falKey()}` },
     cache: "no-store",
   });
-  if (!res.ok) {
-    throw new Error(`fal result ${res.status}`);
+  const text = await res.text();
+  let d: {
+    video?: { url?: string } | Array<{ url?: string }>;
+    video_url?: string;
+    detail?: unknown;
+  } = {};
+  try {
+    d = JSON.parse(text);
+  } catch {
+    /* non-JSON */
   }
-  const d = (await res.json()) as { video?: { url?: string } };
-  return d.video?.url ?? null;
+
+  if (!res.ok) {
+    const detail = d.detail;
+    const items = Array.isArray(detail) ? (detail as Array<{ msg?: string; type?: string }>) : [];
+    const isPolicy =
+      items.some((x) => x.type === "content_policy_violation") ||
+      /content.?polic|content checker|flagged/i.test(text);
+    if (isPolicy) return { videoUrl: null, error: "policy" };
+    const msg = items.map((x) => x.msg).filter(Boolean).join("; ");
+    return { videoUrl: null, error: msg || `fal result ${res.status}` };
+  }
+
+  const video = d.video;
+  const url =
+    (Array.isArray(video) ? video[0]?.url : video?.url) ?? d.video_url ?? null;
+  return { videoUrl: url };
 }

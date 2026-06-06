@@ -56,12 +56,21 @@ export async function writeState(state: MovieState): Promise<void> {
 }
 
 export async function readState(jobId: string): Promise<MovieState | null> {
-  const { blobs } = await list({ prefix: STATE_KEY(jobId) });
-  const blob = blobs.find((b) => b.pathname === STATE_KEY(jobId));
-  if (!blob) return null;
-  const res = await fetch(blob.url, { cache: "no-store" });
-  if (!res.ok) return null;
-  return (await res.json()) as MovieState;
+  const key = STATE_KEY(jobId);
+  // Vercel Blob `list` is eventually consistent — a just-written state can be
+  // absent for a second or two. Retry briefly so freshly created jobs don't 404
+  // on their first status polls.
+  for (let attempt = 0; attempt < 4; attempt++) {
+    const { blobs } = await list({ prefix: key });
+    const blob = blobs.find((b) => b.pathname === key);
+    if (blob) {
+      const res = await fetch(blob.url, { cache: "no-store" });
+      if (!res.ok) return null;
+      return (await res.json()) as MovieState;
+    }
+    if (attempt < 3) await new Promise((r) => setTimeout(r, 600));
+  }
+  return null;
 }
 
 export async function deleteJobAssets(jobId: string): Promise<void> {
