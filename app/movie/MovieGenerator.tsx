@@ -639,8 +639,8 @@ export function MovieGenerator() {
             <div className="flex flex-wrap items-baseline justify-between gap-2 mt-4">
               <p className="text-xs mono text-[var(--color-gold)] uppercase tracking-widest">
                 {isExtensionResult
-                  ? "Your +10s extension · preview"
-                  : "Preview · watermarked"}
+                  ? "Your +10s extension · 720p preview"
+                  : "Preview · 720p · watermarked"}
               </p>
               <p className="text-[10px] mono text-[var(--color-mute)]">
                 /m/{job.jobId.slice(0, 8)}…
@@ -666,8 +666,8 @@ export function MovieGenerator() {
             </h3>
             <p className="text-sm text-[var(--color-paper)]/85 mb-5 leading-relaxed">
               {isExtensionResult
-                ? "Get the new 10s 1080p MP4 (just the extension, no watermark) in your inbox + on this page. Stack another 10s anytime by uploading this clip again."
-                : "Get the 1080p MP4 without watermark in your inbox + on this page. Commercial rights yours."}
+                ? "Previews run at 720p for speed — buy it and we upscale your exact clip to a clean 1080p MP4 (no watermark), in your inbox + on this page. Stack another 10s anytime by uploading this clip again."
+                : "Previews run at 720p to keep rendering fast — buy it and we upscale your exact clip to a clean 1080p MP4 (no watermark), in your inbox + on this page. Commercial rights yours."}
             </p>
             <button
               onClick={() => void startCheckout()}

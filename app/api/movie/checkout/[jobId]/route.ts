@@ -1,10 +1,12 @@
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
 import Stripe from "stripe";
 import { readState, writeState } from "../../../../lib/movies";
-import { isBypassEmail, sendCleanMovieEmail } from "../../../../lib/movieEmail";
+import { isBypassEmail } from "../../../../lib/movieEmail";
+import { deliverMovieHd } from "../../../../lib/movieUpscale";
 
 export const runtime = "nodejs";
-export const maxDuration = 30;
+// Room for post-response `after()` HD upscale on the bypass path.
+export const maxDuration = 300;
 export const dynamic = "force-dynamic";
 
 // Inline pricing — no pre-created Stripe product/price needed. The session
@@ -64,45 +66,25 @@ export async function POST(
         { status: 503 },
       );
     }
-    // Send first; only mark paid if the email actually goes out. Otherwise
-    // bypass becomes a silent black hole where the buyer redirects to a
-    // "paid" page but nothing ever lands in their inbox.
-    const sent = await sendCleanMovieEmail({
-      to: state.email,
-      jobId,
-      prompt: state.prompt,
-      cleanUrl: state.cleanUrl,
-      bypass: true,
-    });
-    if (!sent.ok) {
-      console.error(
-        "[chappieworks:movie] bypass email send failed",
-        jobId,
-        sent.error,
-      );
-      return NextResponse.json(
-        {
-          error: `bypass email failed: ${sent.error}`,
-          cleanUrl: state.cleanUrl,
-        },
-        { status: 502 },
-      );
-    }
     const updated = {
       ...state,
       paid: true,
       paidAt: new Date().toISOString(),
       stripeSessionId: "bypass",
+      hdPending: true,
     };
     await writeState(updated);
-    console.log(
-      "[chappieworks:movie] bypass unlock",
-      jobId,
-      "→",
-      state.email,
-      "resend id",
-      sent.id ?? "(none)",
+    // Upscale to 1080p + email after the response.
+    after(() =>
+      deliverMovieHd(jobId, { bypass: true }).catch((err) =>
+        console.error(
+          "[chappieworks:movie] bypass hd delivery threw",
+          jobId,
+          err instanceof Error ? err.message : err,
+        ),
+      ),
     );
+    console.log("[chappieworks:movie] bypass unlock", jobId, "→", state.email);
     return NextResponse.json({
       url: `${origin}/m/${jobId}?paid=1&bypass=1`,
       bypassed: true,

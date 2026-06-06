@@ -2,14 +2,15 @@ import { NextResponse } from "next/server";
 import { after } from "next/server";
 import Stripe from "stripe";
 import { readState, writeState } from "../../../lib/movies";
-import { sendCleanMovieEmail } from "../../../lib/movieEmail";
+import { deliverMovieHd } from "../../../lib/movieUpscale";
 import {
   generatePackAndEmail,
   readPackState,
 } from "../../../lib/photoshootPack";
 
 export const runtime = "nodejs";
-export const maxDuration = 30;
+// Allow post-response `after()` work (HD upscale + email) room to finish.
+export const maxDuration = 300;
 export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
@@ -116,16 +117,22 @@ export async function POST(req: Request) {
       paid: true,
       paidAt: new Date().toISOString(),
       stripeSessionId: session.id,
+      hdPending: true,
     };
     await writeState(updated);
 
+    // Produce the 1080p deliverable + email it after the response so Stripe
+    // gets a fast 200. Idempotent inside deliverMovieHd.
     if (updated.cleanUrl) {
-      await sendCleanMovieEmail({
-        to: state.email,
-        jobId,
-        prompt: state.prompt,
-        cleanUrl: updated.cleanUrl,
-      });
+      after(() =>
+        deliverMovieHd(jobId).catch((err) =>
+          console.error(
+            "[chappieworks:movie] hd delivery threw",
+            jobId,
+            err instanceof Error ? err.message : err,
+          ),
+        ),
+      );
     }
 
     console.log(
