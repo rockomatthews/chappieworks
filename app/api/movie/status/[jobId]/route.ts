@@ -14,6 +14,7 @@ import {
   CLEAN_KEY,
   type MovieState,
 } from "../../../../lib/movies";
+import { falStatus, falVideoResult, type FalStatus } from "../../../../lib/fal";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
@@ -78,6 +79,77 @@ async function burnWatermark(cleanMp4: Buffer): Promise<Buffer> {
   } finally {
     await rm(workDir, { recursive: true, force: true }).catch(() => {});
   }
+}
+
+async function pollFal(state: MovieState): Promise<NextResponse> {
+  if (!state.falStatusUrl || !state.falResultUrl) {
+    return NextResponse.json(publicView(state));
+  }
+
+  let status: FalStatus;
+  try {
+    status = await falStatus(state.falStatusUrl);
+  } catch (err) {
+    console.error(
+      "[chappieworks:movie] fal status failed",
+      state.jobId,
+      err instanceof Error ? err.message : err,
+    );
+    return NextResponse.json(publicView(state));
+  }
+
+  if (status === "IN_QUEUE" || status === "IN_PROGRESS") {
+    // Hard cap so a stalled render can't hang in "generating" forever.
+    const ageMs = Date.now() - new Date(state.createdAt).getTime();
+    if (ageMs > 15 * 60 * 1000) {
+      const failed: MovieState = {
+        ...state,
+        status: "failed",
+        failureReason:
+          "The render took too long and timed out. No charge — please try again, it's usually quick.",
+      };
+      await writeState(failed);
+      return NextResponse.json(publicView(failed));
+    }
+    if (state.status !== "generating") {
+      await writeState({ ...state, status: "generating" });
+    }
+    return NextResponse.json({ ...publicView(state), status: "generating" });
+  }
+
+  if (status === "ERROR") {
+    const failed: MovieState = {
+      ...state,
+      status: "failed",
+      failureReason:
+        "The render failed (the model may have flagged the prompt). Try rephrasing.",
+    };
+    await writeState(failed);
+    return NextResponse.json(publicView(failed));
+  }
+
+  // COMPLETED
+  await writeState({ ...state, status: "watermarking" });
+  let cleanBuffer: Buffer;
+  try {
+    const videoUrl = await falVideoResult(state.falResultUrl);
+    if (!videoUrl) throw new Error("no video url in fal result");
+    cleanBuffer = await downloadToBuffer(videoUrl);
+  } catch (err) {
+    console.error(
+      "[chappieworks:movie] fal download failed",
+      state.jobId,
+      err instanceof Error ? err.message : err,
+    );
+    const failed: MovieState = {
+      ...state,
+      status: "failed",
+      failureReason: "couldn't download generated video",
+    };
+    await writeState(failed);
+    return NextResponse.json(publicView(failed));
+  }
+  return await finalizeReady(state, cleanBuffer);
 }
 
 async function pollSora(state: MovieState): Promise<NextResponse> {
@@ -242,7 +314,21 @@ export async function GET(
     return NextResponse.json(publicView(state));
   }
 
-  // Sora 2 path (new jobs)
+  // Kling (fal.ai) path — current
+  if (state.falRequestId) {
+    try {
+      return await pollFal(state);
+    } catch (err) {
+      console.error(
+        "[chappieworks:movie] fal poll threw",
+        jobId,
+        err instanceof Error ? err.message : err,
+      );
+      return NextResponse.json(publicView(state));
+    }
+  }
+
+  // Sora 2 path (legacy jobs)
   if (state.openaiVideoId) {
     try {
       return await pollSora(state);

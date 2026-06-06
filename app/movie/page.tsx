@@ -79,7 +79,7 @@ export default function MoviePage() {
                 you buy.
               </li>
               <li>
-                Forge spins up a Sora 2 render — text and image inputs into one
+                Forge spins up a Kling render — text and image inputs into one
                 model, native audio. It usually takes a couple of minutes, and
                 can run longer when the model&rsquo;s queue is busy. The page
                 polls while it runs — leave and come back anytime; we hold your

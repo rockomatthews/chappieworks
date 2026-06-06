@@ -115,19 +115,11 @@ export async function deliverMovieHd(
 ): Promise<void> {
   const state = await readState(jobId);
   if (!state || !state.cleanUrl) return;
-  if (state.hdUrl) return; // already produced
+  if (state.hdUrl) return; // already done
 
-  let hdUrl: string;
-  try {
-    hdUrl = await produceHd(jobId, state.cleanUrl);
-  } catch (err) {
-    console.error(
-      "[chappieworks:upscale] produceHd failed; emailing 720p as fallback",
-      jobId,
-      err instanceof Error ? err.message : err,
-    );
-    hdUrl = state.cleanUrl;
-  }
+  // Kling outputs native ~1080p, so the clean clip IS the deliverable — no
+  // upscale needed. (produceHd remains available for sources that need it.)
+  const hdUrl = state.cleanUrl;
 
   const fresh = (await readState(jobId)) ?? state;
   await writeState({ ...fresh, hdUrl, hdPending: false });

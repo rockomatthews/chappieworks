@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
-import OpenAI from "openai";
 import { put } from "@vercel/blob";
+import {
+  falSubmit,
+  KLING_TEXT_TO_VIDEO,
+  KLING_IMAGE_TO_VIDEO,
+} from "../../../lib/fal";
 import ffmpegPath from "ffmpeg-static";
 import ffmpeg from "fluent-ffmpeg";
 import { mkdtemp, rm, readFile, writeFile } from "fs/promises";
@@ -31,18 +35,9 @@ const ALLOWED_IMAGE_TYPES = new Set([
   "image/webp",
 ]);
 
-// sora-2 renders reliably in ~60–120s (sora-2-pro 1080p was too slow and
-// stalled past the client poll budget). We generate at 720p here and upscale
-// the finished clip to 1080p with ffmpeg in the status route, so the deliverable
-// is a 1080p MP4 without depending on the slow pro model.
-const SORA_MODEL = "sora-2";
-const SORA_SIZE = "1280x720";
-
-function mapDurationToSora(d: number): "4" | "8" | "12" {
-  if (d >= 10) return "12";
-  if (d >= 7) return "8";
-  return "4";
-}
+// Generation runs on Kling (Kling 2.1 Master) via fal.ai — high quality, native
+// ~1080p, permissive content policy, and much faster/cheaper than Sora (which
+// OpenAI is discontinuing). Kling supports 5s or 10s clips.
 
 // Pull the last frame from a video at a public URL and return it as a PNG
 // buffer. Used by extension mode to seed the next 10s with the final frame
@@ -170,16 +165,14 @@ export async function POST(req: Request) {
     duration = 10;
   }
 
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) {
-    console.error("[chappieworks:movie] OPENAI_API_KEY missing");
+  if (!process.env.FAL_KEY) {
+    console.error("[chappieworks:movie] FAL_KEY missing");
     return NextResponse.json(
       { error: "generator offline — try again shortly" },
       { status: 503 },
     );
   }
 
-  const openai = new OpenAI({ apiKey });
   const jobId = newJobId();
 
   let startImageUrl: string | undefined;
@@ -239,41 +232,44 @@ export async function POST(req: Request) {
   }
 
   try {
-    const seconds = mapDurationToSora(duration);
+    const seconds = duration >= 7 ? "10" : "5";
 
-    const params: OpenAI.Videos.VideoCreateParams = {
-      model: SORA_MODEL,
+    const input: Record<string, unknown> = {
       prompt,
-      seconds,
-      size: SORA_SIZE,
+      duration: seconds,
+      aspect_ratio: "16:9",
+      negative_prompt: "blur, distort, and low quality",
+      cfg_scale: 0.5,
     };
+    const model = startImageUrl ? KLING_IMAGE_TO_VIDEO : KLING_TEXT_TO_VIDEO;
     if (startImageUrl) {
-      params.input_reference = { image_url: startImageUrl };
+      input.image_url = startImageUrl;
     }
 
-    const video = await openai.videos.create(params);
+    const sub = await falSubmit(model, input);
 
     const state: MovieState = {
       jobId,
       prompt,
       email,
       createdAt: new Date().toISOString(),
-      openaiVideoId: video.id,
-      status: video.status === "failed" ? "failed" : "generating",
+      falRequestId: sub.requestId,
+      falStatusUrl: sub.statusUrl,
+      falResultUrl: sub.resultUrl,
+      status: "generating",
       paid: false,
       durationSec: Number(seconds),
       mode,
       startImageUrl,
       inputVideoUrl,
-      failureReason: video.error?.message,
     };
     await writeState(state);
 
     console.log(
       "[chappieworks:movie] created job",
       jobId,
-      "sora",
-      video.id,
+      "kling",
+      sub.requestId,
       "mode",
       mode,
       "seconds",
