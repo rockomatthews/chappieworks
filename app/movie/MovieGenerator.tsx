@@ -2,6 +2,10 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { upload } from "@vercel/blob/client";
+import {
+  StripeCheckoutModal,
+  canEmbedCheckout,
+} from "@/app/components/StripeCheckoutModal";
 
 function WatermarkOverlay() {
   return (
@@ -94,6 +98,9 @@ export function MovieGenerator() {
   const [error, setError] = useState<string | null>(null);
   const [job, setJob] = useState<JobStatus | null>(null);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [checkoutClientSecret, setCheckoutClientSecret] = useState<
+    string | null
+  >(null);
   const [pollError, setPollError] = useState<string | null>(null);
   const pollStartRef = useRef<number>(0);
   const pollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -326,15 +333,31 @@ export function MovieGenerator() {
   async function startCheckout() {
     if (!job || job.status !== "ready") return;
     setCheckoutLoading(true);
+    setError(null);
     try {
+      const embedded = canEmbedCheckout();
       const res = await fetch(`/api/movie/checkout/${job.jobId}`, {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ embedded }),
       });
-      const data = (await res.json()) as { url?: string; error?: string };
-      if (!res.ok || !data.url) {
-        throw new Error(data.error ?? "couldn't start checkout");
+      const data = (await res.json()) as {
+        url?: string;
+        clientSecret?: string;
+        error?: string;
+      };
+      if (!res.ok) throw new Error(data.error ?? "couldn't start checkout");
+      // Embedded: open the on-page panel. Otherwise fall back to redirect.
+      if (data.clientSecret) {
+        setCheckoutClientSecret(data.clientSecret);
+        setCheckoutLoading(false);
+        return;
       }
-      window.location.href = data.url;
+      if (data.url) {
+        window.location.href = data.url;
+        return;
+      }
+      throw new Error("couldn't start checkout");
     } catch (err) {
       setError(err instanceof Error ? err.message : "checkout failed");
       setCheckoutLoading(false);
@@ -681,6 +704,12 @@ export function MovieGenerator() {
             <p className="text-xs mono text-[var(--color-mute)] mt-3">
               Secure checkout via Stripe. Apple Pay / Google Pay supported.
             </p>
+            {checkoutClientSecret && (
+              <StripeCheckoutModal
+                clientSecret={checkoutClientSecret}
+                onClose={() => setCheckoutClientSecret(null)}
+              />
+            )}
           </div>
 
           <button
