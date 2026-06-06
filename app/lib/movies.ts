@@ -8,7 +8,10 @@ export type MovieState = {
   email: string;
   createdAt: string;
   replicateId?: string;        // legacy Seedance jobs
-  openaiVideoId?: string;      // Sora 2 jobs
+  openaiVideoId?: string;      // legacy Sora 2 jobs
+  falRequestId?: string;       // Kling (via fal.ai) jobs
+  falStatusUrl?: string;
+  falResultUrl?: string;
   status: "pending" | "generating" | "watermarking" | "ready" | "failed";
   failureReason?: string;
   previewUrl?: string;

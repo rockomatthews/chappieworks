@@ -98,19 +98,12 @@ export default async function MovieSharePage({
                 />
                 <div className="flex flex-wrap items-baseline justify-between gap-2 mt-4">
                   <p className="text-xs mono text-[var(--color-gold)] uppercase tracking-widest">
-                    {state.paid ? "Unlocked · 1080p" : "Preview · 720p · watermarked"}
+                    {state.paid ? "Unlocked · 1080p" : "Preview · watermarked"}
                   </p>
                   <p className="text-[10px] mono text-[var(--color-mute)]">
                     /m/{jobId.slice(0, 8)}
                   </p>
                 </div>
-                {!state.paid && (
-                  <p className="text-xs text-[var(--color-paper)]/60 mt-2 leading-relaxed">
-                    Previews play at 720p — it keeps rendering fast and the free
-                    tier sustainable. Buy it and we upscale your exact clip to a
-                    full 1080p MP4.
-                  </p>
-                )}
               </div>
 
               {state.paid && (state.hdUrl || state.cleanUrl) && (
@@ -132,17 +125,9 @@ export default async function MovieSharePage({
                   >
                     Download 1080p MP4 →
                   </a>
-                  {!state.hdUrl && state.hdPending ? (
-                    <p className="text-xs mono text-[var(--color-mute)] mt-3">
-                      Upscaling to 1080p now — the button has your clip in the
-                      meantime, and the full 1080p lands in your inbox at{" "}
-                      {state.email} within a minute. Commercial rights yours.
-                    </p>
-                  ) : (
-                    <p className="text-xs mono text-[var(--color-mute)] mt-3">
-                      Also emailed to {state.email}. Commercial rights yours.
-                    </p>
-                  )}
+                  <p className="text-xs mono text-[var(--color-mute)] mt-3">
+                    Also emailed to {state.email}. Commercial rights yours.
+                  </p>
                 </div>
               )}
 
