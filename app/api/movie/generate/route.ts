@@ -4,6 +4,8 @@ import {
   falSubmit,
   KLING_TEXT_TO_VIDEO,
   KLING_IMAGE_TO_VIDEO,
+  WAN_TEXT_TO_VIDEO,
+  WAN_IMAGE_TO_VIDEO,
 } from "../../../lib/fal";
 import ffmpegPath from "ffmpeg-static";
 import ffmpeg from "fluent-ffmpeg";
@@ -86,6 +88,7 @@ export async function POST(req: Request) {
   let imageFile: File | null = null;
   let inputVideoUrl: string | undefined;
   let duration = 5;
+  let tier: "standard" | "raw" = "standard";
 
   if (contentType.includes("multipart/form-data")) {
     const form = await req.formData();
@@ -93,6 +96,7 @@ export async function POST(req: Request) {
     email = String(form.get("email") ?? "").trim().toLowerCase();
     const rawDuration = Number(form.get("duration") ?? 5);
     duration = rawDuration === 10 ? 10 : 5;
+    if (String(form.get("tier") ?? "") === "raw") tier = "raw";
     const maybeImage = form.get("image");
     if (maybeImage instanceof File && maybeImage.size > 0) {
       imageFile = maybeImage;
@@ -106,10 +110,12 @@ export async function POST(req: Request) {
         email?: string;
         duration?: number;
         inputVideoUrl?: string;
+        tier?: string;
       };
       prompt = (body.prompt ?? "").trim();
       email = (body.email ?? "").trim().toLowerCase();
       duration = body.duration === 10 ? 10 : 5;
+      if (body.tier === "raw") tier = "raw";
       if (body.inputVideoUrl) inputVideoUrl = body.inputVideoUrl;
     } catch {
       return NextResponse.json({ error: "invalid request body" }, { status: 400 });
@@ -234,14 +240,22 @@ export async function POST(req: Request) {
   try {
     const seconds = duration >= 7 ? "10" : "5";
 
-    const input: Record<string, unknown> = {
-      prompt,
-      duration: seconds,
-      aspect_ratio: "16:9",
-      negative_prompt: "blur, distort, and low quality",
-      cfg_scale: 0.5,
-    };
-    const model = startImageUrl ? KLING_IMAGE_TO_VIDEO : KLING_TEXT_TO_VIDEO;
+    let model: string;
+    const input: Record<string, unknown> = { prompt, aspect_ratio: "16:9" };
+    if (tier === "raw") {
+      // Wan 2.2 — open model, far fewer content filters. Duration via frames
+      // (~24fps): 121 ≈ 5s, 161 ≈ ~6.7s (Wan's max).
+      model = startImageUrl ? WAN_IMAGE_TO_VIDEO : WAN_TEXT_TO_VIDEO;
+      input.resolution = "720p";
+      input.num_frames = duration >= 7 ? 161 : 121;
+      input.enable_prompt_expansion = true;
+    } else {
+      // Kling 2.1 Master — high quality, native 1080p.
+      model = startImageUrl ? KLING_IMAGE_TO_VIDEO : KLING_TEXT_TO_VIDEO;
+      input.duration = seconds;
+      input.negative_prompt = "blur, distort, and low quality";
+      input.cfg_scale = 0.5;
+    }
     if (startImageUrl) {
       input.image_url = startImageUrl;
     }
