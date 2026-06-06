@@ -101,6 +101,19 @@ async function pollSora(state: MovieState): Promise<NextResponse> {
   }
 
   if (video.status === "queued" || video.status === "in_progress") {
+    // Hard cap: if Sora has been rendering far too long, fail gracefully so the
+    // job can't hang in "generating" forever (orphaned when polling stops).
+    const ageMs = Date.now() - new Date(state.createdAt).getTime();
+    if (ageMs > 15 * 60 * 1000) {
+      const failed: MovieState = {
+        ...state,
+        status: "failed",
+        failureReason:
+          "The render took too long and timed out (Sora's queue was backed up). No charge — please try again, it's usually quick.",
+      };
+      await writeState(failed);
+      return NextResponse.json(publicView(failed));
+    }
     const newStatus: MovieState["status"] = "generating";
     if (state.status !== newStatus) {
       await writeState({ ...state, status: newStatus });
