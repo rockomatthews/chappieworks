@@ -58,11 +58,12 @@ type JobStatus = {
 type Duration = 5 | 10;
 
 const POLL_INTERVAL_MS = 4000;
-const MAX_POLL_DURATION_MS = 8 * 60 * 1000;
+const MAX_POLL_DURATION_MS = 15 * 60 * 1000;
 
 const STATUS_COPY: Record<JobStatus["status"], string> = {
   pending: "Queued — starting the render…",
-  generating: "Forge is rendering your clip. 60–120 seconds.",
+  generating:
+    "Forge is rendering your clip. Usually a couple of minutes — sometimes 5+ when the model's queue is busy. Leave and come back anytime; we hold your result.",
   watermarking: "Almost there — finalizing the preview.",
   ready: "Ready. Watch it below.",
   failed: "The render failed. Try a different prompt.",
@@ -612,8 +613,14 @@ export function MovieGenerator() {
           )}
           {job.jobId !== "starting" && (
             <p className="text-xs mono text-[var(--color-mute)] mt-3">
-              You can stay here or come back later — we&rsquo;ll keep the result
-              for 30 days at /m/{job.jobId.slice(0, 8)}…
+              You can leave this page and come back — we&rsquo;ll keep the result
+              for 30 days at{" "}
+              <a
+                href={`/m/${job.jobId}`}
+                className="text-[var(--color-gold)] underline underline-offset-2 hover:opacity-80 break-all"
+              >
+                chappieworks.com/m/{job.jobId.slice(0, 8)}
+              </a>
             </p>
           )}
         </div>
