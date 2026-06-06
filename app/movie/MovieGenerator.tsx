@@ -88,6 +88,7 @@ export function MovieGenerator() {
   const [prompt, setPrompt] = useState("");
   const [email, setEmail] = useState("");
   const [duration, setDuration] = useState<Duration>(5);
+  const [tier, setTier] = useState<"standard" | "raw">("standard");
   const [image, setImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [video, setVideo] = useState<File | null>(null);
@@ -301,6 +302,7 @@ export function MovieGenerator() {
       formData.append("prompt", prompt);
       formData.append("email", email);
       formData.append("duration", String(effectiveDuration));
+      formData.append("tier", tier);
       if (image) formData.append("image", image);
       if (inputVideoUrl) formData.append("inputVideoUrl", inputVideoUrl);
 
@@ -526,6 +528,49 @@ export function MovieGenerator() {
             {mode === "video" && (
               <p className="text-[10px] mono text-[var(--color-mute)] mt-1.5">
                 Extensions are always 10s — the cadence is the director&rsquo;s lever.
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-xs mono text-[var(--color-gold)] uppercase tracking-widest mb-2">
+              Engine
+            </label>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => setTier("standard")}
+                className={`px-4 py-3 rounded-md border text-sm transition ${
+                  tier === "standard"
+                    ? "border-[var(--color-gold)] bg-[var(--color-gold)]/10 text-[var(--color-gold)]"
+                    : "border-white/15 text-[var(--color-paper)]/80 hover:border-white/30"
+                }`}
+              >
+                <div className="font-medium">Standard</div>
+                <div className="text-[10px] mono text-[var(--color-mute)] mt-0.5">
+                  Kling · best quality, 1080p
+                </div>
+              </button>
+              <button
+                type="button"
+                onClick={() => setTier("raw")}
+                className={`px-4 py-3 rounded-md border text-sm transition ${
+                  tier === "raw"
+                    ? "border-[var(--color-rust)] bg-[var(--color-rust)]/10 text-[var(--color-rust)]"
+                    : "border-white/15 text-[var(--color-paper)]/80 hover:border-white/30"
+                }`}
+              >
+                <div className="font-medium">Raw</div>
+                <div className="text-[10px] mono text-[var(--color-mute)] mt-0.5">
+                  Wan · fewer content filters
+                </div>
+              </button>
+            </div>
+            {tier === "raw" && (
+              <p className="text-[10px] mono text-[var(--color-mute)] mt-1.5 leading-relaxed">
+                Raw uses an open model with far fewer restrictions (e.g. cinematic
+                violence). Illegal content is still blocked. Quality varies more
+                than Standard.
               </p>
             )}
           </div>

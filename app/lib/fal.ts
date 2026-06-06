@@ -9,6 +9,13 @@ export const KLING_TEXT_TO_VIDEO =
 export const KLING_IMAGE_TO_VIDEO =
   "fal-ai/kling-video/v2.1/master/image-to-video";
 
+// "Raw" tier — Wan 2.2 (open model, far fewer content restrictions than the
+// hosted commercial models). Slugs overridable via env if we swap models.
+export const WAN_TEXT_TO_VIDEO =
+  process.env.FAL_RAW_TEXT_MODEL ?? "fal-ai/wan/v2.2-a14b/text-to-video";
+export const WAN_IMAGE_TO_VIDEO =
+  process.env.FAL_RAW_IMAGE_MODEL ?? "fal-ai/wan/v2.2-a14b/image-to-video";
+
 function falKey(): string {
   const key = process.env.FAL_KEY;
   if (!key) throw new Error("FAL_KEY not set");
