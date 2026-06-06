@@ -79,9 +79,11 @@ export default function MoviePage() {
                 you buy.
               </li>
               <li>
-                Forge spins up a Seedance 2.0 render on Replicate — text and
-                image inputs into one model, native audio, 1080p HD. Takes
-                roughly 60–120 seconds. The page polls while it runs.
+                Forge spins up a Sora 2 render — text and image inputs into one
+                model, native audio. It usually takes a couple of minutes, and
+                can run longer when the model&rsquo;s queue is busy. The page
+                polls while it runs — leave and come back anytime; we hold your
+                result for 30 days.
               </li>
               <li>
                 When it&rsquo;s done, the watermarked preview plays inline.
