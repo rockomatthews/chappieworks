@@ -8,6 +8,11 @@ import {
   WAN_IMAGE_TO_VIDEO,
 } from "../../../lib/fal";
 import { screenForAdult } from "../../../lib/moderation";
+import {
+  atlasSubmit,
+  ATLAS_TEXT_TO_VIDEO,
+  ATLAS_IMAGE_TO_VIDEO,
+} from "../../../lib/atlas";
 import ffmpegPath from "ffmpeg-static";
 import ffmpeg from "fluent-ffmpeg";
 import { mkdtemp, rm, readFile, writeFile } from "fs/promises";
@@ -249,6 +254,59 @@ export async function POST(req: Request) {
 
   try {
     const seconds = duration >= 7 ? "10" : "5";
+
+    // Raw tier → Atlas Cloud (uncensored backend; cinematic violence renders).
+    // Requires ATLAS_API_KEY. Without it, we fall through to fal's Wan below,
+    // which moderates — so violence may be blocked. Adult prompts were already
+    // screened out above, so anything reaching Atlas is non-sexual.
+    if (tier === "raw" && process.env.ATLAS_API_KEY) {
+      try {
+        const atlasModel = startImageUrl
+          ? ATLAS_IMAGE_TO_VIDEO
+          : ATLAS_TEXT_TO_VIDEO;
+        const atlasInput: Record<string, unknown> = {
+          prompt,
+          aspect_ratio: "16:9",
+          duration: duration >= 7 ? 10 : 5,
+        };
+        if (startImageUrl) atlasInput.image_url = startImageUrl;
+
+        const { taskId } = await atlasSubmit(atlasModel, atlasInput);
+        const state: MovieState = {
+          jobId,
+          prompt,
+          email,
+          createdAt: new Date().toISOString(),
+          atlasTaskId: taskId,
+          status: "generating",
+          paid: false,
+          durationSec: Number(seconds),
+          mode,
+          startImageUrl,
+          inputVideoUrl,
+        };
+        await writeState(state);
+        console.log(
+          "[chappieworks:movie] created job",
+          jobId,
+          "atlas",
+          taskId,
+          "model",
+          atlasModel,
+          "mode",
+          mode,
+        );
+        return NextResponse.json({ jobId });
+      } catch (err) {
+        // Atlas key invalid / outage → fall back to fal's Wan so Raw still
+        // renders (moderated). Auto-upgrades to uncensored once the key works.
+        console.error(
+          "[chappieworks:movie] atlas submit failed, falling back to fal Wan",
+          jobId,
+          err instanceof Error ? err.message : err,
+        );
+      }
+    }
 
     let model: string;
     const input: Record<string, unknown> = { prompt, aspect_ratio: "16:9" };

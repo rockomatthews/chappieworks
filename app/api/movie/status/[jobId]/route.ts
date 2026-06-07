@@ -15,6 +15,7 @@ import {
   type MovieState,
 } from "../../../../lib/movies";
 import { falStatus, falVideoResult, type FalStatus } from "../../../../lib/fal";
+import { atlasPoll } from "../../../../lib/atlas";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
@@ -151,6 +152,76 @@ async function pollFal(state: MovieState): Promise<NextResponse> {
   } catch (err) {
     console.error(
       "[chappieworks:movie] fal download failed",
+      state.jobId,
+      err instanceof Error ? err.message : err,
+    );
+    const failed: MovieState = {
+      ...state,
+      status: "failed",
+      failureReason: "couldn't download generated video",
+    };
+    await writeState(failed);
+    return NextResponse.json(publicView(failed));
+  }
+  return await finalizeReady(state, cleanBuffer);
+}
+
+async function pollAtlas(state: MovieState): Promise<NextResponse> {
+  if (!state.atlasTaskId) {
+    return NextResponse.json(publicView(state));
+  }
+
+  let result: Awaited<ReturnType<typeof atlasPoll>>;
+  try {
+    result = await atlasPoll(state.atlasTaskId);
+  } catch (err) {
+    console.error(
+      "[chappieworks:movie] atlas poll failed",
+      state.jobId,
+      err instanceof Error ? err.message : err,
+    );
+    return NextResponse.json(publicView(state));
+  }
+
+  if (result.status === "pending") {
+    const ageMs = Date.now() - new Date(state.createdAt).getTime();
+    if (ageMs > 15 * 60 * 1000) {
+      const failed: MovieState = {
+        ...state,
+        status: "failed",
+        failureReason:
+          "The render took too long and timed out. No charge — please try again.",
+      };
+      await writeState(failed);
+      return NextResponse.json(publicView(failed));
+    }
+    if (state.status !== "generating") {
+      await writeState({ ...state, status: "generating" });
+    }
+    return NextResponse.json({ ...publicView(state), status: "generating" });
+  }
+
+  if (result.status === "failed" || !result.videoUrl) {
+    const friendly =
+      result.error ?? "the render failed — no charge, please try again";
+    console.error("[chappieworks:movie] atlas job failed", state.jobId, friendly);
+    const failed: MovieState = {
+      ...state,
+      status: "failed",
+      failureReason: friendly,
+    };
+    await writeState(failed);
+    return NextResponse.json(publicView(failed));
+  }
+
+  // completed
+  await writeState({ ...state, status: "watermarking" });
+  let cleanBuffer: Buffer;
+  try {
+    cleanBuffer = await downloadToBuffer(result.videoUrl);
+  } catch (err) {
+    console.error(
+      "[chappieworks:movie] atlas download failed",
       state.jobId,
       err instanceof Error ? err.message : err,
     );
@@ -325,6 +396,20 @@ export async function GET(
 
   if (state.status === "ready" || state.status === "failed") {
     return NextResponse.json(publicView(state));
+  }
+
+  // Raw tier — Atlas Cloud (uncensored backend)
+  if (state.atlasTaskId) {
+    try {
+      return await pollAtlas(state);
+    } catch (err) {
+      console.error(
+        "[chappieworks:movie] atlas poll threw",
+        jobId,
+        err instanceof Error ? err.message : err,
+      );
+      return NextResponse.json(publicView(state));
+    }
   }
 
   // Kling (fal.ai) path — current
