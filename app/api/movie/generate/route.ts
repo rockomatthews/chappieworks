@@ -7,6 +7,7 @@ import {
   WAN_TEXT_TO_VIDEO,
   WAN_IMAGE_TO_VIDEO,
 } from "../../../lib/fal";
+import { screenForAdult } from "../../../lib/moderation";
 import ffmpegPath from "ffmpeg-static";
 import ffmpeg from "fluent-ffmpeg";
 import { mkdtemp, rm, readFile, writeFile } from "fs/promises";
@@ -234,6 +235,15 @@ export async function POST(req: Request) {
         },
         { status: 502 },
       );
+    }
+  }
+
+  // Raw tier runs on an unmoderated backend — block adult prompts ourselves
+  // (violence is fine). Keeps NSFW out and Stripe/brand safe.
+  if (tier === "raw") {
+    const screen = await screenForAdult(prompt, startImageUrl);
+    if (screen.blocked) {
+      return NextResponse.json({ error: screen.reason }, { status: 400 });
     }
   }
 
