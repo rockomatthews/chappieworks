@@ -156,3 +156,46 @@ export async function getUserTweets(
   );
   return data?.data ?? [];
 }
+
+export type MentionTweet = XTweet & {
+  authorId: string;
+  authorUsername?: string;
+  isRetweet: boolean;
+};
+
+// Recent tweets mentioning a user, newest first, with the author's handle
+// resolved (via expansions) so callers can dedupe per-person and skip self/RTs.
+export async function getMentions(
+  userId: string,
+  opts: { sinceId?: string; maxResults?: number } = {}
+): Promise<MentionTweet[]> {
+  const query: Record<string, string> = {
+    max_results: String(opts.maxResults ?? 20),
+    "tweet.fields": "created_at,author_id,referenced_tweets",
+    expansions: "author_id",
+    "user.fields": "username",
+  };
+  if (opts.sinceId) query.since_id = opts.sinceId;
+  const data = await xGet<{
+    data?: Array<{
+      id: string;
+      text: string;
+      created_at?: string;
+      author_id?: string;
+      referenced_tweets?: Array<{ type: string; id: string }>;
+    }>;
+    includes?: { users?: Array<{ id: string; username: string }> };
+  }>(`https://api.twitter.com/2/users/${userId}/mentions`, query);
+
+  const handleById = new Map(
+    (data.includes?.users ?? []).map((u) => [u.id, u.username])
+  );
+  return (data.data ?? []).map((t) => ({
+    id: t.id,
+    text: t.text,
+    created_at: t.created_at,
+    authorId: t.author_id ?? "",
+    authorUsername: t.author_id ? handleById.get(t.author_id) : undefined,
+    isRetweet: (t.referenced_tweets ?? []).some((r) => r.type === "retweeted"),
+  }));
+}
