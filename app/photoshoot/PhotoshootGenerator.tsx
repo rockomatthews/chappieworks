@@ -13,6 +13,7 @@ type Status = {
   images: Img[];
   failureReason?: string;
   paletteHex?: string[];
+  fontPairing?: { heading: string; body: string; rationale?: string };
   paid?: boolean;
   packageStatus?: "idle" | "generating" | "ready" | "failed";
   packageImages?: Img[];
@@ -293,7 +294,7 @@ export function PhotoshootGenerator() {
               <h3 className="text-xl font-semibold mb-2">Love them? Get the Full Brand Identity Package — $49</h3>
               <p className="text-sm text-[var(--color-paper)]/85 mb-4">Built from your same assets, cohesive and ready to ship:</p>
               <ul className="grid sm:grid-cols-2 gap-x-6 gap-y-1.5 text-sm text-[var(--color-paper)]/90 mb-5">
-                {["Logo treatment on-brand", "Color palette board", "Social avatar + banner", "Ad creative", "Seamless brand pattern", "All 2K PNG, commercial rights"].map((x) => (
+                {["Brand identity document — colors, fonts, voice", "Logo treatment on-brand", "Color palette board", "Social avatar + banner", "Ad creative + brand pattern", "All commercial rights, yours"].map((x) => (
                   <li key={x} className="flex gap-2"><span className="text-[var(--color-gold)]">▸</span>{x}</li>
                 ))}
               </ul>
@@ -326,8 +327,18 @@ export function PhotoshootGenerator() {
                   ))}
                 </div>
               )}
+              {(st?.fontPairing || (st?.packageImages?.length ?? 0) > 0) && jobId && (
+                <a
+                  href={`/photoshoot/brand/${jobId}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 rounded-md bg-[var(--color-gold)] text-black font-semibold px-6 py-3 text-sm hover:opacity-90"
+                >
+                  📄 Open your Brand Identity Document →
+                </a>
+              )}
               {pkg === "ready" && (
-                <p className="text-sm text-[var(--color-gold)]">✓ Package complete — download each above.</p>
+                <p className="text-sm text-[var(--color-gold)]">✓ Package complete — download each image above, and your brand document is linked.</p>
               )}
             </div>
           )}

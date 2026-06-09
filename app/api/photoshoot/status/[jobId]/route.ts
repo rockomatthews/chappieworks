@@ -20,6 +20,7 @@ export async function GET(
     failureReason: state.failureReason,
     brand_name: state.brand_name,
     paletteHex: state.paletteHex,
+    fontPairing: state.fontPairing,
     paid: state.paid ?? false,
     packageStatus: state.packageStatus ?? "idle",
     packageImages: state.packageImages ?? [],
