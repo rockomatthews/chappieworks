@@ -7,6 +7,11 @@ import {
   generatePackAndEmail,
   readPackState,
 } from "../../../lib/photoshootPack";
+import {
+  readState as readShootState,
+  writeState as writeShootState,
+} from "../../../lib/photoshoots";
+import { runPackage } from "../../../lib/photoshootRun";
 
 export const runtime = "nodejs";
 // Allow post-response `after()` work (HD upscale + email) room to finish.
@@ -94,6 +99,45 @@ export async function POST(req: Request) {
         { received: true, error: message },
         { status: 500 },
       );
+    }
+  }
+
+  // New /photoshoot Full Brand Identity Package flow.
+  if (kind === "photoshoot-package") {
+    const shootId = session.metadata?.jobId;
+    if (!shootId) {
+      return NextResponse.json({ received: true, note: "no jobId metadata" });
+    }
+    try {
+      const state = await readShootState(shootId);
+      if (!state) {
+        return NextResponse.json({ received: true, note: "shoot state missing" });
+      }
+      if (state.packageStatus === "ready" || state.packageStatus === "generating") {
+        return NextResponse.json({ received: true, note: "already processing" });
+      }
+      await writeShootState({
+        ...state,
+        paid: true,
+        paidAt: new Date().toISOString(),
+        stripeSessionId: session.id,
+        packageStatus: "generating",
+      });
+      after(() =>
+        runPackage(shootId).catch((err) =>
+          console.error(
+            "[chappieworks:photoshoot] webhook package threw",
+            shootId,
+            err instanceof Error ? err.message : err,
+          ),
+        ),
+      );
+      console.log("[chappieworks:stripe-webhook] brand package paid, queued", shootId);
+      return NextResponse.json({ received: true, ok: true, jobId: shootId });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "unknown";
+      console.error("[chappieworks:stripe-webhook] package handler failed", message);
+      return NextResponse.json({ received: true, error: message }, { status: 500 });
     }
   }
 

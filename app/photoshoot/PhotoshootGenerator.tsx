@@ -1,514 +1,348 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  StripeCheckoutModal,
+  canEmbedCheckout,
+} from "../components/StripeCheckoutModal";
 
-type PhotoshootImage = {
-  mode: string;
-  modeLabel: string;
-  size: string;
-  url: string;
-};
-
-type JobStatus = {
+type Img = { mode: string; modeLabel: string; size: string; url: string };
+type Status = {
   jobId: string;
   status: "pending" | "generating" | "ready" | "failed";
-  images: PhotoshootImage[];
+  images: Img[];
   failureReason?: string;
-  brand_name?: string;
+  paletteHex?: string[];
+  paid?: boolean;
+  packageStatus?: "idle" | "generating" | "ready" | "failed";
+  packageImages?: Img[];
+  packageFailureReason?: string;
 };
 
-const INDUSTRIES = [
-  "DTC product / e-commerce",
-  "SaaS / software",
-  "Restaurant / food / beverage",
-  "Fashion / apparel",
-  "Health / wellness / fitness",
-  "Beauty / skincare",
-  "Agency / professional services",
-  "Crypto / fintech",
-  "Real estate",
-  "Other",
-];
-
-const VIBES = [
-  "Modern minimal — clean, white space, refined",
-  "Bold + maximal — saturated, playful, energetic",
-  "Luxe / premium — moody, deep tones, cinematic",
-  "Earthy / organic — natural, grounded, warm",
-  "Tech / editorial — futuristic, sharp, monochrome",
-  "Retro / nostalgic — film grain, faded, throwback",
-  "Surreal / conceptual — dreamlike, abstract",
-];
-
-const POLL_INTERVAL_MS = 4000;
-const MAX_POLL_MS = 6 * 60 * 1000;
-
-const STATUS_COPY: Record<JobStatus["status"], string> = {
-  pending: "Queued — the studio is opening your brief…",
-  generating:
-    "Scribe is writing prompts. Forge is rendering through gpt-image-1. 60–180 seconds.",
-  ready: "Your 3 brand visuals are ready below.",
-  failed: "The render failed. Try a different brief.",
-};
+function ImageCard({ img }: { img: Img }) {
+  const ratio =
+    img.size === "1536x1024"
+      ? "aspect-[3/2]"
+      : img.size === "1024x1536"
+        ? "aspect-[2/3]"
+        : "aspect-square";
+  return (
+    <figure className="card rounded-xl overflow-hidden">
+      <div className={`relative ${ratio} bg-black/30`}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={img.url}
+          alt={img.modeLabel}
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+      </div>
+      <figcaption className="flex items-center justify-between px-3 py-2 text-xs">
+        <span className="text-[var(--color-paper)]/85">{img.modeLabel}</span>
+        <a
+          href={img.url}
+          download
+          target="_blank"
+          rel="noreferrer"
+          className="mono text-[var(--color-gold)] hover:underline"
+        >
+          Download ↓
+        </a>
+      </figcaption>
+    </figure>
+  );
+}
 
 export function PhotoshootGenerator() {
   const [brandName, setBrandName] = useState("");
-  const [brandDescription, setBrandDescription] = useState("");
+  const [desc, setDesc] = useState("");
   const [industry, setIndustry] = useState("");
   const [vibe, setVibe] = useState("");
-  const [colorPalette, setColorPalette] = useState("");
-  const [referenceUrl, setReferenceUrl] = useState("");
+  const [colors, setColors] = useState("");
+  const [email, setEmail] = useState("");
+  const [logo, setLogo] = useState<File | null>(null);
+  const [photos, setPhotos] = useState<File[]>([]);
 
+  const [jobId, setJobId] = useState<string | null>(null);
+  const [st, setSt] = useState<Status | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [pollError, setPollError] = useState<string | null>(null);
-  const [job, setJob] = useState<JobStatus | null>(null);
 
-  const pollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const pollStartRef = useRef<number>(0);
-  const errorRef = useRef<HTMLParagraphElement>(null);
-  const renderPanelRef = useRef<HTMLDivElement>(null);
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [buying, setBuying] = useState(false);
+  const pollRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const stopPolling = useCallback(() => {
-    if (pollTimerRef.current) {
-      clearTimeout(pollTimerRef.current);
-      pollTimerRef.current = null;
+  // Resume a paid job after Stripe's return_url redirect (?job=…&paid=1).
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const j = params.get("job");
+    if (j && params.get("paid") === "1") setJobId(j);
+  }, []);
+
+  const poll = useCallback(async (id: string) => {
+    try {
+      const res = await fetch(`/api/photoshoot/status/${id}`, {
+        cache: "no-store",
+      });
+      if (res.ok) {
+        const data = (await res.json()) as Status;
+        setSt(data);
+        const stillWorking =
+          data.status === "pending" ||
+          data.status === "generating" ||
+          data.packageStatus === "generating";
+        if (stillWorking) {
+          pollRef.current = setTimeout(() => poll(id), 2500);
+        }
+      } else {
+        pollRef.current = setTimeout(() => poll(id), 3000);
+      }
+    } catch {
+      pollRef.current = setTimeout(() => poll(id), 3500);
     }
   }, []);
 
-  const pollOnce = useCallback(
-    async (jobId: string) => {
-      try {
-        const res = await fetch(`/api/photoshoot/status/${jobId}`, {
-          cache: "no-store",
-        });
-        if (!res.ok) {
-          setPollError(`status check failed (${res.status})`);
-          throw new Error(`status ${res.status}`);
-        }
-        const data = (await res.json()) as JobStatus;
-        setJob(data);
-        setPollError(null);
-        if (data.status === "ready" || data.status === "failed") {
-          stopPolling();
-          return;
-        }
-        const elapsed = Date.now() - pollStartRef.current;
-        if (elapsed > MAX_POLL_MS) {
-          stopPolling();
-          setError(
-            "This is taking longer than expected. Reload in a minute to check again.",
-          );
-          return;
-        }
-        pollTimerRef.current = setTimeout(
-          () => void pollOnce(jobId),
-          POLL_INTERVAL_MS,
-        );
-      } catch {
-        pollTimerRef.current = setTimeout(
-          () => void pollOnce(jobId),
-          POLL_INTERVAL_MS * 2,
-        );
-      }
-    },
-    [stopPolling],
-  );
+  useEffect(() => {
+    if (!jobId) return;
+    poll(jobId);
+    return () => {
+      if (pollRef.current) clearTimeout(pollRef.current);
+    };
+  }, [jobId, poll]);
 
-  useEffect(() => () => stopPolling(), [stopPolling]);
-
-  async function submit(e: React.FormEvent<HTMLFormElement>) {
+  async function submit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
-
-    if (!brandName.trim() || !brandDescription.trim()) {
-      setError("Brand name and description are required.");
+    if (!brandName.trim() || !desc.trim()) {
+      setError("Brand name and a short description are required.");
       return;
     }
-
     setSubmitting(true);
-    stopPolling();
-    setJob({ jobId: "starting", status: "pending", images: [] });
-    requestAnimationFrame(() => {
-      renderPanelRef.current?.scrollIntoView({
-        behavior: "smooth",
-        block: "center",
-      });
-    });
-
     try {
+      const fd = new FormData();
+      fd.set("brand_name", brandName);
+      fd.set("brand_description", desc);
+      fd.set("industry", industry);
+      fd.set("vibe", vibe);
+      fd.set("color_palette", colors);
+      fd.set("email", email);
+      if (logo) fd.set("logo", logo);
+      for (const p of photos) fd.append("photos", p);
       const res = await fetch("/api/photoshoot/generate", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          brand_name: brandName.trim(),
-          brand_description: brandDescription.trim(),
-          industry: industry.trim() || undefined,
-          vibe: vibe.trim() || undefined,
-          color_palette: colorPalette.trim() || undefined,
-          reference_url: referenceUrl.trim() || undefined,
-        }),
+        body: fd,
       });
       const data = (await res.json()) as { jobId?: string; error?: string };
-      if (!res.ok || !data.jobId) {
-        throw new Error(data.error ?? `request failed (${res.status})`);
-      }
-      const jobId = data.jobId;
-      setJob({ jobId, status: "pending", images: [] });
-      pollStartRef.current = Date.now();
-      pollTimerRef.current = setTimeout(
-        () => void pollOnce(jobId),
-        POLL_INTERVAL_MS,
-      );
+      if (!res.ok || !data.jobId) throw new Error(data.error ?? "generation failed");
+      setJobId(data.jobId);
+      setSt({ jobId: data.jobId, status: "pending", images: [] });
     } catch (err) {
-      setJob(null);
-      setError(err instanceof Error ? err.message : "Couldn't start render");
-      requestAnimationFrame(() => {
-        errorRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
-      });
+      setError(err instanceof Error ? err.message : "something went wrong");
     } finally {
       setSubmitting(false);
     }
   }
 
-  const showForm = !job || job.status === "failed";
-  const isRendering =
-    job && (job.status === "pending" || job.status === "generating");
+  async function unlock() {
+    if (!jobId) return;
+    setError(null);
+    setBuying(true);
+    try {
+      const embedded = canEmbedCheckout();
+      const res = await fetch(`/api/photoshoot/checkout/${jobId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ embedded, email }),
+      });
+      const data = (await res.json()) as {
+        clientSecret?: string;
+        url?: string;
+        bypassed?: boolean;
+        error?: string;
+      };
+      if (!res.ok) throw new Error(data.error ?? "checkout failed");
+      if (data.bypassed) {
+        poll(jobId);
+        return;
+      }
+      if (data.clientSecret) {
+        setClientSecret(data.clientSecret);
+      } else if (data.url) {
+        window.location.href = data.url; // redirect fallback
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "checkout failed");
+    } finally {
+      setBuying(false);
+    }
+  }
+
+  const inputCls =
+    "w-full rounded-md bg-black/30 border border-white/12 px-3 py-2.5 text-sm focus:border-[var(--color-gold)] outline-none";
+
+  // 1) Initial form
+  if (!jobId) {
+    return (
+      <form onSubmit={submit} className="card rounded-xl p-6 sm:p-8 space-y-5">
+        <div className="grid sm:grid-cols-2 gap-4">
+          <label className="block space-y-1.5">
+            <span className="text-xs mono text-[var(--color-mute)]">Brand name *</span>
+            <input className={inputCls} value={brandName} onChange={(e) => setBrandName(e.target.value)} placeholder="Acme Roastery" />
+          </label>
+          <label className="block space-y-1.5">
+            <span className="text-xs mono text-[var(--color-mute)]">Industry</span>
+            <input className={inputCls} value={industry} onChange={(e) => setIndustry(e.target.value)} placeholder="Specialty coffee" />
+          </label>
+        </div>
+        <label className="block space-y-1.5">
+          <span className="text-xs mono text-[var(--color-mute)]">What you do (2–4 sentences) *</span>
+          <textarea className={`${inputCls} min-h-[90px]`} value={desc} onChange={(e) => setDesc(e.target.value)} placeholder="Small-batch coffee roaster. Warm, earthy, craft-forward. We sell direct and to indie cafés." />
+        </label>
+        <div className="grid sm:grid-cols-2 gap-4">
+          <label className="block space-y-1.5">
+            <span className="text-xs mono text-[var(--color-mute)]">Aesthetic / vibe</span>
+            <input className={inputCls} value={vibe} onChange={(e) => setVibe(e.target.value)} placeholder="Warm, rustic, premium" />
+          </label>
+          <label className="block space-y-1.5">
+            <span className="text-xs mono text-[var(--color-mute)]">Colors (optional)</span>
+            <input className={inputCls} value={colors} onChange={(e) => setColors(e.target.value)} placeholder="terracotta, cream, espresso" />
+          </label>
+        </div>
+
+        <div className="rounded-lg border border-dashed border-white/15 p-4 space-y-3">
+          <p className="text-xs mono text-[var(--color-gold)] uppercase tracking-widest">
+            Upload your brand assets — this is what makes it yours
+          </p>
+          <div className="grid sm:grid-cols-2 gap-4">
+            <label className="block space-y-1.5">
+              <span className="text-xs text-[var(--color-paper)]/80">Logo (PNG/JPG/WebP)</span>
+              <input type="file" accept="image/png,image/jpeg,image/webp" className="block w-full text-xs text-[var(--color-mute)] file:mr-3 file:rounded file:border-0 file:bg-[var(--color-gold)] file:px-3 file:py-1.5 file:text-black file:text-xs" onChange={(e) => setLogo(e.target.files?.[0] ?? null)} />
+              {logo && <span className="text-[11px] text-[var(--color-mute)]">{logo.name}</span>}
+            </label>
+            <label className="block space-y-1.5">
+              <span className="text-xs text-[var(--color-paper)]/80">Existing photos (up to 5)</span>
+              <input type="file" accept="image/png,image/jpeg,image/webp" multiple className="block w-full text-xs text-[var(--color-mute)] file:mr-3 file:rounded file:border-0 file:bg-white/10 file:px-3 file:py-1.5 file:text-white file:text-xs" onChange={(e) => setPhotos(Array.from(e.target.files ?? []).slice(0, 5))} />
+              {photos.length > 0 && <span className="text-[11px] text-[var(--color-mute)]">{photos.length} photo(s)</span>}
+            </label>
+          </div>
+          <p className="text-[11px] text-[var(--color-mute)]">
+            We read your real colors + style off these and use them as references — so the visuals look like <em>your</em> brand, not generic AI. Optional, but the output is dramatically better with them.
+          </p>
+        </div>
+
+        <label className="block space-y-1.5">
+          <span className="text-xs mono text-[var(--color-mute)]">Email (for your package + receipt)</span>
+          <input type="email" className={inputCls} value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@brand.com" />
+        </label>
+
+        {error && <p className="text-sm text-red-400">{error}</p>}
+        <button type="submit" disabled={submitting} className="w-full rounded-md bg-[var(--color-gold)] text-black font-semibold py-3 text-sm hover:opacity-90 disabled:opacity-60">
+          {submitting ? "Starting…" : "Generate 3 free brand visuals →"}
+        </button>
+        <p className="text-[11px] text-center text-[var(--color-mute)]">Free · no card · renders right here in minutes</p>
+      </form>
+    );
+  }
+
+  // 2) Working / results
+  const previewReady = st?.status === "ready";
+  const previewFailed = st?.status === "failed";
+  const pkg = st?.packageStatus;
 
   return (
-    <div className="space-y-6">
-      {showForm && (
-        <form onSubmit={submit} className="card rounded-xl p-6 sm:p-8 space-y-5">
-          <div>
-            <label
-              htmlFor="ps-brand"
-              className="block text-xs mono text-[var(--color-gold)] uppercase tracking-widest mb-2"
-            >
-              Brand or company name *
-            </label>
-            <input
-              id="ps-brand"
-              value={brandName}
-              onChange={(e) => setBrandName(e.target.value)}
-              placeholder="Acme Coffee Roasters"
-              required
-              className="w-full bg-[var(--color-ink)] border border-white/15 rounded-md px-3 py-2 text-base sm:text-sm text-[var(--color-paper)] placeholder:text-[var(--color-mute)] focus:outline-none focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/50"
-              style={{ fontSize: "16px" }}
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="ps-description"
-              className="block text-xs mono text-[var(--color-gold)] uppercase tracking-widest mb-2"
-            >
-              What does your brand do? (2–4 sentences) *
-            </label>
-            <textarea
-              id="ps-description"
-              value={brandDescription}
-              onChange={(e) => setBrandDescription(e.target.value)}
-              placeholder="We roast small-batch single-origin coffee in Brooklyn. Direct trade, focused on Ethiopian and Colombian beans. Our customers are weekend brewers who care about origin stories."
-              rows={4}
-              required
-              className="w-full bg-[var(--color-ink)] border border-white/15 rounded-md px-3 py-2 text-base sm:text-sm text-[var(--color-paper)] placeholder:text-[var(--color-mute)] focus:outline-none focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/50"
-              style={{ fontSize: "16px" }}
-            />
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label
-                htmlFor="ps-industry"
-                className="block text-xs mono text-[var(--color-gold)] uppercase tracking-widest mb-2"
-              >
-                Industry
-              </label>
-              <select
-                id="ps-industry"
-                value={industry}
-                onChange={(e) => setIndustry(e.target.value)}
-                className="w-full bg-[var(--color-ink)] border border-white/15 rounded-md px-3 py-2 text-base sm:text-sm text-[var(--color-paper)] focus:outline-none focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/50"
-                style={{ fontSize: "16px" }}
-              >
-                <option value="">Choose one…</option>
-                {INDUSTRIES.map((i) => (
-                  <option key={i} value={i}>
-                    {i}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label
-                htmlFor="ps-vibe"
-                className="block text-xs mono text-[var(--color-gold)] uppercase tracking-widest mb-2"
-              >
-                Aesthetic / vibe
-              </label>
-              <select
-                id="ps-vibe"
-                value={vibe}
-                onChange={(e) => setVibe(e.target.value)}
-                className="w-full bg-[var(--color-ink)] border border-white/15 rounded-md px-3 py-2 text-base sm:text-sm text-[var(--color-paper)] focus:outline-none focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/50"
-                style={{ fontSize: "16px" }}
-              >
-                <option value="">Choose one…</option>
-                {VIBES.map((v) => (
-                  <option key={v} value={v}>
-                    {v}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label
-                htmlFor="ps-color"
-                className="block text-xs mono text-[var(--color-gold)] uppercase tracking-widest mb-2"
-              >
-                Color preferences (optional)
-              </label>
-              <input
-                id="ps-color"
-                value={colorPalette}
-                onChange={(e) => setColorPalette(e.target.value)}
-                placeholder="deep green + cream + brass"
-                className="w-full bg-[var(--color-ink)] border border-white/15 rounded-md px-3 py-2 text-base sm:text-sm text-[var(--color-paper)] placeholder:text-[var(--color-mute)] focus:outline-none focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/50"
-                style={{ fontSize: "16px" }}
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="ps-ref"
-                className="block text-xs mono text-[var(--color-gold)] uppercase tracking-widest mb-2"
-              >
-                Reference URL (optional)
-              </label>
-              <input
-                id="ps-ref"
-                value={referenceUrl}
-                onChange={(e) => setReferenceUrl(e.target.value)}
-                placeholder="https://..."
-                className="w-full bg-[var(--color-ink)] border border-white/15 rounded-md px-3 py-2 text-base sm:text-sm text-[var(--color-paper)] placeholder:text-[var(--color-mute)] focus:outline-none focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/50"
-                style={{ fontSize: "16px" }}
-              />
-            </div>
-          </div>
-
-          {error && (
-            <p
-              ref={errorRef}
-              role="alert"
-              className="text-sm text-[var(--color-rust)] bg-[var(--color-rust)]/10 border border-[var(--color-rust)]/40 rounded-md px-3 py-2 scroll-mt-24"
-            >
-              {error}
-            </p>
-          )}
-
-          <button
-            type="submit"
-            disabled={submitting}
-            className="w-full px-6 py-3 rounded-md bg-[var(--color-gold)] text-[var(--color-ink)] font-medium hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {submitting ? "Starting…" : "Generate my free 3-image preview →"}
-          </button>
-
-          <p className="text-xs mono text-[var(--color-mute)] text-center">
-            Renders right here on the page. No card. $49 unlocks the full
-            10-image pack (emailed).
-          </p>
-        </form>
-      )}
-
-      {isRendering && job && (
-        <div
-          ref={renderPanelRef}
-          className="card rounded-xl p-6 sm:p-8 ring-2 ring-[var(--color-gold)] scroll-mt-24"
-        >
-          <div className="flex items-center gap-3 mb-3">
-            <span className="inline-block w-2 h-2 rounded-full bg-[var(--color-gold)] animate-pulse" />
-            <p className="text-xs mono text-[var(--color-gold)] uppercase tracking-widest">
-              {job.jobId === "starting"
-                ? "Starting render…"
-                : `Rendering · job ${job.jobId.slice(0, 8)}`}
-            </p>
-          </div>
-          <p className="text-base text-[var(--color-paper)] leading-relaxed">
-            {STATUS_COPY[job.status]}
-          </p>
-          {job.images.length > 0 && (
-            <p className="text-xs mono text-[var(--color-mute)] mt-3">
-              {job.images.length} of 3 ready · streaming in as they finish.
-            </p>
-          )}
-          {job.images.length > 0 && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-5">
-              {job.images.map((img) => (
-                <PreviewImage key={img.mode} img={img} />
+    <div className="space-y-8">
+      <section className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="text-lg font-semibold">Your 3 free brand visuals</h3>
+          {st?.paletteHex && st.paletteHex.length > 0 && (
+            <div className="flex gap-1.5" title="Palette read from your assets">
+              {st.paletteHex.slice(0, 6).map((h) => (
+                <span key={h} className="w-5 h-5 rounded-full border border-white/20" style={{ background: h }} />
               ))}
             </div>
           )}
-          {pollError && (
-            <p className="text-xs mono text-[var(--color-rust)] mt-3 bg-[var(--color-rust)]/10 rounded px-2 py-1">
-              Status check: {pollError}
-            </p>
-          )}
         </div>
-      )}
 
-      {job && job.status === "ready" && (
-        <div className="space-y-5">
-          <div className="card rounded-xl p-4 sm:p-5 ring-2 ring-[var(--color-gold)]">
-            <p className="text-xs mono text-[var(--color-gold)] uppercase tracking-widest mb-3">
-              Your 3-image brand preview · ready
+        {!previewReady && !previewFailed && (
+          <div className="card rounded-xl p-8 text-center">
+            <div className="inline-block w-8 h-8 border-2 border-[var(--color-gold)] border-t-transparent rounded-full animate-spin" />
+            <p className="text-sm text-[var(--color-mute)] mt-4">
+              Reading your brand DNA and rendering 3 on-brand visuals… typically under 3 minutes.
             </p>
-            <div className="grid grid-cols-1 gap-4">
-              {job.images.map((img) => (
-                <PreviewImage key={img.mode} img={img} />
-              ))}
+            <p className="text-xs mono text-[var(--color-mute)] mt-1">{st?.images?.length ?? 0}/3 done</p>
+          </div>
+        )}
+        {previewFailed && (
+          <div className="card rounded-xl p-6 text-sm text-red-400">
+            {st?.failureReason ?? "Generation failed."} — refresh and try again, no charge.
+          </div>
+        )}
+
+        {(st?.images?.length ?? 0) > 0 && (
+          <div className="grid sm:grid-cols-3 gap-4">
+            {st!.images.map((img) => (
+              <ImageCard key={img.mode} img={img} />
+            ))}
+          </div>
+        )}
+      </section>
+
+      {previewReady && (
+        <section className="space-y-4">
+          {!st?.paid ? (
+            <div className="card rounded-xl p-6 sm:p-8 border-[var(--color-gold)]/40">
+              <h3 className="text-xl font-semibold mb-2">Love them? Get the Full Brand Identity Package — $49</h3>
+              <p className="text-sm text-[var(--color-paper)]/85 mb-4">Built from your same assets, cohesive and ready to ship:</p>
+              <ul className="grid sm:grid-cols-2 gap-x-6 gap-y-1.5 text-sm text-[var(--color-paper)]/90 mb-5">
+                {["Logo treatment on-brand", "Color palette board", "Social avatar + banner", "Ad creative", "Seamless brand pattern", "All 2K PNG, commercial rights"].map((x) => (
+                  <li key={x} className="flex gap-2"><span className="text-[var(--color-gold)]">▸</span>{x}</li>
+                ))}
+              </ul>
+              {error && <p className="text-sm text-red-400 mb-3">{error}</p>}
+              <button onClick={unlock} disabled={buying} className="w-full sm:w-auto rounded-md bg-[var(--color-gold)] text-black font-semibold px-8 py-3 text-sm hover:opacity-90 disabled:opacity-60">
+                {buying ? "Opening checkout…" : "Unlock the full package — $49"}
+              </button>
+              <p className="text-[11px] text-[var(--color-mute)] mt-2">Secure checkout right here on the page. No redirect.</p>
             </div>
-          </div>
-
-          <div
-            className="card rounded-xl p-6 sm:p-8"
-            style={{
-              background:
-                "linear-gradient(135deg, rgba(201,164,55,0.1), rgba(201,164,55,0.02))",
-              border: "1px solid rgba(201,164,55,0.4)",
-            }}
-          >
-            <p className="text-xs mono text-[var(--color-gold)] uppercase tracking-widest mb-2">
-              Like what you see? Unlock the full pack.
-            </p>
-            <h3 className="text-xl font-semibold mb-2">
-              Brand Aesthetic Pack — $49
-            </h3>
-            <p className="text-sm text-[var(--color-paper)]/85 mb-5 leading-relaxed">
-              10 polished visuals across all 7 modes — hero banner, social cards
-              (3 variations), moodboard, Meta + TikTok ad creative, brand
-              pattern, vertical poster. All 2K PNG, emailed in minutes.
-            </p>
-            <a
-              href="#pack"
-              className="inline-block px-6 py-3 rounded-md bg-[var(--color-gold)] text-[var(--color-ink)] font-medium hover:opacity-90 transition"
-            >
-              Buy the full pack →
-            </a>
-          </div>
-
-          <button
-            onClick={() => {
-              setJob(null);
-              setError(null);
-              setPollError(null);
-              stopPolling();
-            }}
-            className="w-full text-sm text-[var(--color-paper)]/70 hover:text-[var(--color-gold)] underline underline-offset-4 transition"
-          >
-            ← Try another brief
-          </button>
-        </div>
+          ) : (
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">Your Full Brand Identity Package</h3>
+              {pkg === "generating" && (
+                <div className="card rounded-xl p-8 text-center">
+                  <div className="inline-block w-8 h-8 border-2 border-[var(--color-gold)] border-t-transparent rounded-full animate-spin" />
+                  <p className="text-sm text-[var(--color-mute)] mt-4">
+                    Payment received — generating your package ({st?.packageImages?.length ?? 0}/6). Hang tight, a couple minutes.
+                  </p>
+                </div>
+              )}
+              {pkg === "failed" && (
+                <div className="card rounded-xl p-6 text-sm text-red-400">
+                  {st?.packageFailureReason ?? "Package generation hit a snag."} — we&rsquo;ll retry; email us if it doesn&rsquo;t land.
+                </div>
+              )}
+              {(st?.packageImages?.length ?? 0) > 0 && (
+                <div className="grid sm:grid-cols-3 gap-4">
+                  {st!.packageImages!.map((img) => (
+                    <ImageCard key={img.mode} img={img} />
+                  ))}
+                </div>
+              )}
+              {pkg === "ready" && (
+                <p className="text-sm text-[var(--color-gold)]">✓ Package complete — download each above.</p>
+              )}
+            </div>
+          )}
+        </section>
       )}
 
-      {job && job.status === "failed" && (
-        <div className="card rounded-xl p-6 ring-1 ring-[var(--color-rust)]/40">
-          <p className="text-xs mono text-[var(--color-rust)] uppercase tracking-widest mb-2">
-            Render failed
-          </p>
-          <p className="text-sm text-[var(--color-paper)]/85">
-            {job.failureReason ??
-              "Something went sideways. Try a slightly different brief."}
-          </p>
-          <button
-            onClick={() => {
-              setJob(null);
-              setError(null);
-              setPollError(null);
-              stopPolling();
-            }}
-            className="mt-4 text-sm text-[var(--color-paper)]/70 hover:text-[var(--color-gold)] underline underline-offset-4 transition"
-          >
-            ← Try another brief
-          </button>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function PreviewWatermark() {
-  return (
-    <svg
-      className="absolute inset-0 pointer-events-none z-10"
-      viewBox="0 0 1200 1200"
-      preserveAspectRatio="xMidYMid slice"
-      style={{ width: "100%", height: "100%" }}
-      aria-hidden="true"
-    >
-      <text
-        x="600"
-        y="600"
-        fontSize="110"
-        fontWeight="bold"
-        fill="rgba(255,255,255,0.32)"
-        textAnchor="middle"
-        dominantBaseline="middle"
-        fontFamily="sans-serif"
-        transform="rotate(-22 600 600)"
-      >
-        CHAPPIE WORKS PREVIEW
-      </text>
-      <text
-        x="600"
-        y="1140"
-        fontSize="36"
-        fill="rgba(255,255,255,0.55)"
-        textAnchor="middle"
-        dominantBaseline="middle"
-        fontFamily="monospace"
-      >
-        chappieworks.com/photoshoot · $49 unlocks the clean pack
-      </text>
-    </svg>
-  );
-}
-
-function PreviewImage({ img }: { img: PhotoshootImage }) {
-  return (
-    <div className="rounded-md overflow-hidden border border-white/10 bg-black/30">
-      <div
-        className="relative block bg-black"
-        onContextMenu={(e) => e.preventDefault()}
-      >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={img.url}
-          alt={`${img.modeLabel} brand visual — watermarked preview`}
-          className="block w-full h-auto select-none"
-          loading="lazy"
-          draggable={false}
+      {clientSecret && (
+        <StripeCheckoutModal
+          clientSecret={clientSecret}
+          onClose={() => {
+            setClientSecret(null);
+            if (jobId) poll(jobId);
+          }}
         />
-        <PreviewWatermark />
-      </div>
-      <div className="px-3 py-2 flex flex-wrap items-baseline justify-between gap-2">
-        <span className="text-[10px] mono uppercase tracking-widest text-[var(--color-gold)]">
-          {img.modeLabel}
-        </span>
-        <span className="text-[10px] mono text-[var(--color-mute)]">
-          {img.size} · watermarked
-        </span>
-      </div>
-      <div className="px-3 pb-3">
-        <a
-          href="#pack"
-          className="text-[10px] mono uppercase tracking-widest text-[var(--color-gold)] hover:underline underline-offset-2"
-        >
-          Buy clean pack to remove watermark →
-        </a>
-      </div>
+      )}
     </div>
   );
 }

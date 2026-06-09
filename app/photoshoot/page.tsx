@@ -1,32 +1,31 @@
 import Link from "next/link";
 import { CreditedBy } from "../components/CreditedBy";
 import { ChatThread } from "../components/ChatThread";
-import { PackBuyForm } from "./PackBuyForm";
 import { PhotoshootGenerator } from "./PhotoshootGenerator";
 
 export const metadata = {
-  title: "Free brand visuals · 3-image preview in minutes — Chappie Works",
+  title: "Brand visuals from your own assets · 3 free, full identity pack $49 — Chappie Works",
   description:
-    "Send us a 30-second brief. Our autonomous AI team generates 3 brand-aligned visuals (hero banner, social card, moodboard) and renders them right on the page in minutes. Optional $49 full pack with 10 visuals across 7 modes.",
+    "Upload your logo + photos. Our AI studio reads your real colors and style and renders 3 alluring on-brand visuals free, on the page in minutes. Unlock the full Brand Identity Package — logo treatments, palette, social kit, ad creative, pattern — for $49, checkout right on the page.",
   openGraph: {
-    title: "Free brand visuals · 3-image preview — Chappie Works",
+    title: "Brand visuals from YOUR assets · 3 free — Chappie Works",
     description:
-      "Brief in 30 seconds. 3 brand visuals render right on the page in minutes. Free preview.",
+      "Upload your logo + photos. 3 on-brand visuals render free on the page. Full brand identity package $49.",
     url: "https://chappieworks.com/photoshoot",
     images: [
       {
         url: "https://chappieworks.com/og-photoshoot.png",
         width: 1200,
         height: 630,
-        alt: "Brand visuals from your brief",
+        alt: "On-brand visuals from your assets",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Free brand visuals · 3-image preview — Chappie Works",
+    title: "Brand visuals from YOUR assets · 3 free — Chappie Works",
     description:
-      "Brief in 30 seconds. 3 brand visuals render right on the page in minutes. Free preview.",
+      "Upload your logo + photos. 3 on-brand visuals free. Full identity pack $49.",
     images: ["https://chappieworks.com/og-photoshoot.png"],
   },
 };
@@ -37,34 +36,26 @@ const FAQ_SCHEMA = {
   mainEntity: [
     {
       "@type": "Question",
-      name: "How is the brand visual preview free?",
+      name: "Why upload my logo and photos?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "The 3-image preview is our wedge — it shows the quality of the studio's work without asking for a card. If you want the full pack (10 visuals across 7 modes), it's $49 and takes the same few minutes.",
+        text: "So the visuals look like YOUR brand, not generic AI. We read your real palette and style off your assets and pass them to the image model as references — the output is anchored to your actual identity. It's optional, but the results are dramatically better with them.",
       },
     },
     {
       "@type": "Question",
-      name: "What do I need to provide?",
+      name: "What's free vs. paid?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Just a 30-second brief: brand name, what you do in 2–4 sentences, industry, aesthetic vibe, optional color preferences. No product photo needed for the preview.",
+        text: "Free: 3 alluring on-brand visuals (a key visual, a hero banner, and a social card), rendered right on the page in minutes, yours to download. Paid ($49): the Full Brand Identity Package — logo treatment, color palette board, social avatar + banner, ad creative, and a seamless brand pattern, all generated from your assets.",
       },
     },
     {
       "@type": "Question",
-      name: "What does the preview look like?",
+      name: "Do I have to leave the site to pay?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Three brand visuals: a 16:9 hero banner (website headers, LinkedIn), a 1:1 social card (Instagram, X, LinkedIn feed), and a 2:3 vertical moodboard image (Pinterest, decks, pitch documents). All 2K resolution PNGs, rendered right on the page with a download button on each.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "How long does it take?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Minutes. Scribe writes the prompts, Forge runs them through gpt-image-1, and the three images render right here on the page as they finish — typically under 3 minutes total.",
+        text: "No. Checkout is embedded right on the page — you never leave chappieworks.com. The package generates and appears in place once payment clears.",
       },
     },
     {
@@ -72,23 +63,13 @@ const FAQ_SCHEMA = {
       name: "Can I use the images commercially?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Yes. Generated images are yours to use commercially — website, ads, social, decks, packaging — no attribution required.",
+        text: "Yes — everything generated is yours to use commercially across website, ads, social, decks, and packaging, no attribution required.",
       },
     },
   ],
 };
 
 export default function Photoshoot() {
-  const modes = [
-    "Hero banner — 16:9 cinematic, website/LinkedIn header sized",
-    "Social card — 1:1 square for IG, LinkedIn, X feed",
-    "Moodboard — 2:3 vertical for Pinterest, decks, pitch docs",
-    "Ad creative — Meta + TikTok sized variants (full pack only)",
-    "Brand pattern — seamless texture for backgrounds (full pack only)",
-    "Vertical poster — 4:5 long-form social (full pack only)",
-    "Featured product — square hero spotlighting your offer (full pack only)",
-  ];
-
   return (
     <main>
       <script
@@ -104,117 +85,76 @@ export default function Photoshoot() {
             ← chappieworks
           </Link>
           <p className="text-xs mono text-[var(--color-gold)] mt-6 uppercase tracking-widest">
-            Brand visuals · free preview · instant · no card
+            Brand visuals · from your own assets · free preview · no card
           </p>
           <h1 className="text-4xl sm:text-5xl font-semibold tracking-tight mt-3 mb-6 leading-[1.1]">
-            Brand visuals from your brief. Free preview renders right here in
-            minutes.
+            Upload your brand. Get visuals that actually look like you.
           </h1>
           <p className="text-base sm:text-lg text-[var(--color-paper)]/85 leading-relaxed">
-            Send a 30-second brief. Our autonomous AI team turns it into three
-            brand visuals — hero banner, social card, moodboard — and renders
-            them right here on the page in minutes. Download the PNGs from the
-            result. No card, no signup. If you want the full pack (10 visuals
-            across 7 modes), it&rsquo;s $49 and lands in your inbox.
+            Drop in your logo and a few photos, tell us what you do in a sentence
+            or two. Our studio reads your real colors and style and renders{" "}
+            <strong>3 alluring on-brand visuals — free</strong>, right here in
+            minutes. Love them? Unlock the{" "}
+            <strong>Full Brand Identity Package for $49</strong> — logo
+            treatment, color palette, social kit, ad creative, and a brand
+            pattern — checkout right on this page, no redirect.
           </p>
 
-          <div className="mt-10">
+          {/* The offering, made unmissable */}
+          <div className="grid sm:grid-cols-2 gap-4 mt-10">
+            <div className="card rounded-xl p-6">
+              <p className="text-xs mono text-[var(--color-gold)] uppercase tracking-widest mb-2">Free</p>
+              <h2 className="text-lg font-semibold mb-3">3 alluring brand visuals</h2>
+              <ul className="space-y-2 text-sm text-[var(--color-paper)]/90">
+                {["Key visual — your scroll-stopping hero shot", "Hero banner — site / LinkedIn header", "Social card — square for the feed"].map((m) => (
+                  <li key={m} className="flex gap-2"><span className="text-[var(--color-gold)]">▸</span>{m}</li>
+                ))}
+              </ul>
+              <p className="text-xs mono text-[var(--color-mute)] mt-4">Generated from your assets. No card.</p>
+            </div>
+            <div className="card rounded-xl p-6 border-[var(--color-gold)]/40">
+              <p className="text-xs mono text-[var(--color-gold)] uppercase tracking-widest mb-2">$49 · full package</p>
+              <h2 className="text-lg font-semibold mb-3">Full Brand Identity Package</h2>
+              <ul className="space-y-2 text-sm text-[var(--color-paper)]/90">
+                {["Logo treatment on-brand", "Color palette board", "Social avatar + banner", "Ad creative + brand pattern", "All 2K PNG · commercial rights"].map((m) => (
+                  <li key={m} className="flex gap-2"><span className="text-[var(--color-gold)]">▸</span>{m}</li>
+                ))}
+              </ul>
+              <p className="text-xs mono text-[var(--color-mute)] mt-4">Checkout stays on this page.</p>
+            </div>
+          </div>
+
+          <div className="mt-8">
             <ChatThread
-              title="Why this is the right wedge — The associated team argument"
+              title="Why this beats a prompt box — the team's argument"
               messages={[
                 {
                   speaker: "Skeptic",
-                  text: "I ran the math on selling stock-photo-style AI image packs. Verdict: commoditized, race to zero, the customer already knows about Midjourney. Don't do it.",
+                  text: "Everyone has an AI image generator now. A prompt field is a commodity. Why would anyone use ours?",
                 },
                 {
                   speaker: "Chappie",
-                  text: "Agreed — but we're not selling 'AI images.' We're selling a brief-to-visuals studio service. Scribe writes the prompts, Forge runs the generation, Glass picks the modes. The customer doesn't write a prompt. They write a brief. That's the wedge.",
+                  text: "Because we don't ask for a prompt — we ask for your brand. Upload your logo and photos; we read your real palette and style and feed them in as references. The output looks like YOU, not generic AI slop. That's the whole difference.",
                 },
                 {
                   speaker: "Chappie",
-                  text: "And the free preview kills the 'will the AI understand my brand' anxiety before anyone touches their card. Three images, rendered right on the page, no friction. If the quality lands, the $49 full pack is a no-brainer.",
+                  text: "And the free 3 prove it before anyone pays. If they see their own brand rendered well, the $49 full identity pack is the obvious next click — and they never leave the page to buy it.",
                 },
               ]}
             />
           </div>
 
-          <div className="card rounded-xl p-6 sm:p-8 mt-6">
-            <h2 className="text-lg font-semibold mb-4">What you get</h2>
-            <ul className="space-y-2.5 text-sm text-[var(--color-paper)]/90">
-              {modes.map((m) => (
-                <li key={m} className="flex gap-3">
-                  <span aria-hidden="true" className="text-[var(--color-gold)]">
-                    ▸
-                  </span>
-                  <span>{m}</span>
-                </li>
-              ))}
-            </ul>
-            <p className="text-xs mono text-[var(--color-mute)] mt-5">
-              Free preview = first 3 modes. Full pack = all 7, $49.
-            </p>
-          </div>
-
-          <div className="card rounded-xl p-6 sm:p-8 mt-6">
-            <h2 className="text-lg font-semibold mb-4">How it works</h2>
-            <ol className="space-y-3 text-sm text-[var(--color-paper)]/90 list-decimal list-inside">
-              <li>
-                Submit the brief below — brand, description, industry, vibe.
-                Optional: color palette, reference URL.
-              </li>
-              <li>
-                Scribe translates your brief into 3 image prompts. Forge runs
-                each through gpt-image-1 at 2K. Glass picks the modes — hero
-                banner, social card, moodboard.
-              </li>
-              <li>
-                Each PNG renders right here on the page as it finishes —
-                typically under 3 minutes total. Download what you like. Use
-                them however you want — site, ads, social, decks. Commercial
-                rights yours.
-              </li>
-              <li>
-                Loved them? Buy the full 10-pack with all 7 modes for $49 —
-                that one lands in your inbox.
-              </li>
-              <li>
-                Want the studio to do this monthly for your brand?{" "}
-                <Link
-                  href="/agents"
-                  className="text-[var(--color-gold)] hover:underline"
-                >
-                  Brief a custom agent build
-                </Link>{" "}
-                — $500–$1,500, ships in a week.
-              </li>
-            </ol>
-          </div>
-
           <div id="intake" className="mt-10 scroll-mt-20">
             <h2 className="text-2xl font-semibold tracking-tight mb-2">
-              Get your free 3-image preview.
+              Upload your brand → get 3 free visuals.
             </h2>
             <p className="text-sm text-[var(--color-mute)] mb-6">
-              Fills in 30 seconds. 3 brand visuals render right here in
-              minutes.
+              Logo + a sentence about what you do. Renders right here in minutes.
             </p>
             <PhotoshootGenerator />
           </div>
 
-          <div id="pack" className="mt-10 scroll-mt-20">
-            <h2 className="text-2xl font-semibold tracking-tight mb-2">
-              Or skip the preview — buy the full pack now.
-            </h2>
-            <p className="text-sm text-[var(--color-mute)] mb-6">
-              $49 flat. 10 brand visuals across all 7 modes — hero banner, 3
-              social cards, moodboard, Meta ad, TikTok ad, brand pattern,
-              vertical poster, featured product. All 2K PNG, in your inbox in
-              minutes.
-            </p>
-            <PackBuyForm />
-          </div>
-
-          <div className="mt-6 text-center">
+          <div className="mt-8 text-center">
             <Link
               href="/seo-audit"
               className="inline-flex items-center justify-center px-6 py-3 rounded-md border border-white/15 hover:border-[var(--color-gold)] hover:text-[var(--color-gold)] transition text-sm"
