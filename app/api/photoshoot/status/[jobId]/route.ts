@@ -19,5 +19,10 @@ export async function GET(
     images: state.images,
     failureReason: state.failureReason,
     brand_name: state.brand_name,
+    paletteHex: state.paletteHex,
+    paid: state.paid ?? false,
+    packageStatus: state.packageStatus ?? "idle",
+    packageImages: state.packageImages ?? [],
+    packageFailureReason: state.packageFailureReason,
   });
 }
