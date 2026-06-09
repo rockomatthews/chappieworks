@@ -1,5 +1,17 @@
 import Anthropic from "@anthropic-ai/sdk";
-import OpenAI, { toFile } from "openai";
+
+// Image backend: Google Nano Banana (Gemini 2.5 Flash Image) via fal.ai. Excels
+// at brand-consistent compositing from reference images — the customer's real
+// logo/photos are passed as image_urls so output is anchored to their identity.
+// Model slugs overridable via env (e.g. swap to nano-banana-pro or back to gpt-image-1).
+const FAL_IMAGE_EDIT = process.env.FAL_IMAGE_EDIT_MODEL ?? "fal-ai/nano-banana/edit";
+const FAL_IMAGE_T2I = process.env.FAL_IMAGE_T2I_MODEL ?? "fal-ai/nano-banana";
+
+function aspectFor(size: ImageSize): "3:2" | "1:1" | "2:3" {
+  if (size === "1536x1024") return "3:2";
+  if (size === "1024x1536") return "2:3";
+  return "1:1";
+}
 
 export type PhotoshootBrief = {
   name?: string;
@@ -208,47 +220,42 @@ export async function craftImagePrompts(
   return craftPrompts(s, FREE_MODES);
 }
 
-// Generate one image. When reference assets are supplied, use gpt-image-1's edit
-// endpoint with the brand's real logo/photos as references → on-brand output.
+// Generate one image via Nano Banana on fal. When reference assets are supplied,
+// the edit model composites from the brand's real logo/photos (passed as URLs);
+// otherwise the text-to-image model is used. Returns base64 PNG (the pipeline
+// stores it via uploadImage), so the rest of the flow is unchanged.
 export async function generateImage(
   prompt: string,
   size: ImageSize,
   referenceUrls?: string[],
 ): Promise<string> {
-  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
+  const key = process.env.FAL_KEY;
+  if (!key) throw new Error("FAL_KEY not set");
 
-  if (referenceUrls && referenceUrls.length) {
-    const files = await Promise.all(
-      referenceUrls.slice(0, 4).map(async (url, i) => {
-        const res = await fetch(url);
-        if (!res.ok) throw new Error(`reference fetch ${res.status}`);
-        const buf = Buffer.from(await res.arrayBuffer());
-        const type = res.headers.get("content-type") ?? "image/png";
-        const ext = type.includes("png") ? "png" : type.includes("webp") ? "webp" : "jpg";
-        return toFile(buf, `ref-${i}.${ext}`, { type });
-      }),
-    );
-    const result = await openai.images.edit({
-      model: "gpt-image-1",
-      image: files,
-      prompt,
-      size,
-      quality: "medium",
-      n: 1,
-    });
-    const b64 = result.data?.[0]?.b64_json;
-    if (!b64) throw new Error("openai edit returned no image data");
-    return b64;
-  }
-
-  const result = await openai.images.generate({
-    model: "gpt-image-1",
+  const useEdit = Boolean(referenceUrls && referenceUrls.length);
+  const model = useEdit ? FAL_IMAGE_EDIT : FAL_IMAGE_T2I;
+  const input: Record<string, unknown> = {
     prompt,
-    size,
-    quality: "medium",
-    n: 1,
+    aspect_ratio: aspectFor(size),
+    num_images: 1,
+    output_format: "png",
+  };
+  if (useEdit) input.image_urls = referenceUrls!.slice(0, 4);
+
+  // Synchronous fal endpoint — Nano Banana resolves in seconds, no polling.
+  const res = await fetch(`https://fal.run/${model}`, {
+    method: "POST",
+    headers: { Authorization: `Key ${key}`, "Content-Type": "application/json" },
+    body: JSON.stringify(input),
   });
-  const b64 = result.data?.[0]?.b64_json;
-  if (!b64) throw new Error("openai returned no image data");
-  return b64;
+  if (!res.ok) {
+    throw new Error(`nano-banana ${res.status}: ${(await res.text()).slice(0, 300)}`);
+  }
+  const d = (await res.json()) as { images?: Array<{ url?: string }> };
+  const url = d.images?.[0]?.url;
+  if (!url) throw new Error("nano-banana returned no image url");
+
+  const imgRes = await fetch(url);
+  if (!imgRes.ok) throw new Error(`nano-banana image fetch ${imgRes.status}`);
+  return Buffer.from(await imgRes.arrayBuffer()).toString("base64");
 }

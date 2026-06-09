@@ -16,7 +16,7 @@ const MAX_ASSETS = 5;
 const ALLOWED = new Set(["image/png", "image/jpeg", "image/jpg", "image/webp"]);
 
 export async function POST(req: Request) {
-  if (!process.env.OPENAI_API_KEY || !process.env.ANTHROPIC_API_KEY) {
+  if (!process.env.FAL_KEY || !process.env.ANTHROPIC_API_KEY) {
     return NextResponse.json(
       { error: "generator offline — try again shortly" },
       { status: 503 },
