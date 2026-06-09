@@ -1,5 +1,6 @@
 import {
   extractBrandDna,
+  recommendBrandDoc,
   craftPrompts,
   generateImage,
   MODE_SPECS,
@@ -75,6 +76,14 @@ export async function runPackage(jobId: string): Promise<void> {
 
   try {
     const refs = refsOf(cur);
+
+    // Brand identity document data — typography pairing + voice notes.
+    if (!cur.fontPairing) {
+      const doc = await recommendBrandDoc(cur);
+      cur = { ...cur, fontPairing: doc.fontPairing, voiceNotes: doc.voiceNotes };
+      await writeState(cur);
+    }
+
     const prompts = await craftPrompts(cur, PACKAGE_MODES);
     const images: PhotoshootImage[] = [];
     for (const mode of PACKAGE_MODES) {

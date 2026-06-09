@@ -153,6 +153,61 @@ Return EXACTLY this JSON, no preamble:
   }
 }
 
+// Recommend a typography pairing (real Google Fonts so they load on the web) and
+// a short brand-voice note for the brand identity document.
+export async function recommendBrandDoc(s: PhotoshootBrief): Promise<{
+  fontPairing: { heading: string; body: string; rationale: string };
+  voiceNotes: string;
+}> {
+  const fallback = {
+    fontPairing: { heading: "Poppins", body: "Inter", rationale: "" },
+    voiceNotes: "",
+  };
+  try {
+    const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! });
+    const msg = await anthropic.messages.create({
+      model: "claude-opus-4-8",
+      max_tokens: 500,
+      messages: [
+        {
+          role: "user",
+          content: `You are Glass + Scribe on Chappie Studio. For this brand, recommend a typography pairing and a brand-voice note for its identity guidelines.
+
+Brand: ${s.brand_name ?? "—"}
+Description: ${s.brand_description ?? "—"}
+Industry: ${s.industry ?? "—"}
+Vibe: ${s.vibe ?? "—"}
+Style read from their assets: ${s.styleNotes ?? "—"}
+
+Rules:
+- Fonts MUST be real, well-known GOOGLE FONTS (so they render on the web), e.g. Playfair Display, Inter, Poppins, Lora, Montserrat, Work Sans, DM Serif Display, Space Grotesk, Fraunces, Libre Franklin.
+- Heading + body should contrast tastefully and fit the brand.
+
+Return EXACTLY this JSON, no preamble:
+{"fontPairing":{"heading":"<Google Font>","body":"<Google Font>","rationale":"one sentence on why it fits"},"voiceNotes":"2-3 sentences describing the brand's voice/tone for whoever writes its copy"}`,
+        },
+      ],
+    });
+    const block = msg.content[0];
+    const raw = block?.type === "text" ? block.text : "";
+    const parsed = JSON.parse(raw.slice(raw.indexOf("{"), raw.lastIndexOf("}") + 1)) as {
+      fontPairing?: { heading?: string; body?: string; rationale?: string };
+      voiceNotes?: string;
+    };
+    return {
+      fontPairing: {
+        heading: parsed.fontPairing?.heading?.trim() || "Poppins",
+        body: parsed.fontPairing?.body?.trim() || "Inter",
+        rationale: parsed.fontPairing?.rationale?.trim() || "",
+      },
+      voiceNotes: parsed.voiceNotes?.trim() || "",
+    };
+  } catch (err) {
+    console.error("[chappieworks:photoshoot] brand-doc rec failed", err);
+    return fallback;
+  }
+}
+
 export async function craftPrompts(
   s: PhotoshootBrief,
   modes: ImageMode[],

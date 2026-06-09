@@ -116,7 +116,7 @@ export default function Photoshoot() {
               <p className="text-xs mono text-[var(--color-gold)] uppercase tracking-widest mb-2">$49 · full package</p>
               <h2 className="text-lg font-semibold mb-3">Full Brand Identity Package</h2>
               <ul className="space-y-2 text-sm text-[var(--color-paper)]/90">
-                {["Logo treatment on-brand", "Color palette board", "Social avatar + banner", "Ad creative + brand pattern", "All 2K PNG · commercial rights"].map((m) => (
+                {["Brand identity document — colors, fonts + voice", "Logo treatment + social avatar/banner", "Color palette board", "Ad creative + brand pattern", "All commercial rights · yours"].map((m) => (
                   <li key={m} className="flex gap-2"><span className="text-[var(--color-gold)]">▸</span>{m}</li>
                 ))}
               </ul>

@@ -26,6 +26,9 @@ export type PhotoshootState = {
   // Brand DNA read off the uploaded assets (Claude vision).
   paletteHex?: string[];
   styleNotes?: string;
+  // Brand identity document fields (paid package).
+  fontPairing?: { heading: string; body: string; rationale?: string };
+  voiceNotes?: string;
   // Free preview state.
   status: "pending" | "generating" | "ready" | "failed";
   images: PhotoshootImage[];
