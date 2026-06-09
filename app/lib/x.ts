@@ -90,16 +90,18 @@ async function xGet<T>(baseUrl: string, query: Record<string, string> = {}): Pro
   return res.json() as Promise<T>;
 }
 
-// Post a tweet, optionally as a reply to another tweet.
+// Post a tweet. Optionally as a reply (in_reply_to_tweet_id) or a quote tweet
+// (quote_tweet_id) — public commentary that stands on our own timeline.
 export async function postTweet(
   text: string,
-  inReplyToId?: string
+  opts?: { replyTo?: string; quoteTweetId?: string }
 ): Promise<{ id: string }> {
   requireCreds();
   const url = "https://api.twitter.com/2/tweets";
   const auth = oauth1Header("POST", url, {}); // JSON body excluded from signature
   const body: Record<string, unknown> = { text };
-  if (inReplyToId) body.reply = { in_reply_to_tweet_id: inReplyToId };
+  if (opts?.replyTo) body.reply = { in_reply_to_tweet_id: opts.replyTo };
+  if (opts?.quoteTweetId) body.quote_tweet_id = opts.quoteTweetId;
 
   const res = await fetch(url, {
     method: "POST",

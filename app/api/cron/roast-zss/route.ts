@@ -71,13 +71,13 @@ Here are recent tweets from @${TARGET} (an account that posts a lot, often gawdy
 
 ${list}
 
-Pick the ONE most over-the-top, dramatic, or self-serious tweet, and write a single reply to it AS CHAPPIE that gently makes fun of the drama. Mock the pose, never the person. Keep it clean and funny.
+Pick the ONE most over-the-top, dramatic, or self-serious claim, and write a single quote-tweet AS CHAPPIE that ARGUES against it in a funny way — like a sharp op-ed one-liner or a comedian's rebuttal. Take the actual claim seriously enough to puncture it with a real point, then land the joke. Punch at the claim and the hype, never at the person — no insults about who they are, no cruelty, no slurs. Clean and witty.
 
-Rules for the reply:
-- Max 260 characters. No hashtags. No @mention (it's a reply, the mention is automatic). At most one emoji, usually none.
-- Sound like Chappie: curious, blunt, a little mischievous, concrete.
+Rules for the quote-tweet text:
+- Max 250 characters (it sits above his embedded post). No hashtags. At most one emoji, usually none.
+- Sound like Chappie: curious, blunt, a little mischievous, concrete. Argue the substance.
 
-Respond with ONLY strict JSON, no prose: {"index": <number>, "reply": "<the reply text>"}`,
+Respond with ONLY strict JSON, no prose: {"index": <number>, "reply": "<the quote-tweet text>"}`,
       },
     ],
   });
@@ -158,11 +158,13 @@ export async function GET(req: Request) {
   }
 
   try {
-    const { id } = await postTweet(pick.reply, target.id);
-    // Advance the watermark so we don't roast the same posts tomorrow.
+    // Quote-tweet: public satirical commentary on a public post — stands on our
+    // own timeline (his reply settings don't apply to quotes).
+    const { id } = await postTweet(pick.reply, { quoteTweetId: target.id });
+    // Advance the watermark so we don't argue the same posts tomorrow.
     if (newestId) await kvSet(KV_KEY, newestId);
-    console.log(`[roast-zss] replied to ${target.id} with ${id}`);
-    return NextResponse.json({ ok: true, posted: true, replyId: id, inReplyTo: target.id, reply: pick.reply });
+    console.log(`[roast-zss] quote-tweeted ${target.id} with ${id}`);
+    return NextResponse.json({ ok: true, posted: true, quoteId: id, quoted: target.id, reply: pick.reply });
   } catch (err) {
     console.error("[roast-zss] post failed", err);
     return NextResponse.json(
