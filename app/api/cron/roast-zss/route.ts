@@ -157,14 +157,33 @@ export async function GET(req: Request) {
     return NextResponse.json({ ok: true, posted: false, reason: "no-x-creds", reply: pick.reply });
   }
 
+  const link = `https://x.com/${TARGET}/status/${target.id}`;
   try {
-    // Quote-tweet: public satirical commentary on a public post — stands on our
-    // own timeline (his reply settings don't apply to quotes).
-    const { id } = await postTweet(pick.reply, { quoteTweetId: target.id });
+    let id: string;
+    let mode: "quote" | "link";
+    try {
+      // First choice: a real quote-tweet — public satirical commentary that
+      // stands on our own timeline.
+      ({ id } = await postTweet(pick.reply, { quoteTweetId: target.id }));
+      mode = "quote";
+    } catch (qErr) {
+      // Some authors (e.g. @ZssBecker) restrict BOTH replies AND quotes to
+      // people in the thread — X 403s the quote. Fall back to a standalone
+      // commentary tweet that links his post in the text. Always allowed; it's
+      // just our own tweet. Clamp the take so the t.co link (23 chars) fits 280.
+      const m = qErr instanceof Error ? qErr.message : "";
+      if (/403|forbidden|not allowed|quoting this post/i.test(m)) {
+        const text = `${pick.reply.slice(0, 250).trimEnd()}\n\n${link}`;
+        ({ id } = await postTweet(text));
+        mode = "link";
+      } else {
+        throw qErr;
+      }
+    }
     // Advance the watermark so we don't argue the same posts tomorrow.
     if (newestId) await kvSet(KV_KEY, newestId);
-    console.log(`[roast-zss] quote-tweeted ${target.id} with ${id}`);
-    return NextResponse.json({ ok: true, posted: true, quoteId: id, quoted: target.id, reply: pick.reply });
+    console.log(`[roast-zss] posted (${mode}) re ${target.id} as ${id}`);
+    return NextResponse.json({ ok: true, posted: true, mode, id, ref: target.id, reply: pick.reply });
   } catch (err) {
     console.error("[roast-zss] post failed", err);
     return NextResponse.json(
