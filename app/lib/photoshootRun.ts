@@ -71,7 +71,15 @@ export async function runPackage(jobId: string): Promise<void> {
   const initial = await readState(jobId);
   if (!initial) return;
   if (initial.packageStatus === "ready") return;
-  let cur: PhotoshootState = { ...initial, packageStatus: "generating" };
+  // runPackage only runs after payment/bypass. Force paid:true here so a stale
+  // read (blob eventual consistency) can't clobber the paid flag the checkout
+  // just wrote — otherwise the brand-doc page would show the locked screen.
+  let cur: PhotoshootState = {
+    ...initial,
+    paid: true,
+    paidAt: initial.paidAt ?? new Date().toISOString(),
+    packageStatus: "generating",
+  };
   await writeState(cur);
 
   try {
