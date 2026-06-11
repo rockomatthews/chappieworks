@@ -264,7 +264,9 @@ export async function POST(req: Request) {
       // 4/6/8s only, so map our 5s→6s and 10s→8s (Veo's max).
       model = startImageUrl ? VEO_IMAGE_TO_VIDEO : VEO_TEXT_TO_VIDEO;
       input.duration = duration >= 7 ? "8s" : "6s";
-      input.resolution = "1080p";
+      // 720p preview (with audio) keeps the free-preview cost ~half; we upscale
+      // this exact clip to 1080p at purchase (see deliverMovieHd).
+      input.resolution = "720p";
       input.generate_audio = true;
       input.negative_prompt = "blur, distort, low quality";
     }
