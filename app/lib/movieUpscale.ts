@@ -117,10 +117,10 @@ export async function deliverMovieHd(
   if (!state || !state.cleanUrl) return;
   if (state.hdUrl) return; // already done
 
-  // Previews render at 720p (with audio) to keep free-preview cost down. Upscale
-  // that exact clip to 1080p at purchase — same video the buyer previewed, just
-  // sharper. ffmpeg copies the audio stream (-c:a copy), so dialogue survives.
-  const hdUrl = await produceHd(jobId, state.cleanUrl);
+  // Veo renders native 1080p with audio, so the clean clip IS the deliverable —
+  // no upscale needed (and no fragile serverless-ffmpeg dependency). produceHd
+  // remains available for sources that genuinely need it.
+  const hdUrl = state.cleanUrl;
 
   const fresh = (await readState(jobId)) ?? state;
   await writeState({ ...fresh, hdUrl, hdPending: false });

@@ -11,8 +11,12 @@ export const KLING_IMAGE_TO_VIDEO =
 
 // Standard tier — Veo 3.1 (Google) via fal. Native audio: dialogue + SFX +
 // ambient, with lip-sync. Durations are 4s/6s/8s only. Output shape matches
-// Kling ({video:{url}}). Slugs overridable to revert to Kling or try others.
-export const VEO_TEXT_TO_VIDEO = process.env.FAL_STD_TEXT_MODEL ?? "fal-ai/veo3.1";
+// Kling ({video:{url}}). Default to the FAST tier: $0.15/s with audio vs $0.40/s
+// on Standard (~62% cheaper), still native 1080p. Set FAL_STD_TEXT_MODEL to
+// "fal-ai/veo3.1" for max-quality Standard, or back to Kling, without a deploy.
+export const VEO_TEXT_TO_VIDEO =
+  process.env.FAL_STD_TEXT_MODEL ?? "fal-ai/veo3.1/fast";
+// No documented fast image-to-video variant, so i2v stays on Standard (rarer path).
 export const VEO_IMAGE_TO_VIDEO =
   process.env.FAL_STD_IMAGE_MODEL ?? "fal-ai/veo3.1/image-to-video";
 
