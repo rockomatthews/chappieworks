@@ -129,7 +129,7 @@ export async function createSite(input: {
         id: newMessageId(),
         at: now,
         from: "studio",
-        body: `Welcome${input.ownerName ? `, ${input.ownerName.split(" ")[0]}` : ""}. Your private edit thread is live. Type any change you want — new copy, swapped colors, a fresh page — and the studio will ship it within 24 hours. We'll post back here when it lands.`,
+        body: `Welcome${input.ownerName ? `, ${input.ownerName.split(" ")[0]}` : ""}. Your brief is in — this is your private build thread. Once the $99 launch is paid, Chappie starts building your full site and your first draft lands right here, usually within 48 hours. After the draft, your first 5 edit requests are free ($25 each after that). Hang tight — we'll post every update here.`,
       },
     ],
   };

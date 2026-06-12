@@ -9,13 +9,13 @@ import { isBypassEmail } from "../lib/movieEmail";
 
 export const metadata = {
   title:
-    "A website you can chat with. $99 to launch, $49/mo to keep it perfect — Chappie Works",
+    "A website you can chat with. $99 to launch, first 5 edits free — Chappie Works",
   description:
-    "An AI studio builds your site in 48 hours, then keeps editing it forever. Chat the changes — new pages, fresh copy, swapped colors — and they ship within 24 hours. $99 build + $49/mo unlimited edits. You own the code.",
+    "An AI studio builds your site in 48 hours, then edits it on request. Chat the changes — new pages, fresh copy, swapped colors — and they ship within 24 hours. $99 launch, first 5 edits free, then $25 each. No subscription. You own the code.",
   openGraph: {
     title: "Chappie Site — a website you can chat with",
     description:
-      "$99 launch + $49/mo. The studio builds it, then keeps editing it forever. Chat changes any time, edits ship within 24 hours.",
+      "$99 launch, first 5 edits free, then $25 each. The studio builds it and edits on request. You own the code.",
     url: "https://chappieworks.com/website",
   },
 };
@@ -95,10 +95,10 @@ const FAQ_SCHEMA = {
   mainEntity: [
     {
       "@type": "Question",
-      name: "What does $99 + $49/mo actually get me?",
+      name: "What does the $99 actually get me?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "$99 builds your site — a real production Next.js site, hosted on Vercel, on a domain we buy and transfer to you. Live within 48 hours. $49/mo keeps it perfect: unlimited edits by chat, hosting handled, security patches, SEO basics maintained. Cancel any time and keep the code.",
+        text: "$99 builds your site — a real production Next.js site, hosted on Vercel, on a domain we buy and transfer to you. First draft within 48 hours. After the draft, your first 5 edit requests are free; $25 per request after that. No subscription, no monthly fee — you pay only when you need a change. You own the code.",
       },
     },
     {
@@ -114,7 +114,7 @@ const FAQ_SCHEMA = {
       name: "What does 'I own the code' mean?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "The site lives in a GitHub repo we maintain. Cancel the subscription and we transfer the repo to your GitHub account — you keep every line of code and can host it yourself, hire someone else, or take it to any other platform. No lock-in.",
+        text: "The site lives in a GitHub repo we maintain. Ask any time and we transfer the repo to your GitHub account — you keep every line of code and can host it yourself, hire someone else, or take it to any other platform. No lock-in.",
       },
     },
     {
@@ -122,7 +122,7 @@ const FAQ_SCHEMA = {
       name: "Can it be an actual store with checkout?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Yes. The store version is a Next.js storefront with Stripe Checkout — products, cart, payment, order emails. You connect your own Stripe account and money lands directly in your bank. Same $99 + $49/mo, no transaction fees from us.",
+        text: "Yes. The store version is a Next.js storefront with Stripe Checkout — products, cart, payment, order emails. You connect your own Stripe account and money lands directly in your bank. Same $99 launch + $25/edit, no transaction fees from us.",
       },
     },
     {
@@ -197,20 +197,20 @@ export default async function WebsiteSku({
             ← chappieworks
           </Link>
           <p className="text-xs mono text-[var(--color-gold)] mt-6 uppercase tracking-widest">
-            Chappie Site · $99 launch · $49/mo unlimited edits · you own the
-            code
+            Chappie Site · $99 launch · 5 free edits, then $25 each · you own
+            the code
           </p>
           <h1 className="text-4xl sm:text-5xl font-semibold tracking-tight mt-3 mb-6 leading-[1.1]">
             A website you can chat with. Built in 48 hours. Edited in 24.
           </h1>
           <p className="text-base sm:text-lg text-[var(--color-paper)]/85 leading-relaxed">
-            Tell us what you do in four sentences. The studio builds a real
-            Next.js site — code, design, hosting, domain — and ships it in 48
-            hours. After launch you get a private chat dashboard. Type what
-            you want changed — &ldquo;swap the headline,&rdquo; &ldquo;add a
-            pricing page,&rdquo; &ldquo;make the hero green&rdquo; — and the
-            edit ships within a day. $99 to launch, $49/mo to keep it perfect.
-            Cancel any time and keep the code.
+            Tell us what you do in four sentences and pay the $99 launch.
+            Chappie starts building a real Next.js site — code, design, hosting,
+            domain — and your first draft lands in your private chat dashboard
+            within 48 hours. Want changes? Type them — &ldquo;swap the
+            headline,&rdquo; &ldquo;add a pricing page,&rdquo; &ldquo;make the
+            hero green&rdquo; — and they ship within a day. Your first 5 edit
+            requests are free; $25 each after that. You own the code.
           </p>
 
           {justPaid ? (
@@ -222,10 +222,9 @@ export default async function WebsiteSku({
                 Got it. Now tell the studio what to build.
               </h2>
               <p className="text-sm text-[var(--color-paper)]/85 leading-relaxed mb-4">
-                $99 launch fee is paid, $49/mo subscription is set up. To kick
-                off the build we need your two-minute brief — scroll down or
-                jump straight to it. Your site goes live within 48 hours of
-                this form submission.
+                $99 launch is paid. To kick off the build we need your
+                two-minute brief — scroll down or jump straight to it. Your
+                first draft lands within 48 hours of this form submission.
               </p>
               <a
                 href="#intake"
@@ -250,7 +249,7 @@ export default async function WebsiteSku({
               messages={[
                 {
                   speaker: "Skeptic",
-                  text: "Web design is the most commoditized agency service on earth. Squarespace exists. Wix exists. Why would anyone pay you $49/mo when they can DIY for $16?",
+                  text: "Web design is the most commoditized agency service on earth. Squarespace exists. Wix exists. Why would anyone pay you $99 and $25 an edit when they can DIY for $16?",
                 },
                 {
                   speaker: "Chappie",
@@ -285,7 +284,7 @@ export default async function WebsiteSku({
 
           <div className="card rounded-xl p-6 sm:p-8 mt-6">
             <h2 className="text-lg font-semibold mb-4">
-              What $49/mo gets you — unlimited edits
+              Edits after launch — 5 free, then $25 each
             </h2>
             <ul className="space-y-2.5 text-sm text-[var(--color-paper)]/90">
               {editsIncluded.map((m) => (
@@ -298,10 +297,10 @@ export default async function WebsiteSku({
               ))}
             </ul>
             <p className="text-xs mono text-[var(--color-mute)] mt-5">
-              Fair-use unlimited. We&rsquo;ll never count edits against you. If
-              you ask for a full redesign every month we&rsquo;ll have a
-              conversation, but typical clients send 2–8 edits a month and
-              we&rsquo;re fine.
+              Your first 5 edit requests after the first draft are free. After
+              that it&rsquo;s $25 per request — pay only when you actually need a
+              change, no monthly fee. Hosting + security patches handled either
+              way.
             </p>
           </div>
 
@@ -313,13 +312,13 @@ export default async function WebsiteSku({
                 what to build.
               </li>
               <li>
-                We email you a Stripe link for the $99 launch fee. Pay it and
-                the studio starts.
+                Pay the $99 launch right here on the page (or from the link we
+                email you). The moment it clears, Chappie starts building.
               </li>
               <li>
-                Within 48 hours your site is live on your domain. You get the
-                URL and a link to your private edit-chat dashboard at
-                chappieworks.com.
+                Your private chat dashboard opens immediately and Chappie posts
+                build updates there. Your first draft lands within 48 hours, on
+                your domain.
               </li>
               <li>
                 Need a change? Open the dashboard and chat with Chappie. Type
@@ -330,8 +329,9 @@ export default async function WebsiteSku({
                 and the studio ships it within 24 hours.
               </li>
               <li>
-                $49/mo starts after launch. Cancel any time — we transfer the
-                GitHub repo to you and you keep every line of code.
+                Your first 5 edits are free; $25 each after that — no
+                subscription. The code lives in a GitHub repo we hand to you any
+                time, and you own every line.
               </li>
             </ol>
           </div>
@@ -342,8 +342,8 @@ export default async function WebsiteSku({
             </h2>
             <p className="text-sm text-[var(--color-mute)] mb-6">
               {superUser
-                ? "Two minutes. We'll reply with your private edit dashboard link within a few hours — no Stripe link, no $99 charge. Site goes live within 48 hours."
-                : "Two minutes. We'll reply with a Stripe link for the $99 launch fee within a few hours. Pay it and your site goes live within 48 hours."}
+                ? "Two minutes. We'll set up your private build dashboard — no charge for you. First draft within 48 hours."
+                : "Two minutes. Then pay the $99 launch below (or from the email we send) and Chappie starts building — first draft within 48 hours."}
             </p>
             <IntakeForm
               formType="website"
@@ -357,9 +357,10 @@ export default async function WebsiteSku({
               Then pay to launch.
             </h2>
             <p className="text-sm text-[var(--color-mute)] mb-5">
-              Brief sent? Pay the $99 launch fee (+ $49/mo edits) right here and the
-              studio starts now — you&rsquo;ll get a link to chat with the studio
-              about your build. Or pay with CHAPPIE.
+              Brief sent? Pay the $99 launch right here and Chappie starts
+              building your first draft now — you&rsquo;ll get a link to your
+              chat dashboard to follow along. First 5 edits free, $25 each after.
+              Or pay with CHAPPIE.
             </p>
             <WebsiteLaunchButton />
             <div className="mt-3">

@@ -9,8 +9,7 @@ export const runtime = "nodejs";
 export const maxDuration = 60;
 export const dynamic = "force-dynamic";
 
-const LAUNCH = 9900; // $99 one-time launch fee
-const MONTHLY = 4900; // $49/mo unlimited edits
+const LAUNCH = 9900; // $99 one-time launch fee (no subscription — 5 free edits, then $25/request)
 
 // Pay-right-away for a Chappie Site: $99 launch + $49/mo, on-page (embedded
 // Stripe) instead of the email-a-link flow. On success the buyer gets a magic
@@ -93,23 +92,13 @@ export async function POST(req: Request) {
   }
   const stripe = new Stripe(secretKey);
   const meta = { kind: "website-launch", slug: site.slug, email };
-  // Subscription with the $99 one-time launch fee on the first invoice.
   const lineItems = [
     {
       quantity: 1,
       price_data: {
         currency: "usd",
-        unit_amount: MONTHLY,
-        recurring: { interval: "month" as const },
-        product_data: { name: "Chappie Site — unlimited edits ($49/mo)" },
-      },
-    },
-    {
-      quantity: 1,
-      price_data: {
-        currency: "usd",
         unit_amount: LAUNCH,
-        product_data: { name: "Chappie Site — $99 launch fee" },
+        product_data: { name: "Chappie Site — $99 launch (build + 5 free edits)" },
       },
     },
   ];
@@ -118,24 +107,24 @@ export async function POST(req: Request) {
     if (body.embedded === true) {
       const session = await stripe.checkout.sessions.create({
         ui_mode: "embedded_page",
-        mode: "subscription",
+        mode: "payment",
         line_items: lineItems,
         customer_email: email,
         return_url: `${origin}/website?launched=1&slug=${site.slug}&session_id={CHECKOUT_SESSION_ID}`,
         metadata: meta,
-        subscription_data: { metadata: meta },
+        payment_intent_data: { metadata: meta },
       });
       return NextResponse.json({ clientSecret: session.client_secret, slug: site.slug });
     }
 
     const session = await stripe.checkout.sessions.create({
-      mode: "subscription",
+      mode: "payment",
       line_items: lineItems,
       customer_email: email,
       success_url: `${origin}/website?launched=1&slug=${site.slug}`,
       cancel_url: `${origin}/website`,
       metadata: meta,
-      subscription_data: { metadata: meta },
+      payment_intent_data: { metadata: meta },
     });
     return NextResponse.json({ url: session.url, slug: site.slug });
   } catch (err) {
