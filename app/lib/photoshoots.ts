@@ -73,7 +73,10 @@ export async function readState(jobId: string): Promise<PhotoshootState | null> 
     const { blobs } = await list({ prefix: key });
     const blob = blobs.find((b) => b.pathname === key);
     if (blob) {
-      const res = await fetch(blob.url, { cache: "no-store" });
+      // Cache-bust the blob CDN (see movies.ts readState): the public URL edge-
+      // caches stale content after an overwrite, which clobbered the paid flag /
+      // palette on quick successive read-modify-writes. Unique query = fresh read.
+      const res = await fetch(`${blob.url}?v=${Date.now()}`, { cache: "no-store" });
       if (!res.ok) return null;
       return (await res.json()) as PhotoshootState;
     }
