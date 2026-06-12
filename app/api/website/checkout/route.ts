@@ -41,32 +41,50 @@ export async function POST(req: Request) {
     process.env.NEXT_PUBLIC_SITE_URL ??
     "https://chappieworks.com";
 
-  const site = await createSite({
-    ownerEmail: email,
-    ownerName: name || businessName,
-    businessName,
-    brief: brief || undefined,
-  });
+  let site;
+  try {
+    site = await createSite({
+      ownerEmail: email,
+      ownerName: name || businessName,
+      businessName,
+      brief: brief || undefined,
+    });
+  } catch (err) {
+    const m = err instanceof Error ? err.message : "unknown";
+    console.error("[chappieworks:website] createSite failed", m);
+    return NextResponse.json({ error: `createSite: ${m}` }, { status: 500 });
+  }
 
   async function dashboardLinkFor(slug: string): Promise<string> {
-    const minted = await mintSiteMagicLink({ email, slug, baseUrl: origin });
-    return minted.ok ? minted.link : `${origin}/studio/site-edits/${slug}`;
+    try {
+      const minted = await mintSiteMagicLink({ email, slug, baseUrl: origin });
+      return minted.ok ? minted.link : `${origin}/studio/site-edits/${slug}`;
+    } catch (err) {
+      console.error("[chappieworks:website] mintSiteMagicLink threw", err);
+      return `${origin}/studio/site-edits/${slug}`;
+    }
   }
 
   // Master-email bypass — skip Stripe, start the build, email the chat link.
   if (isBypassEmail(email)) {
-    await appendMessage(site.slug, {
-      from: "system",
-      body: "Launch fee bypassed (internal test). Build started.",
-      statusChange: "in_progress",
-    });
-    const link = await dashboardLinkFor(site.slug);
-    after(() =>
-      sendMagicLink({ to: email, link, businessName }).catch((e) =>
-        console.error("[chappieworks:website] bypass magic link email failed", e),
-      ),
-    );
-    return NextResponse.json({ bypassed: true, slug: site.slug, dashboardLink: link });
+    try {
+      await appendMessage(site.slug, {
+        from: "system",
+        body: "Launch fee bypassed (internal test). Build started.",
+        statusChange: "in_progress",
+      });
+      const link = await dashboardLinkFor(site.slug);
+      after(() =>
+        sendMagicLink({ to: email, link, businessName }).catch((e) =>
+          console.error("[chappieworks:website] bypass magic link email failed", e),
+        ),
+      );
+      return NextResponse.json({ bypassed: true, slug: site.slug, dashboardLink: link });
+    } catch (err) {
+      const m = err instanceof Error ? err.message : "unknown";
+      console.error("[chappieworks:website] bypass path failed", m);
+      return NextResponse.json({ error: `bypass: ${m}` }, { status: 500 });
+    }
   }
 
   const secretKey = process.env.STRIPE_SECRET_KEY;
