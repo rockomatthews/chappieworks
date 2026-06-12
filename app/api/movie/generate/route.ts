@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 import { put } from "@vercel/blob";
 import {
   falSubmit,
-  KLING_TEXT_TO_VIDEO,
-  KLING_IMAGE_TO_VIDEO,
+  VEO_TEXT_TO_VIDEO,
+  VEO_IMAGE_TO_VIDEO,
   WAN_TEXT_TO_VIDEO,
   WAN_IMAGE_TO_VIDEO,
 } from "../../../lib/fal";
@@ -260,11 +260,15 @@ export async function POST(req: Request) {
       input.num_frames = duration >= 7 ? 161 : 121;
       input.enable_prompt_expansion = true;
     } else {
-      // Kling 2.1 Master — high quality, native 1080p.
-      model = startImageUrl ? KLING_IMAGE_TO_VIDEO : KLING_TEXT_TO_VIDEO;
-      input.duration = seconds;
-      input.negative_prompt = "blur, distort, and low quality";
-      input.cfg_scale = 0.5;
+      // Veo 3.1 — native audio (dialogue + SFX) at 1080p. Veo durations are
+      // 4/6/8s only, so map our 5s→6s and 10s→8s (Veo's max).
+      model = startImageUrl ? VEO_IMAGE_TO_VIDEO : VEO_TEXT_TO_VIDEO;
+      input.duration = duration >= 7 ? "8s" : "6s";
+      // 720p preview (with audio) keeps the free-preview cost ~half; we upscale
+      // this exact clip to 1080p at purchase (see deliverMovieHd).
+      input.resolution = "720p";
+      input.generate_audio = true;
+      input.negative_prompt = "blur, distort, low quality";
     }
     if (startImageUrl) {
       input.image_url = startImageUrl;
@@ -292,7 +296,7 @@ export async function POST(req: Request) {
     console.log(
       "[chappieworks:movie] created job",
       jobId,
-      "kling",
+      tier === "raw" ? "wan" : "veo3.1",
       sub.requestId,
       "mode",
       mode,

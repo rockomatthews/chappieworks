@@ -9,6 +9,13 @@ export const KLING_TEXT_TO_VIDEO =
 export const KLING_IMAGE_TO_VIDEO =
   "fal-ai/kling-video/v2.1/master/image-to-video";
 
+// Standard tier — Veo 3.1 (Google) via fal. Native audio: dialogue + SFX +
+// ambient, with lip-sync. Durations are 4s/6s/8s only. Output shape matches
+// Kling ({video:{url}}). Slugs overridable to revert to Kling or try others.
+export const VEO_TEXT_TO_VIDEO = process.env.FAL_STD_TEXT_MODEL ?? "fal-ai/veo3.1";
+export const VEO_IMAGE_TO_VIDEO =
+  process.env.FAL_STD_IMAGE_MODEL ?? "fal-ai/veo3.1/image-to-video";
+
 // "Raw" tier — Wan 2.2 (open model, far fewer content restrictions than the
 // hosted commercial models). Slugs overridable via env if we swap models.
 export const WAN_TEXT_TO_VIDEO =

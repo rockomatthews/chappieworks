@@ -117,9 +117,10 @@ export async function deliverMovieHd(
   if (!state || !state.cleanUrl) return;
   if (state.hdUrl) return; // already done
 
-  // Kling outputs native ~1080p, so the clean clip IS the deliverable — no
-  // upscale needed. (produceHd remains available for sources that need it.)
-  const hdUrl = state.cleanUrl;
+  // Previews render at 720p (with audio) to keep free-preview cost down. Upscale
+  // that exact clip to 1080p at purchase — same video the buyer previewed, just
+  // sharper. ffmpeg copies the audio stream (-c:a copy), so dialogue survives.
+  const hdUrl = await produceHd(jobId, state.cleanUrl);
 
   const fresh = (await readState(jobId)) ?? state;
   await writeState({ ...fresh, hdUrl, hdPending: false });
