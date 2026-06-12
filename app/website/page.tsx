@@ -3,6 +3,7 @@ import { CreditedBy } from "../components/CreditedBy";
 import { IntakeForm, type IntakeField } from "../components/IntakeForm";
 import { ChatThread } from "../components/ChatThread";
 import { PayWithChappieButton } from "../components/PayWithChappieButton";
+import { WebsiteLaunchButton } from "./WebsiteLaunchButton";
 import { createSupabaseServerClient } from "../lib/supabase/server";
 import { isBypassEmail } from "../lib/movieEmail";
 
@@ -243,6 +244,7 @@ export default async function WebsiteSku({
               </a>
             </div>
           )}
+          <WebsiteLaunchButton />
           <div className="mt-3">
             <PayWithChappieButton usd={99} sku="website" />
           </div>
