@@ -1,0 +1,30 @@
+name: Chappie Mention Replies
+
+# Reliable, observable trigger for the @chappieworks mention-reply bot (once per
+# person, max 5/day, each ending "(post N/5)"). GitHub hits the endpoint every 2
+# hours; it reads new mentions and replies server-side. replied:0 / scanned:0 is
+# a normal no-op (green); real read/post errors go red.
+
+on:
+  schedule:
+    - cron: "0 */2 * * *" # every 2 hours
+  workflow_dispatch: {}
+
+jobs:
+  mentions:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Reply to mentions
+        env:
+          TOKEN: ${{ secrets.X_AUTOPOST_TOKEN }}
+        run: |
+          if [ -z "$TOKEN" ]; then echo "::error::X_AUTOPOST_TOKEN secret not set"; exit 1; fi
+          code=$(curl -sS --max-time 150 "https://chappieworks.com/api/cron/mentions-reply" \
+            -H "Authorization: Bearer $TOKEN" -o resp.json -w "%{http_code}")
+          echo "HTTP $code"; cat resp.json; echo
+          python3 - <<'PY'
+          import json, sys
+          d = json.load(open("resp.json"))
+          print("replied:", d.get("replied"), "| capLeft:", d.get("capLeft"), "| scanned:", d.get("scanned"))
+          sys.exit(1 if d.get("error") else 0)
+          PY
