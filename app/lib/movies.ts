@@ -64,7 +64,11 @@ export async function readState(jobId: string): Promise<MovieState | null> {
     const { blobs } = await list({ prefix: key });
     const blob = blobs.find((b) => b.pathname === key);
     if (blob) {
-      const res = await fetch(blob.url, { cache: "no-store" });
+      // Cache-bust the blob CDN: its public URL edge-caches stale content for
+      // ~a minute after an overwrite, which made read-modify-write clobber and
+      // fast post-render reads (e.g. checkout right after a preview finishes)
+      // see stale state. A unique query is a distinct CDN key → always fresh.
+      const res = await fetch(`${blob.url}?v=${Date.now()}`, { cache: "no-store" });
       if (!res.ok) return null;
       return (await res.json()) as MovieState;
     }
