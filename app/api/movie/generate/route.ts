@@ -264,9 +264,10 @@ export async function POST(req: Request) {
       // 4/6/8s only, so map our 5s→6s and 10s→8s (Veo's max).
       model = startImageUrl ? VEO_IMAGE_TO_VIDEO : VEO_TEXT_TO_VIDEO;
       input.duration = duration >= 7 ? "8s" : "6s";
-      // 720p preview (with audio) keeps the free-preview cost ~half; we upscale
-      // this exact clip to 1080p at purchase (see deliverMovieHd).
-      input.resolution = "720p";
+      // Native 1080p with audio. On fal Veo, 720p costs the same as 1080p, so
+      // there's no reason to render lower and upscale — the preview clip IS the
+      // 1080p deliverable (paywall just removes the watermark), like Kling was.
+      input.resolution = "1080p";
       input.generate_audio = true;
       input.negative_prompt = "blur, distort, low quality";
     }
