@@ -1,0 +1,31 @@
+name: Chappie Roast ZssBecker
+
+# Reliable, observable trigger for the once-a-day satirical roast of @ZssBecker.
+# GitHub hits the endpoint directly; the endpoint reads his new posts, picks the
+# most dramatic, and posts a quote/link rebuttal server-side. Watch runs in the
+# Actions tab. "no-new-tweets" is a normal no-op (green); real errors go red.
+
+on:
+  schedule:
+    - cron: "0 23 * * *" # 23:00 UTC ~ 5pm MT
+  workflow_dispatch: {}
+
+jobs:
+  roast:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fire the roast
+        env:
+          TOKEN: ${{ secrets.X_AUTOPOST_TOKEN }}
+        run: |
+          if [ -z "$TOKEN" ]; then echo "::error::X_AUTOPOST_TOKEN secret not set"; exit 1; fi
+          code=$(curl -sS --max-time 120 "https://chappieworks.com/api/cron/roast-zss" \
+            -H "Authorization: Bearer $TOKEN" -o resp.json -w "%{http_code}")
+          echo "HTTP $code"; cat resp.json; echo
+          python3 - <<'PY'
+          import json, sys
+          d = json.load(open("resp.json"))
+          print("posted:", d.get("posted"), "| reason:", d.get("reason"), "| mode:", d.get("mode"))
+          # Real failures (read/post) go red; no-new-tweets / no-pick are fine.
+          sys.exit(1 if d.get("error") else 0)
+          PY
