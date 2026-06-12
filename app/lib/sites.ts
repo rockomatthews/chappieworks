@@ -1,4 +1,4 @@
-import { get, put } from "@vercel/blob";
+import { list, put } from "@vercel/blob";
 
 export type EditStatus = "received" | "in_progress" | "shipped" | "needs_info";
 
@@ -58,15 +58,26 @@ export function normalizeEmail(email: string): string {
 }
 
 export async function readSite(slug: string): Promise<SiteRecord | null> {
-  const result = await get(STATE_KEY(slug), { access: "private", useCache: false });
-  if (!result || result.statusCode !== 200) return null;
-  return (await new Response(result.stream).json()) as SiteRecord;
+  const key = STATE_KEY(slug);
+  // Public store; list is eventually consistent so retry, and cache-bust the
+  // CDN read so a just-written record isn't served stale.
+  for (let attempt = 0; attempt < 4; attempt++) {
+    const { blobs } = await list({ prefix: key });
+    const blob = blobs.find((b) => b.pathname === key);
+    if (blob) {
+      const res = await fetch(`${blob.url}?v=${Date.now()}`, { cache: "no-store" });
+      if (!res.ok) return null;
+      return (await res.json()) as SiteRecord;
+    }
+    if (attempt < 3) await new Promise((r) => setTimeout(r, 500));
+  }
+  return null;
 }
 
 export async function writeSite(site: SiteRecord): Promise<void> {
   const updated: SiteRecord = { ...site, updatedAt: new Date().toISOString() };
   await put(STATE_KEY(site.slug), JSON.stringify(updated, null, 2), {
-    access: "private",
+    access: "public",
     contentType: "application/json",
     addRandomSuffix: false,
     allowOverwrite: true,
@@ -127,11 +138,12 @@ export async function createSite(input: {
 }
 
 export async function listSites(): Promise<SiteIndex> {
-  const result = await get(INDEX_KEY, { access: "private", useCache: false });
-  if (!result || result.statusCode !== 200) {
-    return { updatedAt: new Date().toISOString(), slugs: [] };
-  }
-  return (await new Response(result.stream).json()) as SiteIndex;
+  const { blobs } = await list({ prefix: INDEX_KEY });
+  const blob = blobs.find((b) => b.pathname === INDEX_KEY);
+  if (!blob) return { updatedAt: new Date().toISOString(), slugs: [] };
+  const res = await fetch(`${blob.url}?v=${Date.now()}`, { cache: "no-store" });
+  if (!res.ok) return { updatedAt: new Date().toISOString(), slugs: [] };
+  return (await res.json()) as SiteIndex;
 }
 
 async function touchIndex(site: SiteRecord): Promise<void> {
@@ -147,7 +159,7 @@ async function touchIndex(site: SiteRecord): Promise<void> {
     slugs: [entry, ...idx.slugs.filter((s) => s.slug !== site.slug)],
   };
   await put(INDEX_KEY, JSON.stringify(next, null, 2), {
-    access: "private",
+    access: "public",
     contentType: "application/json",
     addRandomSuffix: false,
     allowOverwrite: true,
