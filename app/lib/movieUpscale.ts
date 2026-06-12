@@ -122,8 +122,17 @@ export async function deliverMovieHd(
   // remains available for sources that genuinely need it.
   const hdUrl = state.cleanUrl;
 
+  // Force paid:true — deliverMovieHd only runs post-payment (webhook/bypass), so
+  // a stale read here must not clobber the paid flag the checkout just wrote
+  // (else /m/[jobId] re-shows the paywall to a buyer who already paid).
   const fresh = (await readState(jobId)) ?? state;
-  await writeState({ ...fresh, hdUrl, hdPending: false });
+  await writeState({
+    ...fresh,
+    paid: true,
+    paidAt: fresh.paidAt ?? new Date().toISOString(),
+    hdUrl,
+    hdPending: false,
+  });
 
   await sendCleanMovieEmail({
     to: state.email,
