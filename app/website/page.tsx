@@ -244,11 +244,6 @@ export default async function WebsiteSku({
               </a>
             </div>
           )}
-          <WebsiteLaunchButton />
-          <div className="mt-3">
-            <PayWithChappieButton usd={99} sku="website" />
-          </div>
-
           <div className="mt-10">
             <ChatThread
               title="Why this exists — The associated team argument"
@@ -355,6 +350,21 @@ export default async function WebsiteSku({
               fields={WEBSITE_FIELDS}
               submitLabel="Send the brief →"
             />
+          </div>
+
+          <div className="mt-8">
+            <h2 className="text-2xl font-semibold tracking-tight mb-2">
+              Then pay to launch.
+            </h2>
+            <p className="text-sm text-[var(--color-mute)] mb-5">
+              Brief sent? Pay the $99 launch fee (+ $49/mo edits) right here and the
+              studio starts now — you&rsquo;ll get a link to chat with the studio
+              about your build. Or pay with CHAPPIE.
+            </p>
+            <WebsiteLaunchButton />
+            <div className="mt-3">
+              <PayWithChappieButton usd={99} sku="website" />
+            </div>
           </div>
 
           <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
