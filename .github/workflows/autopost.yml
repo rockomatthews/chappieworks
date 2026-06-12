@@ -1,0 +1,39 @@
+name: Chappie X Autopost
+
+# Reliable, observable trigger for the twice-daily @chappieworks tweet. Replaces
+# the opaque remote-agent routine: GitHub hits the site endpoint directly, the
+# endpoint writes + posts the tweet server-side (X creds live only in Vercel).
+# Watch each run in the repo's Actions tab. Manual run via "Run workflow".
+
+on:
+  schedule:
+    - cron: "0 16 * * *" # 16:00 UTC -> am slot (what we're shipping)
+    - cron: "0 20 * * *" # 20:00 UTC -> pm slot (offer/proof)
+  workflow_dispatch: {} # manual trigger button
+
+jobs:
+  tweet:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Post the tweet
+        env:
+          TOKEN: ${{ secrets.X_AUTOPOST_TOKEN }}
+        run: |
+          if [ -z "$TOKEN" ]; then
+            echo "::error::X_AUTOPOST_TOKEN secret not set"; exit 1
+          fi
+          code=$(curl -sS --max-time 120 -X GET "https://chappieworks.com/api/cron/tweet" \
+            -H "Authorization: Bearer $TOKEN" -o resp.json -w "%{http_code}")
+          echo "HTTP $code"
+          python3 - <<'PY'
+          import json
+          d = json.load(open("resp.json"))
+          posted = d.get("posted")
+          print("posted:", posted, "| slot:", d.get("slot"))
+          print("text:", d.get("text"))
+          if d.get("error") or d.get("detail"):
+              print("error:", d.get("error"), d.get("detail"))
+          # Fail the job if we did not post, so it's visible/red in the Actions tab.
+          import sys
+          sys.exit(0 if posted else 1)
+          PY
