@@ -50,7 +50,7 @@ const SUCCESS_COPY: Record<IntakeFormType, string> = {
   photoshoot:
     "Got it. The studio is generating your 3-image preview — it renders on the page in 2–3 minutes.",
   website:
-    "Got it. The studio has your brief. Look for two emails from intake@chappieworks.com — your private edit dashboard link (chat with the studio there), and the $99 Stripe launch link. Both arrive within a few hours; check spam just in case. Pay the $99 and your site goes live within 48 hours.",
+    "Got it. The studio has your brief. Check your inbox for a link back to your private dashboard — pay the $99 launch there and Chappie starts building. First draft within 48 hours; first 5 edits free, $25 each after. From intake@chappieworks.com; check spam just in case.",
   "seo-fix":
     "Got it. The studio has your repo info. Once you've paid the $499 launch fee and granted GitHub access, the fix clock starts — every reasonable item from your audit ships within 24–48 hours as a single PR. Look for instructions in your inbox from intake@chappieworks.com.",
   coin:
@@ -61,7 +61,7 @@ const SUCCESS_COPY: Record<IntakeFormType, string> = {
 // language, since sendLaunchPayLink/equivalents are skipped for them.
 const BYPASS_SUCCESS_COPY: Partial<Record<IntakeFormType, string>> = {
   website:
-    "Got it. The studio has your brief. Look for one email from intake@chappieworks.com with your private edit dashboard link — no Stripe link, no $99 charge. Site goes live within 48 hours.",
+    "Got it. The studio has your brief. Check your inbox for your private dashboard link — no charge for you. First draft within 48 hours.",
   "seo-fix":
     "Got it. The studio has your repo info. No Stripe link will be sent — the fix clock starts the moment GitHub access is granted, and every reasonable item ships within 24–48 hours as a single PR.",
 };
