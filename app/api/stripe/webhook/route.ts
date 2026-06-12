@@ -12,6 +12,9 @@ import {
   writeState as writeShootState,
 } from "../../../lib/photoshoots";
 import { runPackage } from "../../../lib/photoshootRun";
+import { readSite, appendMessage } from "../../../lib/sites";
+import { mintSiteMagicLink } from "../../../lib/supabase/magiclink";
+import { sendMagicLink } from "../../../lib/siteNotify";
 
 export const runtime = "nodejs";
 // Allow post-response `after()` work (HD upscale + email) room to finish.
@@ -99,6 +102,41 @@ export async function POST(req: Request) {
         { received: true, error: message },
         { status: 500 },
       );
+    }
+  }
+
+  // /website pay-right-away launch flow.
+  if (kind === "website-launch") {
+    const slug = session.metadata?.slug;
+    const email = session.metadata?.email;
+    if (!slug || !email) {
+      return NextResponse.json({ received: true, note: "missing slug/email" });
+    }
+    try {
+      const site = await readSite(slug);
+      if (!site) {
+        return NextResponse.json({ received: true, note: "site missing" });
+      }
+      await appendMessage(slug, {
+        from: "system",
+        body: "Launch fee paid — the studio has started your 48-hour build. We'll post here the moment your site is live.",
+        statusChange: "in_progress",
+      });
+      const origin = process.env.NEXT_PUBLIC_SITE_URL ?? "https://chappieworks.com";
+      after(async () => {
+        const minted = await mintSiteMagicLink({ email, slug, baseUrl: origin });
+        if (minted.ok) {
+          await sendMagicLink({ to: email, link: minted.link, businessName: site.businessName });
+        } else {
+          console.error("[chappieworks:website] webhook magic link mint failed", slug);
+        }
+      });
+      console.log("[chappieworks:stripe-webhook] website launch paid", slug);
+      return NextResponse.json({ received: true, ok: true, slug });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "unknown";
+      console.error("[chappieworks:stripe-webhook] website-launch handler failed", message);
+      return NextResponse.json({ received: true, error: message }, { status: 500 });
     }
   }
 
