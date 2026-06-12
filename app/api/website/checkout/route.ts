@@ -11,10 +11,14 @@ export const dynamic = "force-dynamic";
 
 const LAUNCH = 9900; // $99 one-time launch fee (no subscription — 5 free edits, then $25/request)
 
-// Pay-right-away for a Chappie Site: $99 launch + $49/mo, on-page (embedded
-// Stripe) instead of the email-a-link flow. On success the buyer gets a magic
-// link to their private edit-chat dashboard (same one the operator flow uses).
-// Master email (BYPASS_CHECKOUT_EMAIL) skips Stripe for testing.
+// Pay-right-away for a Chappie Site: $99 launch (one-time), on-page (embedded
+// Stripe). On success the buyer gets a magic link to their private edit-chat
+// dashboard. Master email (BYPASS_CHECKOUT_EMAIL) skips Stripe for testing.
+//
+// STEP 3 TODO (see memory proj-website-checkout): (1) pay-by-existing-slug so the
+// proposal email links back here to pay on-site (no off-site Stripe link); (2)
+// dashboard "building" status until shipped, then edits; (3) non-expiring access;
+// (4) edit counter — first 5 free, then a $25/request Stripe charge.
 export async function POST(req: Request) {
   const body = (await req.json().catch(() => ({}))) as {
     embedded?: boolean;
