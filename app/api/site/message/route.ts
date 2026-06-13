@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { after } from "next/server";
-import { appendMessage, readSite } from "../../../lib/sites";
+import { appendMessage, readSite, writeSite, FREE_EDITS } from "../../../lib/sites";
 import { createSupabaseServerClient } from "../../../lib/supabase/server";
 import { notifyOperatorOfMessage } from "../../../lib/siteNotify";
 import { autoApplyEdit } from "../../../lib/siteAutoApply";
@@ -38,6 +38,38 @@ export async function POST(req: Request) {
   if (!site || site.ownerEmail !== sessionEmail) {
     return NextResponse.json({ ok: false, error: "Not signed in" }, { status: 401 });
   }
+
+  // Must be paid, and the first draft must be delivered before edits open.
+  if (!site.paid) {
+    return NextResponse.json(
+      { ok: false, error: "Pay the $99 launch first — that kicks off your build." },
+      { status: 402 },
+    );
+  }
+  const delivered =
+    !!site.liveUrl || site.status === "shipped" || (site.editsUsed ?? 0) > 0;
+  if (!delivered) {
+    return NextResponse.json(
+      { ok: false, error: "Chappie is still building your first draft — edit requests open the moment it lands." },
+      { status: 409 },
+    );
+  }
+
+  // Edit budget: first 5 free, then $25 per request.
+  const editsUsed = site.editsUsed ?? 0;
+  const allowance = FREE_EDITS + (site.editsPaid ?? 0);
+  if (editsUsed >= allowance) {
+    return NextResponse.json(
+      {
+        ok: false,
+        paymentRequired: true,
+        error: "You've used your free edits — it's $25 per request after that.",
+      },
+      { status: 402 },
+    );
+  }
+  // Count this request against the budget.
+  await writeSite({ ...site, editsUsed: editsUsed + 1 });
 
   const afterCustomer = await appendMessage(slug, {
     from: "customer",

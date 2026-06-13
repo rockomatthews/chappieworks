@@ -5,7 +5,7 @@ import { after } from "next/server";
 import { revalidatePath } from "next/cache";
 import { createSite } from "../lib/sites";
 import { mintSiteMagicLink } from "../lib/supabase/magiclink";
-import { sendLaunchPayLink, sendBriefProposal } from "../lib/siteNotify";
+import { sendBriefProposal } from "../lib/siteNotify";
 import { generateBriefProposal } from "../lib/briefProposal";
 import { provisionRepo } from "../lib/siteProvision";
 import { isBypassEmail } from "../lib/movieEmail";
@@ -428,33 +428,8 @@ async function provisionSiteFromBrief(submission: {
       );
     }
 
-    if (isBypassEmail(site.ownerEmail)) {
-      console.log(
-        "[chappieworks:intake] bypass email — skipping $99 pay link",
-        site.slug,
-      );
-    } else {
-      const payResult = await sendLaunchPayLink({
-        to: site.ownerEmail,
-        businessName: site.businessName,
-        ownerName: site.ownerName,
-      });
-      if (!payResult.ok) {
-        console.error(
-          "[chappieworks:intake] stripe pay-link email failed",
-          site.slug,
-          "error",
-          payResult.error,
-        );
-      } else {
-        console.log(
-          "[chappieworks:intake] stripe pay-link emailed",
-          site.slug,
-          "to",
-          site.ownerEmail,
-        );
-      }
-    }
+    // No separate off-site Stripe link: the proposal email's link goes to the
+    // private dashboard, where the customer pays the $99 on-site (embedded).
   } catch (err) {
     console.error("[chappieworks:intake] provision threw", err);
   }
