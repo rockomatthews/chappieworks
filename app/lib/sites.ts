@@ -2,6 +2,10 @@ import { list, put } from "@vercel/blob";
 
 export type EditStatus = "received" | "in_progress" | "shipped" | "needs_info";
 
+// Edit requests included with the $99 launch before per-request charging kicks in.
+export const FREE_EDITS = 5;
+export const EDIT_PRICE_CENTS = 2500; // $25 per request after the free 5
+
 export const EDIT_STATUS_LABELS: Record<EditStatus, string> = {
   received: "Received",
   in_progress: "In progress",
@@ -31,6 +35,11 @@ export type SiteRecord = {
   githubRepo?: string;       // e.g. "Chappieworks-sites/acme-a1b2c3"
   vercelProjectId?: string;  // Vercel project id for auto-deploys
   vercelUrl?: string;        // e.g. "acme-a1b2c3.vercel.app"
+  // Payment + edit-budget state.
+  paid?: boolean;            // $99 launch paid → build starts
+  paidAt?: string;
+  editsUsed?: number;        // customer edit requests submitted
+  editsPaid?: number;        // extra edits paid for at $25 each (beyond the free 5)
 };
 
 const STATE_KEY = (slug: string) => `sites/${slug}/state.json`;

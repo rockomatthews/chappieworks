@@ -1,6 +1,6 @@
 import { NextResponse, after } from "next/server";
 import Stripe from "stripe";
-import { createSite, appendMessage } from "../../../lib/sites";
+import { createSite, appendMessage, readSite, writeSite } from "../../../lib/sites";
 import { isBypassEmail } from "../../../lib/movieEmail";
 import { mintSiteMagicLink } from "../../../lib/supabase/magiclink";
 import { sendMagicLink } from "../../../lib/siteNotify";
@@ -26,18 +26,13 @@ export async function POST(req: Request) {
     name?: string;
     businessName?: string;
     brief?: string;
+    slug?: string; // pay for an EXISTING brief's site (dashboard / email link)
   };
-  const email = (body.email ?? "").trim().toLowerCase();
+  const slug = (body.slug ?? "").trim();
+  let email = (body.email ?? "").trim().toLowerCase();
   const name = (body.name ?? "").trim();
   const businessName = (body.businessName ?? "").trim();
   const brief = (body.brief ?? "").trim();
-
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return NextResponse.json({ error: "a valid email is required" }, { status: 400 });
-  }
-  if (!businessName) {
-    return NextResponse.json({ error: "business name is required" }, { status: 400 });
-  }
 
   const origin =
     req.headers.get("origin") ??
@@ -45,17 +40,37 @@ export async function POST(req: Request) {
     "https://chappieworks.com";
 
   let site;
-  try {
-    site = await createSite({
-      ownerEmail: email,
-      ownerName: name || businessName,
-      businessName,
-      brief: brief || undefined,
-    });
-  } catch (err) {
-    const m = err instanceof Error ? err.message : "unknown";
-    console.error("[chappieworks:website] createSite failed", m);
-    return NextResponse.json({ error: `createSite: ${m}` }, { status: 500 });
+  if (slug) {
+    // Pay for an existing site (created from the brief) — from the dashboard CTA
+    // or the proposal email link. Owner email comes off the record.
+    const existing = await readSite(slug);
+    if (!existing) {
+      return NextResponse.json({ error: "site not found" }, { status: 404 });
+    }
+    if (existing.paid) {
+      return NextResponse.json({ error: "already paid", paid: true }, { status: 400 });
+    }
+    site = existing;
+    email = existing.ownerEmail;
+  } else {
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return NextResponse.json({ error: "a valid email is required" }, { status: 400 });
+    }
+    if (!businessName) {
+      return NextResponse.json({ error: "business name is required" }, { status: 400 });
+    }
+    try {
+      site = await createSite({
+        ownerEmail: email,
+        ownerName: name || businessName,
+        businessName,
+        brief: brief || undefined,
+      });
+    } catch (err) {
+      const m = err instanceof Error ? err.message : "unknown";
+      console.error("[chappieworks:website] createSite failed", m);
+      return NextResponse.json({ error: `createSite: ${m}` }, { status: 500 });
+    }
   }
 
   async function dashboardLinkFor(slug: string): Promise<string> {
@@ -71,6 +86,8 @@ export async function POST(req: Request) {
   // Master-email bypass — skip Stripe, start the build, email the chat link.
   if (isBypassEmail(email)) {
     try {
+      const fresh = (await readSite(site.slug)) ?? site;
+      await writeSite({ ...fresh, paid: true, paidAt: new Date().toISOString() });
       await appendMessage(site.slug, {
         from: "system",
         body: "Launch fee bypassed (internal test). Build started.",
@@ -78,7 +95,7 @@ export async function POST(req: Request) {
       });
       const link = await dashboardLinkFor(site.slug);
       after(() =>
-        sendMagicLink({ to: email, link, businessName }).catch((e) =>
+        sendMagicLink({ to: email, link, businessName: site.businessName }).catch((e) =>
           console.error("[chappieworks:website] bypass magic link email failed", e),
         ),
       );

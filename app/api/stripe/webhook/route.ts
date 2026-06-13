@@ -12,7 +12,7 @@ import {
   writeState as writeShootState,
 } from "../../../lib/photoshoots";
 import { runPackage } from "../../../lib/photoshootRun";
-import { readSite, appendMessage } from "../../../lib/sites";
+import { readSite, writeSite, appendMessage } from "../../../lib/sites";
 import { mintSiteMagicLink } from "../../../lib/supabase/magiclink";
 import { sendMagicLink } from "../../../lib/siteNotify";
 
@@ -117,9 +117,13 @@ export async function POST(req: Request) {
       if (!site) {
         return NextResponse.json({ received: true, note: "site missing" });
       }
+      if (site.paid) {
+        return NextResponse.json({ received: true, note: "already paid" });
+      }
+      await writeSite({ ...site, paid: true, paidAt: new Date().toISOString() });
       await appendMessage(slug, {
         from: "system",
-        body: "Launch fee paid — the studio has started your 48-hour build. We'll post here the moment your site is live.",
+        body: "Launch fee paid — the studio has started your build. Your first draft lands here, usually within 48 hours. After that, your first 5 edit requests are free.",
         statusChange: "in_progress",
       });
       const origin = process.env.NEXT_PUBLIC_SITE_URL ?? "https://chappieworks.com";
@@ -136,6 +140,25 @@ export async function POST(req: Request) {
     } catch (err) {
       const message = err instanceof Error ? err.message : "unknown";
       console.error("[chappieworks:stripe-webhook] website-launch handler failed", message);
+      return NextResponse.json({ received: true, error: message }, { status: 500 });
+    }
+  }
+
+  // /website per-edit charge ($25 beyond the free 5) → grant one edit credit.
+  if (kind === "website-edit") {
+    const slug = session.metadata?.slug;
+    if (!slug) {
+      return NextResponse.json({ received: true, note: "no slug" });
+    }
+    try {
+      const site = await readSite(slug);
+      if (site) {
+        await writeSite({ ...site, editsPaid: (site.editsPaid ?? 0) + 1 });
+      }
+      return NextResponse.json({ received: true, ok: true, slug });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "unknown";
+      console.error("[chappieworks:stripe-webhook] website-edit handler failed", message);
       return NextResponse.json({ received: true, error: message }, { status: 500 });
     }
   }
