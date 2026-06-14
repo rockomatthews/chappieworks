@@ -1,12 +1,10 @@
 import { NextResponse } from "next/server";
 import { put } from "@vercel/blob";
 import {
-  falSubmit,
-  VEO_TEXT_TO_VIDEO,
-  VEO_IMAGE_TO_VIDEO,
-  WAN_TEXT_TO_VIDEO,
-  WAN_IMAGE_TO_VIDEO,
-} from "../../../lib/fal";
+  atlasSubmit,
+  ATLAS_TEXT_MODEL,
+  ATLAS_IMAGE_MODEL,
+} from "../../../lib/atlas";
 import { screenForAdult } from "../../../lib/moderation";
 import ffmpegPath from "ffmpeg-static";
 import ffmpeg from "fluent-ffmpeg";
@@ -172,8 +170,8 @@ export async function POST(req: Request) {
     duration = 10;
   }
 
-  if (!process.env.FAL_KEY) {
-    console.error("[chappieworks:movie] FAL_KEY missing");
+  if (!process.env.ATLAS_API_KEY) {
+    console.error("[chappieworks:movie] ATLAS_API_KEY missing");
     return NextResponse.json(
       { error: "generator offline — try again shortly" },
       { status: 503 },
@@ -238,56 +236,45 @@ export async function POST(req: Request) {
     }
   }
 
-  // Raw tier runs on an unmoderated backend — block adult prompts ourselves
-  // (violence is fine). Keeps NSFW out and Stripe/brand safe.
-  if (tier === "raw") {
-    const screen = await screenForAdult(prompt, startImageUrl);
-    if (screen.blocked) {
-      return NextResponse.json({ error: screen.reason }, { status: 400 });
-    }
+  // ALL video now runs on Atlas Cloud (uncensored — fal moderated violence on
+  // every model, including the Raw tier, which made it useless). Atlas applies
+  // no platform moderation, so we screen adult content OURSELVES on every prompt
+  // (violence/gore/dark themes are fine — that's the point). Keeps NSFW out and
+  // Stripe/brand safe regardless of tier. `tier` is retained for the UI but no
+  // longer changes the backend.
+  const screen = await screenForAdult(prompt, startImageUrl);
+  if (screen.blocked) {
+    return NextResponse.json({ error: screen.reason }, { status: 400 });
   }
 
   try {
-    const seconds = duration >= 7 ? "10" : "5";
+    // Wan 2.5 durations are 5s/10s. Map our 5/10 directly.
+    const seconds = duration >= 7 ? 10 : 5;
 
-    let model: string;
-    const input: Record<string, unknown> = { prompt, aspect_ratio: "16:9" };
-    if (tier === "raw") {
-      // Wan 2.2 — open model, far fewer content filters. Duration via frames
-      // (~24fps): 121 ≈ 5s, 161 ≈ ~6.7s (Wan's max).
-      model = startImageUrl ? WAN_IMAGE_TO_VIDEO : WAN_TEXT_TO_VIDEO;
-      input.resolution = "720p";
-      input.num_frames = duration >= 7 ? 161 : 121;
-      input.enable_prompt_expansion = true;
-    } else {
-      // Veo 3.1 — native audio (dialogue + SFX) at 1080p. Veo durations are
-      // 4/6/8s only, so map our 5s→6s and 10s→8s (Veo's max).
-      model = startImageUrl ? VEO_IMAGE_TO_VIDEO : VEO_TEXT_TO_VIDEO;
-      input.duration = duration >= 7 ? "8s" : "6s";
-      // Native 1080p with audio. On fal Veo, 720p costs the same as 1080p, so
-      // there's no reason to render lower and upscale — the preview clip IS the
-      // 1080p deliverable (paywall just removes the watermark), like Kling was.
-      input.resolution = "1080p";
-      input.generate_audio = true;
-      input.negative_prompt = "blur, distort, low quality";
-    }
+    // Image-to-video uses the Wan 2.2 turbo model; text-to-video uses Wan 2.5
+    // (native audio, up to 1080p). Both uncensored on Atlas.
+    const model = startImageUrl ? ATLAS_IMAGE_MODEL : ATLAS_TEXT_MODEL;
+    const input: Record<string, unknown> = {
+      prompt,
+      aspect_ratio: "16:9",
+      duration: seconds,
+      resolution: "1080p",
+    };
     if (startImageUrl) {
       input.image_url = startImageUrl;
     }
 
-    const sub = await falSubmit(model, input);
+    const sub = await atlasSubmit(model, input);
 
     const state: MovieState = {
       jobId,
       prompt,
       email,
       createdAt: new Date().toISOString(),
-      falRequestId: sub.requestId,
-      falStatusUrl: sub.statusUrl,
-      falResultUrl: sub.resultUrl,
+      atlasTaskId: sub.taskId,
       status: "generating",
       paid: false,
-      durationSec: Number(seconds),
+      durationSec: seconds,
       mode,
       startImageUrl,
       inputVideoUrl,
@@ -297,8 +284,11 @@ export async function POST(req: Request) {
     console.log(
       "[chappieworks:movie] created job",
       jobId,
-      tier === "raw" ? "wan" : "veo3.1",
-      sub.requestId,
+      "atlas",
+      model,
+      sub.taskId,
+      "tier",
+      tier,
       "mode",
       mode,
       "seconds",
@@ -308,7 +298,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ jobId });
   } catch (err) {
     const message = err instanceof Error ? err.message : "unknown";
-    console.error("[chappieworks:movie] create sora video failed", message);
+    console.error("[chappieworks:movie] create atlas video failed", message);
     return NextResponse.json(
       { error: `couldn't start generation: ${message}` },
       { status: 502 },
