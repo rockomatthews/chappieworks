@@ -9,9 +9,10 @@ export type MovieState = {
   createdAt: string;
   replicateId?: string;        // legacy Seedance jobs
   openaiVideoId?: string;      // legacy Sora 2 jobs
-  falRequestId?: string;       // Kling (via fal.ai) jobs
+  falRequestId?: string;       // legacy Kling/Veo/Wan (via fal.ai) jobs
   falStatusUrl?: string;
   falResultUrl?: string;
+  atlasTaskId?: string;        // Atlas Cloud jobs (current — uncensored backend)
   status: "pending" | "generating" | "watermarking" | "ready" | "failed";
   failureReason?: string;
   previewUrl?: string;
