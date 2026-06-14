@@ -12,6 +12,7 @@ export type MovieState = {
   falRequestId?: string;       // Kling (via fal.ai) jobs
   falStatusUrl?: string;
   falResultUrl?: string;
+  atlasTaskId?: string;        // Raw tier — uncensored backend (Atlas Cloud)
   status: "pending" | "generating" | "watermarking" | "ready" | "failed";
   failureReason?: string;
   previewUrl?: string;
