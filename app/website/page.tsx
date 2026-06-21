@@ -243,6 +243,18 @@ export default async function WebsiteSku({
               </a>
             </div>
           )}
+          <div className="mt-5">
+            <Link
+              href="/website/showcase"
+              className="group inline-flex items-center gap-2.5 text-sm mono text-[var(--color-gold)] hover:text-[var(--color-paper)] transition"
+            >
+              <span className="relative flex h-2 w-2" aria-hidden="true">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--color-gold)] opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-[var(--color-gold)]" />
+              </span>
+              See what the studio can really build — live 3D showcase →
+            </Link>
+          </div>
           <div className="mt-10">
             <ChatThread
               title="Why this exists — The associated team argument"
