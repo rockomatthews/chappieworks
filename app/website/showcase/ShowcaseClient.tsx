@@ -428,6 +428,40 @@ function ScrambleText({
 }
 
 /* ============================================================================
+   6. RunControls — two buttons that tell the 3D scene to run Chappie across.
+   Decoupled from the canvas island via a window CustomEvent.
+============================================================================ */
+function RunControls() {
+  const fire = (dir: "left" | "right") => () =>
+    window.dispatchEvent(new CustomEvent("chappie-run", { detail: { dir } }));
+  return (
+    <div className="flex flex-wrap gap-3">
+      <button
+        type="button"
+        onClick={fire("left")}
+        className="sx-ring inline-flex min-h-[52px] items-center gap-2 rounded-full bg-[var(--color-gold)] px-7 text-sm font-medium text-[var(--color-ink)] transition hover:opacity-90"
+      >
+        Run in from left <span aria-hidden>→</span>
+      </button>
+      <button
+        type="button"
+        onClick={fire("right")}
+        className="inline-flex min-h-[52px] items-center gap-2 rounded-full border border-white/20 bg-[var(--color-raven)]/60 px-7 text-sm font-medium text-[var(--color-paper)] backdrop-blur transition hover:border-[var(--color-gold)] hover:text-[var(--color-gold)]"
+      >
+        <span aria-hidden>←</span> Run in from right
+      </button>
+    </div>
+  );
+}
+
+/* ============================================================================
    Exports — grouped so the server page can compose them.
 ============================================================================ */
-export { ShaderHero, CursorGlow, TiltCard, MagneticButton, ScrambleText };
+export {
+  ShaderHero,
+  CursorGlow,
+  TiltCard,
+  MagneticButton,
+  ScrambleText,
+  RunControls,
+};
