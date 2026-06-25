@@ -6,6 +6,7 @@ import {
   TiltCard,
   MagneticButton,
   ScrambleText,
+  RunControls,
 } from "./ShowcaseClient";
 import ChappieHero from "./ChappieHero";
 
@@ -71,45 +72,40 @@ export default function ShowcasePage() {
       </div>
 
       {/* ---------- HERO ---------- */}
-      {/* Tall scroll-track; the screen pins (sticky) while the camera orbits
-          Chappie and the copy fades — classic scrollytelling, one canvas. */}
-      <section id="chappie-track" className="relative h-[200vh]">
-        <div className="sticky top-0 flex h-screen items-center overflow-hidden px-6 sm:px-10">
-          {/* layer 0: shader field · layer 1: live 3D Chappie · layer 2: copy */}
-          <ShaderHero />
-          <ChappieHero />
-          <div className="sx-hero-copy pointer-events-none relative z-10 mx-auto w-full max-w-5xl">
-            <Link
-              href="/website"
-              className="pointer-events-auto mono text-sm text-[var(--color-paper)]/70 hover:text-[var(--color-gold)]"
-            >
-              ← Chappie Site
-            </Link>
-            <p className="mono mt-8 text-xs uppercase tracking-[0.3em] text-[var(--color-gold)]">
-              The Showcase · live module lab
+      <section className="relative flex min-h-screen items-center overflow-hidden px-6 sm:px-10">
+        {/* layer 0: shader field · layer 1: live 3D Chappie · layer 2: copy */}
+        <ShaderHero />
+        <ChappieHero />
+        <div className="pointer-events-none relative z-10 mx-auto w-full max-w-5xl">
+          <Link
+            href="/website"
+            className="pointer-events-auto mono text-sm text-[var(--color-paper)]/70 hover:text-[var(--color-gold)]"
+          >
+            ← Chappie Site
+          </Link>
+          <p className="mono mt-8 text-xs uppercase tracking-[0.3em] text-[var(--color-gold)]">
+            The Showcase · live module lab
+          </p>
+          <h1 className="mt-5 max-w-2xl text-5xl font-semibold leading-[1.02] tracking-tight [text-shadow:0_2px_30px_rgba(11,11,12,0.6)] sm:text-7xl">
+            Sites that feel <span className="sx-grad-text">alive.</span>
+          </h1>
+          <p className="mt-6 max-w-md text-lg leading-relaxed text-[var(--color-paper)]/90 [text-shadow:0_1px_16px_rgba(11,11,12,0.7)]">
+            That&rsquo;s Chappie — a real 3D model rendered live in your browser,
+            textures and all. He idles right here; hit a button to send him
+            sprinting across the frame or break into a dance. Everything below is
+            real running code.
+          </p>
+          <div className="mt-8">
+            <span className="pointer-events-auto">
+              <RunControls />
+            </span>
+            <p className="mono mt-3 text-xs text-[var(--color-paper)]/60">
+              live idle · run · Thriller — all real-time
             </p>
-            <h1 className="mt-5 max-w-2xl text-5xl font-semibold leading-[1.02] tracking-tight [text-shadow:0_2px_30px_rgba(11,11,12,0.6)] sm:text-7xl">
-              Sites that feel <span className="sx-grad-text">alive.</span>
-            </h1>
-            <p className="mt-6 max-w-md text-lg leading-relaxed text-[var(--color-paper)]/90 [text-shadow:0_1px_16px_rgba(11,11,12,0.7)]">
-              That&rsquo;s Chappie — a live 3D model in your browser. Move your
-              cursor and he watches; click him for a spin; scroll and the camera
-              orbits. Everything below is real running code. This is the ceiling
-              the studio builds to.
-            </p>
-            <div className="mt-9 flex flex-wrap items-center gap-4">
-              <span className="pointer-events-auto">
-                <MagneticButton href="#modules">See the modules</MagneticButton>
-              </span>
-              <span className="mono text-xs text-[var(--color-paper)]/65">
-                click Chappie · scroll to orbit
-              </span>
-            </div>
           </div>
-          {/* scroll cue, fades with the copy */}
-          <div className="sx-hero-copy pointer-events-none absolute inset-x-0 bottom-7 z-10 flex justify-center">
-            <span className="mono text-[11px] uppercase tracking-[0.3em] text-[var(--color-paper)]/50">
-              scroll ↓
+          <div className="mt-8">
+            <span className="pointer-events-auto">
+              <MagneticButton href="#modules">See the modules</MagneticButton>
             </span>
           </div>
         </div>
