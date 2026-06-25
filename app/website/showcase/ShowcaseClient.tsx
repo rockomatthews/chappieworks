@@ -434,6 +434,7 @@ function ScrambleText({
 function RunControls() {
   const fire = (dir: "left" | "right") => () =>
     window.dispatchEvent(new CustomEvent("chappie-run", { detail: { dir } }));
+  const dance = () => window.dispatchEvent(new CustomEvent("chappie-dance"));
   return (
     <div className="flex flex-wrap gap-3">
       <button
@@ -449,6 +450,13 @@ function RunControls() {
         className="inline-flex min-h-[52px] items-center gap-2 rounded-full border border-white/20 bg-[var(--color-raven)]/60 px-7 text-sm font-medium text-[var(--color-paper)] backdrop-blur transition hover:border-[var(--color-gold)] hover:text-[var(--color-gold)]"
       >
         <span aria-hidden>←</span> Run in from right
+      </button>
+      <button
+        type="button"
+        onClick={dance}
+        className="inline-flex min-h-[52px] items-center gap-2 rounded-full border border-white/20 bg-[var(--color-raven)]/60 px-7 text-sm font-medium text-[var(--color-paper)] backdrop-blur transition hover:border-[var(--color-gold)] hover:text-[var(--color-gold)]"
+      >
+        Make him dance <span aria-hidden>♪</span>
       </button>
     </div>
   );

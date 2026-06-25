@@ -10,6 +10,7 @@ import dynamic from "next/dynamic";
 import { useEffect, useRef } from "react";
 
 const RUN_MS = 2000; // matches RUN_MS in ChappieScene
+const IDLE_X = "30%"; // rest position, right of the headline copy
 
 const ChappieScene = dynamic(() => import("./ChappieScene"), {
   ssr: false,
@@ -25,34 +26,53 @@ const ChappieScene = dynamic(() => import("./ChappieScene"), {
 export default function ChappieHero() {
   const outer = useRef<HTMLDivElement>(null);
   const inner = useRef<HTMLDivElement>(null);
+  const backTimer = useRef<number | undefined>(undefined);
 
   useEffect(() => {
-    // park off-screen left until the first run
-    if (outer.current) outer.current.style.transform = "translateX(-100%)";
+    // Chappie idles right-of-center by default (clear of the headline)
+    if (outer.current) outer.current.style.transform = `translateX(${IDLE_X})`;
 
     function onRun(e: Event) {
       const dir = (e as CustomEvent).detail?.dir;
-      const fromLeft = dir !== "right"; // default + "left" enter from the left
+      const fromLeft = dir !== "right"; // "left" = enter from the left, travel right
       if (inner.current) {
         // mirror so he faces his direction of travel (3D rotation shatters the
         // skinned mesh, so we flip in CSS instead)
         inner.current.style.transform = fromLeft ? "scaleX(-1)" : "scaleX(1)";
       }
-      const from = fromLeft ? "-100%" : "100%";
-      const to = fromLeft ? "100%" : "-100%";
+      const entry = fromLeft ? "-100%" : "100%";
+      const exit = fromLeft ? "100%" : "-100%";
       const el = outer.current;
       if (!el) return;
-      // clear any in-flight slide so a fresh press always wins (and directions
-      // don't collide via leftover fill:forwards animations)
+      window.clearTimeout(backTimer.current);
       el.getAnimations().forEach((a) => a.cancel());
-      el.style.transform = `translateX(${from})`;
+      // sweep across; opacity fades at the ends hide the off-screen entry/exit
       el.animate(
-        [{ transform: `translateX(${from})` }, { transform: `translateX(${to})` }],
-        { duration: RUN_MS, easing: "cubic-bezier(0.45,0,0.55,1)", fill: "forwards" },
+        [
+          { transform: `translateX(${entry})`, opacity: 0, offset: 0 },
+          { transform: `translateX(${entry})`, opacity: 1, offset: 0.12 },
+          { transform: `translateX(0%)`, opacity: 1, offset: 0.5 },
+          { transform: `translateX(${exit})`, opacity: 1, offset: 0.88 },
+          { transform: `translateX(${exit})`, opacity: 0, offset: 1 },
+        ],
+        { duration: RUN_MS, easing: "linear", fill: "forwards" },
       );
+      // settle back to center + face front for idle
+      backTimer.current = window.setTimeout(() => {
+        if (inner.current) inner.current.style.transform = "scaleX(1)";
+        el.getAnimations().forEach((a) => a.cancel());
+        el.style.transform = `translateX(${IDLE_X})`;
+        el.animate([{ opacity: 0 }, { opacity: 1 }], {
+          duration: 300,
+          fill: "forwards",
+        });
+      }, RUN_MS);
     }
     window.addEventListener("chappie-run", onRun);
-    return () => window.removeEventListener("chappie-run", onRun);
+    return () => {
+      window.removeEventListener("chappie-run", onRun);
+      window.clearTimeout(backTimer.current);
+    };
   }, []);
 
   return (

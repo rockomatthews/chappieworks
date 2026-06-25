@@ -91,15 +91,16 @@ export default function ShowcasePage() {
           </h1>
           <p className="mt-6 max-w-md text-lg leading-relaxed text-[var(--color-paper)]/90 [text-shadow:0_1px_16px_rgba(11,11,12,0.7)]">
             That&rsquo;s Chappie — a real 3D model rendered live in your browser,
-            textures and all. Hit a button and watch him bolt across the frame.
-            Everything below is real running code.
+            textures and all. He idles right here; hit a button to send him
+            sprinting across the frame or break into a dance. Everything below is
+            real running code.
           </p>
           <div className="mt-8">
             <span className="pointer-events-auto">
               <RunControls />
             </span>
             <p className="mono mt-3 text-xs text-[var(--color-paper)]/60">
-              he runs in and straight out the other side
+              live idle · run · Thriller — all real-time
             </p>
           </div>
           <div className="mt-8">

@@ -2,11 +2,11 @@
 
 /* The real R3F scene — code-split, client-only via ChappieHero.tsx.
 
-   Chappie is rendered at a FIXED identity transform (centered, grounded). A
-   glTF SkinnedMesh cannot be translated/rotated at runtime without the skinning
-   shader double-transforming the verts (they fly off-screen / shatter), so we
-   never move him in 3D — the run-across is done by CSS-translating the canvas
-   in ChappieHero. Here we only play/stop the run cycle and toggle visibility. */
+   Chappie idles at a FIXED identity transform (centered, grounded, side-on
+   camera). A glTF SkinnedMesh can't be translated/rotated at runtime without
+   the skinning shader shattering the verts, so he never moves in 3D — the
+   run-across is a CSS translate of the canvas (ChappieHero). Here we just
+   crossfade between the idle / run / thriller clips. */
 
 import { Suspense, useEffect, useMemo, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
@@ -37,12 +37,10 @@ function Loader() {
 
 function ChappieRunner() {
   const group = useRef<THREE.Group>(null);
-  const { scene, animations } = useGLTF("/models/chappie-run.glb");
-  const { actions, names } = useAnimations(animations, group);
-  const run = useRef({ active: false, t0: 0 });
+  const { scene, animations } = useGLTF("/models/chappie-anim.glb");
+  const { actions } = useAnimations(animations, group);
+  const backTimer = useRef<number | undefined>(undefined);
 
-  // Fit to ~2.6 units tall, feet at y=0 — applied to the scene node (uniform
-  // scale + translation here is fine; it's runtime *movement* that breaks skin).
   const { scale, offset } = useMemo(() => {
     const box = new THREE.Box3().setFromObject(scene);
     const size = box.getSize(new THREE.Vector3());
@@ -64,36 +62,95 @@ function ChappieRunner() {
     });
     scene.scale.setScalar(scale);
     scene.position.copy(offset);
-    scene.visible = false;
   }, [scene, scale, offset]);
 
+  // idle by default
   useEffect(() => {
+    actions.idle?.reset().fadeIn(0.4).play();
+  }, [actions]);
+
+  useEffect(() => {
+    function fadeTo(name: string, once = false) {
+      const next = actions[name];
+      if (!next) return;
+      window.clearTimeout(backTimer.current);
+      Object.values(actions).forEach((a) => {
+        if (a && a !== next && a.isRunning()) a.fadeOut(0.25);
+      });
+      next.reset();
+      next.setLoop(once ? THREE.LoopOnce : THREE.LoopRepeat, Infinity);
+      next.clampWhenFinished = once;
+      next.fadeIn(0.25).play();
+    }
     function onRun() {
-      run.current = { active: true, t0: performance.now() };
-      scene.visible = true;
-      const clip = names[0];
-      (clip ? actions[clip] : undefined)?.reset().play();
+      fadeTo("run");
+      backTimer.current = window.setTimeout(() => fadeTo("idle"), RUN_MS - 150);
+    }
+    function onDance() {
+      const dur = actions.thriller?.getClip().duration ?? 3;
+      fadeTo("thriller", true);
+      backTimer.current = window.setTimeout(
+        () => fadeTo("idle"),
+        dur * 1000 - 250,
+      );
     }
     window.addEventListener("chappie-run", onRun);
-    return () => window.removeEventListener("chappie-run", onRun);
-  }, [actions, names, scene]);
-
-  useFrame(() => {
-    const r = run.current;
-    if (!r.active) return;
-    if (performance.now() - r.t0 >= RUN_MS) {
-      r.active = false;
-      scene.visible = false;
-      const clip = names[0];
-      (clip ? actions[clip] : undefined)?.stop();
-    }
-  });
+    window.addEventListener("chappie-dance", onDance);
+    return () => {
+      window.removeEventListener("chappie-run", onRun);
+      window.removeEventListener("chappie-dance", onDance);
+      window.clearTimeout(backTimer.current);
+    };
+  }, [actions]);
 
   return (
     <group ref={group}>
       <primitive object={scene} />
     </group>
   );
+}
+
+/* Camera swings to a front view for idle/dance (Chappie faces you) and to a
+   side view only while he's running, so the run reads as a profile sprint.
+   The model never rotates — moving the camera is the only safe way to reframe
+   a glTF skinned mesh. */
+function CameraRig() {
+  const mode = useRef<"front" | "side">("front");
+  const timer = useRef<number | undefined>(undefined);
+  const front = useMemo(() => new THREE.Vector3(0, 1.5, 7.4), []);
+  const side = useMemo(() => new THREE.Vector3(7.8, 1.5, 0.7), []);
+  const target = useMemo(() => new THREE.Vector3(0, 1.1, 0), []);
+
+  useEffect(() => {
+    const onRun = () => {
+      mode.current = "side";
+      window.clearTimeout(timer.current);
+      timer.current = window.setTimeout(() => {
+        mode.current = "front";
+      }, RUN_MS);
+    };
+    const onDance = () => {
+      window.clearTimeout(timer.current);
+      mode.current = "front";
+    };
+    window.addEventListener("chappie-run", onRun);
+    window.addEventListener("chappie-dance", onDance);
+    return () => {
+      window.removeEventListener("chappie-run", onRun);
+      window.removeEventListener("chappie-dance", onDance);
+      window.clearTimeout(timer.current);
+    };
+  }, []);
+
+  useFrame((state, dt) => {
+    const dest = mode.current === "side" ? side : front;
+    const cam = state.camera;
+    cam.position.x = THREE.MathUtils.damp(cam.position.x, dest.x, 6, dt);
+    cam.position.y = THREE.MathUtils.damp(cam.position.y, dest.y, 6, dt);
+    cam.position.z = THREE.MathUtils.damp(cam.position.z, dest.z, 6, dt);
+    cam.lookAt(target);
+  });
+  return null;
 }
 
 export default function ChappieScene() {
@@ -103,13 +160,14 @@ export default function ChappieScene() {
       shadows
       dpr={dpr}
       gl={{ alpha: true, antialias: true, powerPreference: "high-performance" }}
-      camera={{ position: [6.6, 1.4, 0.6], fov: 32 }}
+      camera={{ position: [0, 1.5, 7.4], fov: 32 }}
       style={{ background: "transparent" }}
       onCreated={({ camera, gl }) => {
-        camera.lookAt(0, 1.0, 0); // side-on, so we see his running profile
+        camera.lookAt(0, 1.1, 0); // starts front-on (idle faces the viewer)
         gl.setClearColor(0x000000, 0);
       }}
     >
+      <CameraRig />
       <AdaptiveDpr pixelated />
       <ambientLight intensity={0.35} />
       <directionalLight
@@ -156,4 +214,4 @@ export default function ChappieScene() {
   );
 }
 
-useGLTF.preload("/models/chappie-run.glb");
+useGLTF.preload("/models/chappie-anim.glb");
