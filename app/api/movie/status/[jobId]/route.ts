@@ -16,6 +16,7 @@ import {
 } from "../../../../lib/movies";
 import { falStatus, falVideoResult, type FalStatus } from "../../../../lib/fal";
 import { atlasPoll } from "../../../../lib/atlas";
+import { seedancePoll } from "../../../../lib/seedance";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
@@ -80,6 +81,77 @@ async function burnWatermark(cleanMp4: Buffer): Promise<Buffer> {
   } finally {
     await rm(workDir, { recursive: true, force: true }).catch(() => {});
   }
+}
+
+async function pollSeedance(state: MovieState): Promise<NextResponse> {
+  if (!state.seedanceTaskId) {
+    return NextResponse.json(publicView(state));
+  }
+
+  let result: Awaited<ReturnType<typeof seedancePoll>>;
+  try {
+    result = await seedancePoll(state.seedanceTaskId);
+  } catch (err) {
+    console.error(
+      "[chappieworks:movie] seedance poll failed",
+      state.jobId,
+      err instanceof Error ? err.message : err,
+    );
+    return NextResponse.json(publicView(state));
+  }
+
+  if (result.status === "queued" || result.status === "generating") {
+    // Hard cap so a stalled render can't hang in "generating" forever.
+    const ageMs = Date.now() - new Date(state.createdAt).getTime();
+    if (ageMs > 15 * 60 * 1000) {
+      const failed: MovieState = {
+        ...state,
+        status: "failed",
+        failureReason:
+          "The render took too long and timed out. No charge — please try again, it's usually quick.",
+      };
+      await writeState(failed);
+      return NextResponse.json(publicView(failed));
+    }
+    if (state.status !== "generating") {
+      await writeState({ ...state, status: "generating" });
+    }
+    return NextResponse.json({ ...publicView(state), status: "generating" });
+  }
+
+  if (result.status === "failed" || !result.videoUrl) {
+    const friendly =
+      result.error ?? "couldn't generate the video — no charge, please try again";
+    console.error("[chappieworks:movie] seedance job failed", state.jobId, friendly);
+    const failed: MovieState = {
+      ...state,
+      status: "failed",
+      failureReason: friendly,
+    };
+    await writeState(failed);
+    return NextResponse.json(publicView(failed));
+  }
+
+  // Completed — download and finalize.
+  await writeState({ ...state, status: "watermarking" });
+  let cleanBuffer: Buffer;
+  try {
+    cleanBuffer = await downloadToBuffer(result.videoUrl);
+  } catch (err) {
+    console.error(
+      "[chappieworks:movie] seedance download failed",
+      state.jobId,
+      err instanceof Error ? err.message : err,
+    );
+    const failed: MovieState = {
+      ...state,
+      status: "failed",
+      failureReason: "couldn't download generated video",
+    };
+    await writeState(failed);
+    return NextResponse.json(publicView(failed));
+  }
+  return await finalizeReady(state, cleanBuffer);
 }
 
 async function pollAtlas(state: MovieState): Promise<NextResponse> {
@@ -399,7 +471,21 @@ export async function GET(
     return NextResponse.json(publicView(state));
   }
 
-  // Atlas Cloud path — current (uncensored backend)
+  // Seedance 2.0 path — current backend
+  if (state.seedanceTaskId) {
+    try {
+      return await pollSeedance(state);
+    } catch (err) {
+      console.error(
+        "[chappieworks:movie] seedance poll threw",
+        jobId,
+        err instanceof Error ? err.message : err,
+      );
+      return NextResponse.json(publicView(state));
+    }
+  }
+
+  // Atlas Cloud path — legacy jobs created during the brief Atlas window
   if (state.atlasTaskId) {
     try {
       return await pollAtlas(state);

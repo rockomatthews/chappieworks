@@ -12,7 +12,8 @@ export type MovieState = {
   falRequestId?: string;       // legacy Kling/Veo/Wan (via fal.ai) jobs
   falStatusUrl?: string;
   falResultUrl?: string;
-  atlasTaskId?: string;        // Atlas Cloud jobs (current — uncensored backend)
+  atlasTaskId?: string;        // legacy Atlas Cloud jobs
+  seedanceTaskId?: string;     // Seedance 2.0 jobs (current backend)
   status: "pending" | "generating" | "watermarking" | "ready" | "failed";
   failureReason?: string;
   previewUrl?: string;
