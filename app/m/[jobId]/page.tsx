@@ -35,10 +35,14 @@ export default async function MovieSharePage({
   }
 
   const justPaid = paidQuery === "1";
+  // Pay-first: right after checkout the webhook may not have started the render
+  // yet, so a just-paid awaiting_payment job is "rendering" from the buyer's
+  // point of view — the poller picks up the transition.
   const isRendering =
     state.status === "pending" ||
     state.status === "generating" ||
-    state.status === "watermarking";
+    state.status === "watermarking" ||
+    (state.status === "awaiting_payment" && (justPaid || state.paid));
 
   const priceLabel = state.durationSec === 10 ? "$24.99" : "$14.99";
   const isExtension = state.mode === "video";
@@ -58,7 +62,13 @@ export default async function MovieSharePage({
             Movie · /m/{jobId.slice(0, 8)}
           </p>
           <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight mt-3 mb-6 leading-[1.15]">
-            {state.paid ? "Unlocked · HD download ready" : "Your preview"}
+            {state.paid
+              ? state.status === "ready"
+                ? "Unlocked · HD download ready"
+                : "Paid · rendering your clip"
+              : state.status === "awaiting_payment"
+                ? "Your video brief"
+                : "Your preview"}
           </h1>
 
           {state.prompt && (
@@ -72,11 +82,39 @@ export default async function MovieSharePage({
             </div>
           )}
 
+          {state.status === "awaiting_payment" && !justPaid && !state.paid && (
+            <div
+              className="card rounded-xl p-6 sm:p-8"
+              style={{
+                background:
+                  "linear-gradient(135deg, rgba(201,164,55,0.1), rgba(201,164,55,0.02))",
+                border: "1px solid rgba(201,164,55,0.4)",
+              }}
+            >
+              <p className="text-xs mono text-[var(--color-gold)] uppercase tracking-widest mb-2">
+                Brief saved · not rendered yet
+              </p>
+              <h2 className="text-xl font-semibold mb-2">
+                {`Pay ${priceLabel} to start the render`}
+              </h2>
+              <p className="text-sm text-[var(--color-paper)]/85 mb-5 leading-relaxed">
+                Your prompt is saved. Pay and the render starts immediately —
+                clean 1080p MP4, no watermark, on this page and in your inbox.
+              </p>
+              <UnlockButton jobId={jobId} priceLabel={priceLabel} />
+              <p className="text-xs mono text-[var(--color-mute)] mt-3">
+                Secure checkout via Stripe. Apple Pay / Google Pay supported.
+              </p>
+            </div>
+          )}
+
           {isRendering && (
             <RenderingPoller
               jobId={jobId}
               status={
-                state.status as "pending" | "generating" | "watermarking"
+                state.status === "awaiting_payment"
+                  ? "pending"
+                  : (state.status as "pending" | "generating" | "watermarking")
               }
             />
           )}

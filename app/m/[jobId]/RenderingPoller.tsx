@@ -8,7 +8,7 @@ const POLL_INTERVAL_MS = 5000;
 const STATUS_COPY = {
   pending: "Queued — starting the render…",
   generating: "Rendering your clip. 60–120 seconds.",
-  watermarking: "Almost there — burning the watermark on the preview.",
+  watermarking: "Almost there — finalizing your clip.",
 } as const;
 
 export function RenderingPoller({

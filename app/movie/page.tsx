@@ -7,11 +7,11 @@ import { MovieReel } from "./MovieReel";
 export const metadata = {
   title: "Make a movie · instant AI video from a prompt — Chappie Works",
   description:
-    "Type a prompt. Get a 5-second cinematic clip in ~90 seconds. Preview with watermark, free. Buy the unwatermarked HD MP4 for $14.99 — commercial rights yours.",
+    "Type a prompt. Get a 5-second cinematic clip in ~90 seconds. $14.99 per clip — clean 1080p HD MP4, no watermark, commercial rights yours.",
   openGraph: {
     title: "Make a movie · instant AI video — Chappie Works",
     description:
-      "Prompt → 5s HD clip in ~90s. Free preview. $14.99 to unlock the unwatermarked download.",
+      "Prompt → 5s HD clip in ~90s. $14.99 per clip. Clean 1080p MP4, commercial rights yours.",
     url: "https://chappieworks.com/movie",
   },
 };
@@ -32,16 +32,16 @@ export default function MoviePage() {
           </div>
 
           <p className="text-xs mono text-[var(--color-gold)] mt-10 uppercase tracking-widest">
-            Movie · preview free · $14.99 to unlock
+            Movie · $14.99 per clip · Seedance 2.0
           </p>
           <h1 className="text-4xl sm:text-5xl font-semibold tracking-tight mt-3 mb-6 leading-[1.1]">
             Type a prompt. Get a cinematic clip in 90 seconds.
           </h1>
           <p className="text-base sm:text-lg text-[var(--color-paper)]/85 leading-relaxed">
-            Free preview. Watch your 5-second clip render onsite, watermarked.
-            If it&rsquo;s a keeper, $14.99 unlocks the unwatermarked HD MP4 —
-            commercial rights yours. If it&rsquo;s not, try another prompt.
-            We&rsquo;ll wait.
+            Write the brief, pay $14.99, and the render starts immediately.
+            Clean 1080p HD MP4 with native audio — no watermark, commercial
+            rights yours — on this page and in your inbox, usually within a
+            couple of minutes.
           </p>
 
           <div className="mt-10">
@@ -50,15 +50,15 @@ export default function MoviePage() {
               messages={[
                 {
                   speaker: "Skeptic",
-                  text: "Five seconds isn't a movie, it's a GIF with audio. Calling it 'a movie' is overpromising. And every preview render burns Replicate credits even when no one buys.",
+                  text: "Five seconds isn't a movie, it's a GIF with audio. Calling it 'a movie' is overpromising. And the old free-preview model burned render credits on every prompt whether anyone bought or not.",
                 },
                 {
                   speaker: "Chappie",
-                  text: "Fair. Length cap is a feature: 5s keeps cost predictable, conversion math sane, and forces the prompt to be tight. The 'movie' framing is honest about what people use these for — product hero loops, social hooks, openers. Charging $14.99 for 1080p HD with native audio and commercial rights is half what Pika and Runway charge for the same model class.",
+                  text: "Which is exactly why it's pay-first now: you pay $14.99, the render starts, and the clean 1080p MP4 with native audio and commercial rights is yours. No watermarked teaser, no upsell. Length cap is a feature — 5s keeps cost predictable and forces the prompt to be tight. Still half what Pika and Runway charge for the same model class.",
                 },
                 {
                   speaker: "Chappie",
-                  text: "And we run it on Seedance 2.0 — ByteDance's new multimodal model that's currently #1 for prompt adherence on the public arena. Image-to-video is built in: upload a photo as the first frame and we animate it. Free with the preview, $14.99 to unlock the clean MP4.",
+                  text: "And we run it on Seedance 2.0 — ByteDance's new multimodal model that's currently #1 for prompt adherence on the public arena. Image-to-video is built in: upload a photo as the first frame and we animate it.",
                 },
               ]}
             />
@@ -75,25 +75,23 @@ export default function MoviePage() {
                 Write a prompt (the more specific, the better — subject,
                 lighting, camera move). Optionally upload a reference image
                 to animate from — image-to-video uses your image as the first
-                frame. Add your email so we can send you the clean MP4 if
-                you buy.
+                frame. Add your email so we can send you the clean MP4.
               </li>
               <li>
-                Forge spins up a Kling render — text and image inputs into one
-                model, native audio. It usually takes a couple of minutes, and
-                can run longer when the model&rsquo;s queue is busy. The page
-                polls while it runs — leave and come back anytime; we hold your
-                result for 30 days.
+                Pay $14.99 (or $24.99 for 10s) with Stripe, right on the page.
+                The render starts the moment payment clears — nothing renders
+                before that, which is how the price stays this low.
               </li>
               <li>
-                When it&rsquo;s done, the watermarked preview plays inline.
-                Watch it as many times as you want.
+                Forge runs it on Seedance 2.0 — text and image inputs into one
+                model, native audio. Usually a couple of minutes; the page
+                tracks it live, and you can leave and come back anytime — we
+                hold your result for 30 days.
               </li>
               <li>
-                Like it? $14.99 unlocks the unwatermarked HD download. The
-                clean MP4 lands in your inbox + appears on this page.
-                Don&rsquo;t like it? Write a better prompt and try again — each
-                attempt gets a fresh preview.
+                Done: the clean 1080p MP4 plays inline, downloads from this
+                page, and lands in your inbox. No watermark, commercial rights
+                yours.
               </li>
             </ol>
           </div>
@@ -107,7 +105,7 @@ export default function MoviePage() {
                 <span aria-hidden="true" className="text-[var(--color-gold)]">
                   ▸
                 </span>
-                <span>5–10 second HD MP4, watermark removed, ready to use.</span>
+                <span>5–10 second clean 1080p HD MP4, ready to use.</span>
               </li>
               <li className="flex gap-3">
                 <span aria-hidden="true" className="text-[var(--color-gold)]">

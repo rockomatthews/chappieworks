@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { put } from "@vercel/blob";
-import { seedanceSubmit, SEEDANCE_MODEL } from "../../../lib/seedance";
+import { SEEDANCE_MODEL } from "../../../lib/seedance";
 import { screenForAdult } from "../../../lib/moderation";
 import ffmpegPath from "ffmpeg-static";
 import ffmpeg from "fluent-ffmpeg";
@@ -232,11 +232,13 @@ export async function POST(req: Request) {
     }
   }
 
-  // All video runs on Seedance 2.0. Seedance can moderate, but we still screen
-  // adult content OURSELVES on every prompt (violence/gore/dark themes are fine —
-  // that's the point) so NSFW never reaches the backend or a paid deliverable,
-  // keeping Stripe/brand safe. `tier` is retained for the UI but doesn't change
-  // the backend.
+  // All video runs on Seedance 2.0, and Seedance bills credits PER RENDER —
+  // so nothing is submitted until the buyer pays (pay-first). This route only
+  // validates + records the brief. We still screen adult content on every
+  // prompt BEFORE taking money (violence/gore/dark themes are fine — that's
+  // the point) so NSFW never reaches checkout or the backend, keeping
+  // Stripe/brand safe. `tier` is retained for the UI but doesn't change the
+  // backend.
   const screen = await screenForAdult(prompt, startImageUrl);
   if (screen.blocked) {
     return NextResponse.json({ error: screen.reason }, { status: 400 });
@@ -246,20 +248,12 @@ export async function POST(req: Request) {
     // Seedance durations are 5s/10s. Map our 5/10 directly.
     const seconds = duration >= 7 ? 10 : 5;
 
-    const sub = await seedanceSubmit({
-      prompt,
-      duration: seconds,
-      aspectRatio: "16:9",
-      imageUrls: startImageUrl ? [startImageUrl] : undefined,
-    });
-
     const state: MovieState = {
       jobId,
       prompt,
       email,
       createdAt: new Date().toISOString(),
-      seedanceTaskId: sub.taskId,
-      status: "generating",
+      status: "awaiting_payment",
       paid: false,
       durationSec: seconds,
       mode,
@@ -269,11 +263,10 @@ export async function POST(req: Request) {
     await writeState(state);
 
     console.log(
-      "[chappieworks:movie] created job",
+      "[chappieworks:movie] brief recorded (awaiting payment)",
       jobId,
-      "seedance",
+      "model",
       SEEDANCE_MODEL,
-      sub.taskId,
       "tier",
       tier,
       "mode",
@@ -285,9 +278,9 @@ export async function POST(req: Request) {
     return NextResponse.json({ jobId });
   } catch (err) {
     const message = err instanceof Error ? err.message : "unknown";
-    console.error("[chappieworks:movie] create seedance video failed", message);
+    console.error("[chappieworks:movie] record brief failed", message);
     return NextResponse.json(
-      { error: `couldn't start generation: ${message}` },
+      { error: `couldn't start: ${message}` },
       { status: 502 },
     );
   }

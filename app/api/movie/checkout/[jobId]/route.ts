@@ -3,6 +3,7 @@ import Stripe from "stripe";
 import { readState, writeState } from "../../../../lib/movies";
 import { isBypassEmail } from "../../../../lib/movieEmail";
 import { deliverMovieHd } from "../../../../lib/movieUpscale";
+import { startGeneration } from "../../../../lib/movieStart";
 
 export const runtime = "nodejs";
 // Room for post-response `after()` HD upscale on the bypass path.
@@ -17,10 +18,10 @@ function videoPrice(durationSec: number | undefined): {
 } {
   const isExt = durationSec === 10;
   return {
-    unitAmount: isExt ? 2499 : 1499, // $24.99 extension / $14.99 unlock
+    unitAmount: isExt ? 2499 : 1499, // $24.99 10s / $14.99 5s
     name: isExt
-      ? "Chappie Video — clean 1080p extension (10s, no watermark)"
-      : "Chappie Video — clean 1080p MP4 (no watermark)",
+      ? "Chappie Video — 10s clean 1080p AI clip"
+      : "Chappie Video — 5s clean 1080p AI clip",
   };
 }
 
@@ -40,9 +41,12 @@ export async function POST(
   if (!state) {
     return NextResponse.json({ error: "job not found" }, { status: 404 });
   }
-  if (state.status !== "ready") {
+  // Pay-first: checkout happens on the recorded brief (awaiting_payment) and
+  // the render starts from the webhook. "ready" is still accepted for legacy
+  // jobs that pre-rendered a watermarked preview.
+  if (state.status !== "awaiting_payment" && state.status !== "ready") {
     return NextResponse.json(
-      { error: "movie not ready yet" },
+      { error: "job not payable in its current state" },
       { status: 400 },
     );
   }
@@ -60,12 +64,6 @@ export async function POST(
       : "https://chappieworks.com");
 
   if (isBypassEmail(state.email)) {
-    if (!state.cleanUrl) {
-      return NextResponse.json(
-        { error: "clean video not ready — wait a few seconds and retry" },
-        { status: 503 },
-      );
-    }
     const updated = {
       ...state,
       paid: true,
@@ -74,16 +72,29 @@ export async function POST(
       hdPending: true,
     };
     await writeState(updated);
-    // Upscale to 1080p + email after the response.
-    after(() =>
-      deliverMovieHd(jobId, { bypass: true }).catch((err) =>
-        console.error(
-          "[chappieworks:movie] bypass hd delivery threw",
-          jobId,
-          err instanceof Error ? err.message : err,
+    if (state.status === "awaiting_payment") {
+      // Pay-first: kick off the render now that "payment" cleared.
+      after(() =>
+        startGeneration(jobId).catch((err) =>
+          console.error(
+            "[chappieworks:movie] bypass generation threw",
+            jobId,
+            err instanceof Error ? err.message : err,
+          ),
         ),
-      ),
-    );
+      );
+    } else if (state.cleanUrl) {
+      // Legacy pre-rendered job: unlock + deliver the HD file.
+      after(() =>
+        deliverMovieHd(jobId, { bypass: true }).catch((err) =>
+          console.error(
+            "[chappieworks:movie] bypass hd delivery threw",
+            jobId,
+            err instanceof Error ? err.message : err,
+          ),
+        ),
+      );
+    }
     console.log("[chappieworks:movie] bypass unlock", jobId, "→", state.email);
     return NextResponse.json({
       url: `${origin}/m/${jobId}?paid=1&bypass=1`,
