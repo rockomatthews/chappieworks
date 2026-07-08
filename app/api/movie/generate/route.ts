@@ -1,10 +1,6 @@
 import { NextResponse } from "next/server";
 import { put } from "@vercel/blob";
-import {
-  atlasSubmit,
-  ATLAS_TEXT_MODEL,
-  ATLAS_IMAGE_MODEL,
-} from "../../../lib/atlas";
+import { seedanceSubmit, SEEDANCE_MODEL } from "../../../lib/seedance";
 import { screenForAdult } from "../../../lib/moderation";
 import ffmpegPath from "ffmpeg-static";
 import ffmpeg from "fluent-ffmpeg";
@@ -36,9 +32,9 @@ const ALLOWED_IMAGE_TYPES = new Set([
   "image/webp",
 ]);
 
-// Generation runs on Kling (Kling 2.1 Master) via fal.ai — high quality, native
-// ~1080p, permissive content policy, and much faster/cheaper than Sora (which
-// OpenAI is discontinuing). Kling supports 5s or 10s clips.
+// Generation runs on Seedance 2.0 (seedance2.ai) — native audio, up to 1080p,
+// 5s or 10s clips. We keep our own adult-content pre-screen (lib/moderation) so
+// NSFW never reaches the backend; violence/action/dark themes are allowed.
 
 // Pull the last frame from a video at a public URL and return it as a PNG
 // buffer. Used by extension mode to seed the next 10s with the final frame
@@ -170,8 +166,8 @@ export async function POST(req: Request) {
     duration = 10;
   }
 
-  if (!process.env.ATLAS_API_KEY) {
-    console.error("[chappieworks:movie] ATLAS_API_KEY missing");
+  if (!process.env.SEEDANCE_API_KEY) {
+    console.error("[chappieworks:movie] SEEDANCE_API_KEY missing");
     return NextResponse.json(
       { error: "generator offline — try again shortly" },
       { status: 503 },
@@ -236,42 +232,33 @@ export async function POST(req: Request) {
     }
   }
 
-  // ALL video now runs on Atlas Cloud (uncensored — fal moderated violence on
-  // every model, including the Raw tier, which made it useless). Atlas applies
-  // no platform moderation, so we screen adult content OURSELVES on every prompt
-  // (violence/gore/dark themes are fine — that's the point). Keeps NSFW out and
-  // Stripe/brand safe regardless of tier. `tier` is retained for the UI but no
-  // longer changes the backend.
+  // All video runs on Seedance 2.0. Seedance can moderate, but we still screen
+  // adult content OURSELVES on every prompt (violence/gore/dark themes are fine —
+  // that's the point) so NSFW never reaches the backend or a paid deliverable,
+  // keeping Stripe/brand safe. `tier` is retained for the UI but doesn't change
+  // the backend.
   const screen = await screenForAdult(prompt, startImageUrl);
   if (screen.blocked) {
     return NextResponse.json({ error: screen.reason }, { status: 400 });
   }
 
   try {
-    // Wan 2.5 durations are 5s/10s. Map our 5/10 directly.
+    // Seedance durations are 5s/10s. Map our 5/10 directly.
     const seconds = duration >= 7 ? 10 : 5;
 
-    // Image-to-video uses the Wan 2.2 turbo model; text-to-video uses Wan 2.5
-    // (native audio, up to 1080p). Both uncensored on Atlas.
-    const model = startImageUrl ? ATLAS_IMAGE_MODEL : ATLAS_TEXT_MODEL;
-    const input: Record<string, unknown> = {
+    const sub = await seedanceSubmit({
       prompt,
-      aspect_ratio: "16:9",
       duration: seconds,
-      resolution: "1080p",
-    };
-    if (startImageUrl) {
-      input.image_url = startImageUrl;
-    }
-
-    const sub = await atlasSubmit(model, input);
+      aspectRatio: "16:9",
+      imageUrls: startImageUrl ? [startImageUrl] : undefined,
+    });
 
     const state: MovieState = {
       jobId,
       prompt,
       email,
       createdAt: new Date().toISOString(),
-      atlasTaskId: sub.taskId,
+      seedanceTaskId: sub.taskId,
       status: "generating",
       paid: false,
       durationSec: seconds,
@@ -284,8 +271,8 @@ export async function POST(req: Request) {
     console.log(
       "[chappieworks:movie] created job",
       jobId,
-      "atlas",
-      model,
+      "seedance",
+      SEEDANCE_MODEL,
       sub.taskId,
       "tier",
       tier,
@@ -298,7 +285,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ jobId });
   } catch (err) {
     const message = err instanceof Error ? err.message : "unknown";
-    console.error("[chappieworks:movie] create atlas video failed", message);
+    console.error("[chappieworks:movie] create seedance video failed", message);
     return NextResponse.json(
       { error: `couldn't start generation: ${message}` },
       { status: 502 },
