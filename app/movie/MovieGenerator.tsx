@@ -127,6 +127,8 @@ export function MovieGenerator() {
 
   const uploadLabel = useMemo(() => {
     switch (mode) {
+      case "text":
+        return "Beginning image · recommended";
       case "video":
         return "Extend this clip · +10 seconds";
       case "image":
@@ -143,7 +145,7 @@ export function MovieGenerator() {
       case "image":
         return "We'll use this as the first frame and animate it. Cartoon, logo, product shot, photo — anything.";
       default:
-        return "Drop an image to give it motion, or drop a video to extend it by 10 seconds. PNG/JPG/WebP up to 4 MB, MP4/MOV/WebM up to 100 MB. Leave empty for pure text-to-video.";
+        return "Seedance is at its best animating a first frame — drop a photo, product shot, still, or logo and describe how it moves. PNG/JPG/WebP up to 4 MB. (A video extends it by 10s instead — MP4/MOV/WebM up to 100 MB.) You can skip it for pure text-to-video.";
     }
   }, [mode]);
 
@@ -394,44 +396,6 @@ export function MovieGenerator() {
         >
           <div>
             <label
-              htmlFor="movie-prompt"
-              className="block text-xs mono text-[var(--color-gold)] uppercase tracking-widest mb-2"
-            >
-              {mode === "video"
-                ? "Direction for the next 10s *"
-                : mode === "image"
-                  ? "How should it move? *"
-                  : "Describe your scene *"}
-            </label>
-            <textarea
-              id="movie-prompt"
-              value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
-              placeholder={
-                mode === "video"
-                  ? "Continue the same scene — camera pushes in slowly, subject turns toward the light, beat lands on the final note."
-                  : mode === "image"
-                    ? "Camera pushes in slowly. Subject blinks, looks up. Soft wind in the hair. Cinematic, shallow depth of field."
-                    : "A close-up of a hand pouring espresso into a glass cup. Warm morning light from a window. Slow motion. Cinematic, shallow depth of field."
-              }
-              rows={5}
-              maxLength={800}
-              required
-              className="w-full bg-[var(--color-ink)] border border-white/15 rounded-md px-3 py-2 text-base sm:text-sm text-[var(--color-paper)] placeholder:text-[var(--color-mute)] focus:outline-none focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/50"
-              style={{ fontSize: "16px" }}
-            />
-            <div className="flex justify-between mt-1.5 text-[10px] mono text-[var(--color-mute)]">
-              <span>
-                {mode === "video"
-                  ? "The previous clip is your anchor. The next 10s picks up from its final frame."
-                  : "Tip: be specific. Subject, lighting, camera move, mood."}
-              </span>
-              <span>{prompt.length} / 800</span>
-            </div>
-          </div>
-
-          <div>
-            <label
               htmlFor="movie-file"
               className="block text-xs mono text-[var(--color-gold)] uppercase tracking-widest mb-2"
             >
@@ -495,6 +459,44 @@ export function MovieGenerator() {
                 </p>
               </>
             )}
+          </div>
+
+          <div>
+            <label
+              htmlFor="movie-prompt"
+              className="block text-xs mono text-[var(--color-gold)] uppercase tracking-widest mb-2"
+            >
+              {mode === "video"
+                ? "Direction for the next 10s *"
+                : mode === "image"
+                  ? "How should it move? *"
+                  : "Describe your scene *"}
+            </label>
+            <textarea
+              id="movie-prompt"
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+              placeholder={
+                mode === "video"
+                  ? "Continue the same scene — camera pushes in slowly, subject turns toward the light, beat lands on the final note."
+                  : mode === "image"
+                    ? "Camera pushes in slowly. Subject blinks, looks up. Soft wind in the hair. Cinematic, shallow depth of field."
+                    : "A close-up of a hand pouring espresso into a glass cup. Warm morning light from a window. Slow motion. Cinematic, shallow depth of field."
+              }
+              rows={5}
+              maxLength={800}
+              required
+              className="w-full bg-[var(--color-ink)] border border-white/15 rounded-md px-3 py-2 text-base sm:text-sm text-[var(--color-paper)] placeholder:text-[var(--color-mute)] focus:outline-none focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/50"
+              style={{ fontSize: "16px" }}
+            />
+            <div className="flex justify-between mt-1.5 text-[10px] mono text-[var(--color-mute)]">
+              <span>
+                {mode === "video"
+                  ? "The previous clip is your anchor. The next 10s picks up from its final frame."
+                  : "Tip: be specific. Subject, lighting, camera move, mood."}
+              </span>
+              <span>{prompt.length} / 800</span>
+            </div>
           </div>
 
           <div>

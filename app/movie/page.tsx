@@ -72,10 +72,11 @@ export default function MoviePage() {
             <h2 className="text-lg font-semibold mb-4">How it works</h2>
             <ol className="space-y-3 text-sm text-[var(--color-paper)]/90 list-decimal list-inside">
               <li>
-                Write a prompt (the more specific, the better — subject,
-                lighting, camera move). Optionally upload a reference image
-                to animate from — image-to-video uses your image as the first
-                frame. Add your email so we can send you the clean MP4.
+                Start with a beginning image if you have one — a product shot,
+                still, logo, or photo. Seedance is at its best animating a
+                first frame. Then write the prompt for how it moves (subject,
+                lighting, camera move), or skip the image and go pure
+                text-to-video. Add your email so we can send you the clean MP4.
               </li>
               <li>
                 Pay $14.99 (or $24.99 for 10s) with Stripe, right on the page.
