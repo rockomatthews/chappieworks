@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
 import { put } from "@vercel/blob";
 import OpenAI from "openai";
 import Replicate from "replicate";
@@ -17,6 +17,7 @@ import {
 import { falStatus, falVideoResult, type FalStatus } from "../../../../lib/fal";
 import { atlasPoll } from "../../../../lib/atlas";
 import { seedancePoll } from "../../../../lib/seedance";
+import { deliverMovieHd } from "../../../../lib/movieUpscale";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
@@ -101,14 +102,17 @@ async function pollSeedance(state: MovieState): Promise<NextResponse> {
   }
 
   if (result.status === "queued" || result.status === "generating") {
-    // Hard cap so a stalled render can't hang in "generating" forever.
-    const ageMs = Date.now() - new Date(state.createdAt).getTime();
+    // Hard cap so a stalled render can't hang in "generating" forever. Pay-first:
+    // the clock starts when the render actually started (post-payment), not when
+    // the brief was written — a buyer can take arbitrarily long to pay.
+    const startedAt = state.generationStartedAt ?? state.createdAt;
+    const ageMs = Date.now() - new Date(startedAt).getTime();
     if (ageMs > 15 * 60 * 1000) {
       const failed: MovieState = {
         ...state,
         status: "failed",
         failureReason:
-          "The render took too long and timed out. No charge — please try again, it's usually quick.",
+          "The render took too long and timed out. You have NOT lost your money — reply to your receipt email and we'll re-run or refund it.",
       };
       await writeState(failed);
       return NextResponse.json(publicView(failed));
@@ -121,7 +125,8 @@ async function pollSeedance(state: MovieState): Promise<NextResponse> {
 
   if (result.status === "failed" || !result.videoUrl) {
     const friendly =
-      result.error ?? "couldn't generate the video — no charge, please try again";
+      result.error ??
+      "The render failed. You have NOT lost your money — reply to your receipt email and we'll re-run or refund it.";
     console.error("[chappieworks:movie] seedance job failed", state.jobId, friendly);
     const failed: MovieState = {
       ...state,
@@ -454,6 +459,22 @@ async function finalizeReady(
     "duration",
     ready.durationSec,
   );
+
+  // Pay-first flow: the buyer already paid before this render started, so
+  // produce the HD deliverable + email it as soon as the clip lands. Runs
+  // after the response; idempotent inside deliverMovieHd.
+  if (ready.paid && !ready.hdUrl) {
+    after(() =>
+      deliverMovieHd(jobId).catch((err) =>
+        console.error(
+          "[chappieworks:movie] post-render hd delivery threw",
+          jobId,
+          err instanceof Error ? err.message : err,
+        ),
+      ),
+    );
+  }
+
   return NextResponse.json(publicView(ready));
 }
 
@@ -467,7 +488,11 @@ export async function GET(
     return NextResponse.json({ error: "not found" }, { status: 404 });
   }
 
-  if (state.status === "ready" || state.status === "failed") {
+  if (
+    state.status === "ready" ||
+    state.status === "failed" ||
+    state.status === "awaiting_payment"
+  ) {
     return NextResponse.json(publicView(state));
   }
 

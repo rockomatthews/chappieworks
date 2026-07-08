@@ -44,7 +44,13 @@ function WatermarkOverlay() {
 
 type JobStatus = {
   jobId: string;
-  status: "pending" | "generating" | "watermarking" | "ready" | "failed";
+  status:
+    | "awaiting_payment"
+    | "pending"
+    | "generating"
+    | "watermarking"
+    | "ready"
+    | "failed";
   paid: boolean;
   previewUrl?: string;
   cleanUrl?: string;
@@ -61,6 +67,7 @@ const POLL_INTERVAL_MS = 4000;
 const MAX_POLL_DURATION_MS = 15 * 60 * 1000;
 
 const STATUS_COPY: Record<JobStatus["status"], string> = {
+  awaiting_payment: "Brief saved — complete checkout to start the render.",
   pending: "Queued — starting the render…",
   generating:
     "Forge is rendering your clip. Usually a couple of minutes — sometimes 5+ when the model's queue is busy. Leave and come back anytime; we hold your result.",
@@ -132,7 +139,7 @@ export function MovieGenerator() {
   const uploadHelp = useMemo(() => {
     switch (mode) {
       case "video":
-        return "We'll continue your clip with a new 10-second beat — same vibe, your direction. Preview shows your clip plus the new 10s with a watermark.";
+        return "We'll continue your clip with a new 10-second beat — same vibe, your direction. Pay, and the clean extension renders straight to this page + your inbox.";
       case "image":
         return "We'll use this as the first frame and animate it. Cartoon, logo, product shot, photo — anything.";
       default:
@@ -268,7 +275,7 @@ export function MovieGenerator() {
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       failValidation(
-        "Please add a valid email below — we email the unwatermarked HD MP4 if you buy.",
+        "Please add a valid email below — we email your clean HD MP4 there.",
       );
       return;
     }
@@ -315,12 +322,10 @@ export function MovieGenerator() {
         throw new Error(data.error ?? `request failed (${res.status})`);
       }
       const jobId = data.jobId;
-      setJob({ jobId, status: "pending", paid: false, mode });
-      pollStartRef.current = Date.now();
-      pollTimerRef.current = setTimeout(
-        () => void pollOnce(jobId),
-        POLL_INTERVAL_MS,
-      );
+      // Pay-first: the brief is recorded server-side but nothing renders until
+      // checkout completes. Open payment immediately.
+      setJob({ jobId, status: "awaiting_payment", paid: false, mode });
+      await startCheckout(jobId);
     } catch (err) {
       setJob(null);
       setError(err instanceof Error ? err.message : "Couldn't kick off render");
@@ -333,13 +338,14 @@ export function MovieGenerator() {
     }
   }
 
-  async function startCheckout() {
-    if (!job || job.status !== "ready") return;
+  async function startCheckout(jobIdOverride?: string) {
+    const jobId = jobIdOverride ?? job?.jobId;
+    if (!jobId || jobId === "starting") return;
     setCheckoutLoading(true);
     setError(null);
     try {
       const embedded = canEmbedCheckout();
-      const res = await fetch(`/api/movie/checkout/${job.jobId}`, {
+      const res = await fetch(`/api/movie/checkout/${jobId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ embedded }),
@@ -348,6 +354,7 @@ export function MovieGenerator() {
         url?: string;
         clientSecret?: string;
         error?: string;
+        bypassed?: boolean;
       };
       if (!res.ok) throw new Error(data.error ?? "couldn't start checkout");
       // Embedded: open the on-page panel. Otherwise fall back to redirect.
@@ -507,7 +514,7 @@ export function MovieGenerator() {
               >
                 <div className="font-medium">5 seconds</div>
                 <div className="text-[10px] mono text-[var(--color-mute)] mt-0.5">
-                  {PRICE_5S} to unlock
+                  {PRICE_5S}
                 </div>
               </button>
               <button
@@ -521,7 +528,7 @@ export function MovieGenerator() {
               >
                 <div className="font-medium">10 seconds</div>
                 <div className="text-[10px] mono text-[var(--color-mute)] mt-0.5">
-                  {PRICE_10S} to unlock
+                  {PRICE_10S}
                 </div>
               </button>
             </div>
@@ -595,7 +602,7 @@ export function MovieGenerator() {
               style={{ fontSize: "16px" }}
             />
             <p className="text-[10px] mono text-[var(--color-mute)] mt-1.5">
-              We email the unwatermarked HD MP4 if you buy. No spam.
+              Your clean HD MP4 lands here when the render finishes. No spam.
             </p>
           </div>
 
@@ -625,14 +632,67 @@ export function MovieGenerator() {
                 ? "Uploading & starting…"
                 : "Starting…"
               : mode === "video"
-                ? "Generate my +10s extension →"
-                : "Generate my free preview →"}
+                ? `Create my +10s extension — ${PRICE_10S} →`
+                : `Create my video — ${priceLabel} →`}
           </button>
 
           <p className="text-xs mono text-[var(--color-mute)] text-center">
-            Free to preview. {priceLabel} to unlock the HD download.
+            {priceLabel} per clip, charged before the render. Clean 1080p MP4,
+            no watermark, emailed to you.
           </p>
         </form>
+      )}
+
+      {job && job.status === "awaiting_payment" && (
+        <div
+          ref={renderPanelRef}
+          className="card rounded-xl p-6 sm:p-8 ring-2 ring-[var(--color-gold)]/70 scroll-mt-24"
+          style={{
+            background:
+              "linear-gradient(135deg, rgba(201,164,55,0.1), rgba(201,164,55,0.02))",
+          }}
+        >
+          <p className="text-xs mono text-[var(--color-gold)] uppercase tracking-widest mb-2">
+            Brief saved · pay to render
+          </p>
+          <h3 className="text-xl font-semibold mb-2">
+            {`Create my ${job.durationSec === 10 ? "10s" : "5s"} video — ${readyPriceLabel}`}
+          </h3>
+          <p className="text-sm text-[var(--color-paper)]/85 mb-5 leading-relaxed">
+            Pay once and the render starts immediately. Clean 1080p MP4, no
+            watermark — on this page and in your inbox, usually within a couple
+            of minutes. Commercial rights yours.
+          </p>
+          <button
+            onClick={() => void startCheckout()}
+            disabled={checkoutLoading}
+            className="w-full sm:w-auto px-6 py-3 rounded-md bg-[var(--color-gold)] text-[var(--color-ink)] font-medium hover:opacity-90 transition disabled:opacity-50"
+          >
+            {checkoutLoading
+              ? "Opening checkout…"
+              : `Pay ${readyPriceLabel} & render →`}
+          </button>
+          <p className="text-xs mono text-[var(--color-mute)] mt-3">
+            Secure checkout via Stripe. Apple Pay / Google Pay supported.
+          </p>
+          {checkoutClientSecret && (
+            <StripeCheckoutModal
+              clientSecret={checkoutClientSecret}
+              onClose={() => setCheckoutClientSecret(null)}
+            />
+          )}
+          <button
+            onClick={() => {
+              setJob(null);
+              setError(null);
+              setCheckoutClientSecret(null);
+              stopPolling();
+            }}
+            className="block mt-5 text-sm text-[var(--color-paper)]/70 hover:text-[var(--color-gold)] underline underline-offset-4 transition"
+          >
+            ← Edit the prompt instead
+          </button>
+        </div>
       )}
 
       {isRendering && job && (

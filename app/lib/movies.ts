@@ -14,7 +14,16 @@ export type MovieState = {
   falResultUrl?: string;
   atlasTaskId?: string;        // legacy Atlas Cloud jobs
   seedanceTaskId?: string;     // Seedance 2.0 jobs (current backend)
-  status: "pending" | "generating" | "watermarking" | "ready" | "failed";
+  status:
+    | "awaiting_payment"   // brief written, generation held until paid (pay-first)
+    | "pending"
+    | "generating"
+    | "watermarking"
+    | "ready"
+    | "failed";
+  // When the backend render actually started (post-payment). The poll timeout
+  // uses this, not createdAt — a buyer can take arbitrarily long to pay.
+  generationStartedAt?: string;
   failureReason?: string;
   previewUrl?: string;
   cleanUrl?: string;

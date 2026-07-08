@@ -3,6 +3,7 @@ import { after } from "next/server";
 import Stripe from "stripe";
 import { readState, writeState } from "../../../lib/movies";
 import { deliverMovieHd } from "../../../lib/movieUpscale";
+import { startGeneration } from "../../../lib/movieStart";
 import {
   generatePackAndEmail,
   readPackState,
@@ -226,9 +227,21 @@ export async function POST(req: Request) {
     };
     await writeState(updated);
 
-    // Produce the 1080p deliverable + email it after the response so Stripe
-    // gets a fast 200. Idempotent inside deliverMovieHd.
-    if (updated.cleanUrl) {
+    if (state.status === "awaiting_payment" && !state.seedanceTaskId) {
+      // Pay-first flow: the render starts now, AFTER money is in. Respond fast
+      // so Stripe doesn't retry; startGeneration is idempotent on retries.
+      after(() =>
+        startGeneration(jobId).catch((err) =>
+          console.error(
+            "[chappieworks:movie] webhook generation threw",
+            jobId,
+            err instanceof Error ? err.message : err,
+          ),
+        ),
+      );
+    } else if (updated.cleanUrl) {
+      // Legacy pre-rendered job: produce the 1080p deliverable + email it.
+      // Idempotent inside deliverMovieHd.
       after(() =>
         deliverMovieHd(jobId).catch((err) =>
           console.error(
