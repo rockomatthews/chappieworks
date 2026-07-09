@@ -76,6 +76,48 @@ async function extractLastFrame(videoUrl: string): Promise<Buffer> {
   }
 }
 
+// Seedance requires every side of the start image to be 300–6000px. Buyers
+// upload 256px logos and the like, so normalize server-side: if the short side
+// is under 300px, upscale (lanczos) so it lands at 640px; if the long side is
+// over 6000px, downscale so it lands at 4096px. Aspect is preserved and
+// in-range images pass through untouched. Always re-encodes to PNG, which also
+// normalizes WebP inputs.
+async function normalizeStartImage(input: Buffer): Promise<Buffer> {
+  const workDir = await mkdtemp(path.join(tmpdir(), "movie-img-"));
+  const inPath = path.join(workDir, "in.img");
+  const outPath = path.join(workDir, "out.png");
+  try {
+    await writeFile(inPath, input);
+    const scaleExpr =
+      "scale=" +
+      "w='if(lt(min(iw,ih),300),trunc(iw*640/min(iw,ih)/2)*2," +
+      "if(gt(max(iw,ih),6000),trunc(iw*4096/max(iw,ih)/2)*2,iw))':" +
+      "h='if(lt(min(iw,ih),300),trunc(ih*640/min(iw,ih)/2)*2," +
+      "if(gt(max(iw,ih),6000),trunc(ih*4096/max(iw,ih)/2)*2,ih))':" +
+      "flags=lanczos";
+    await new Promise<void>((resolve, reject) => {
+      const timeout = setTimeout(
+        () => reject(new Error("image normalize timeout (30s)")),
+        30000,
+      );
+      ffmpeg(inPath)
+        .outputOptions(["-vf", scaleExpr, "-frames:v 1"])
+        .on("end", () => {
+          clearTimeout(timeout);
+          resolve();
+        })
+        .on("error", (err) => {
+          clearTimeout(timeout);
+          reject(err);
+        })
+        .save(outPath);
+    });
+    return await readFile(outPath);
+  } finally {
+    await rm(workDir, { recursive: true, force: true }).catch(() => {});
+  }
+}
+
 export async function POST(req: Request) {
   const contentType = req.headers.get("content-type") ?? "";
   let prompt = "";
@@ -183,17 +225,17 @@ export async function POST(req: Request) {
   if (imageFile) {
     mode = "image";
     try {
-      const ext = imageFile.name.split(".").pop()?.toLowerCase() ?? "png";
-      const buf = Buffer.from(await imageFile.arrayBuffer());
-      const blob = await put(`movie/${jobId}/start.${ext}`, buf, {
+      const raw = Buffer.from(await imageFile.arrayBuffer());
+      const buf = await normalizeStartImage(raw);
+      const blob = await put(`movie/${jobId}/start.png`, buf, {
         access: "public",
-        contentType: imageFile.type,
+        contentType: "image/png",
       });
       startImageUrl = blob.url;
     } catch (err) {
       console.error("[chappieworks:movie] image upload failed", err);
       return NextResponse.json(
-        { error: "couldn't upload reference image — try a smaller file" },
+        { error: "couldn't process the beginning image — try a different file" },
         { status: 500 },
       );
     }
@@ -203,7 +245,9 @@ export async function POST(req: Request) {
   if (inputVideoUrl) {
     mode = "video";
     try {
-      const frame = await extractLastFrame(inputVideoUrl);
+      const frame = await normalizeStartImage(
+        await extractLastFrame(inputVideoUrl),
+      );
       const blob = await put(`movie/${jobId}/last-frame.png`, frame, {
         access: "public",
         contentType: "image/png",
