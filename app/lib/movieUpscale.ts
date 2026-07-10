@@ -114,8 +114,22 @@ export async function deliverMovieHd(
   opts: { bypass?: boolean } = {},
 ): Promise<void> {
   const state = await readState(jobId);
-  if (!state || !state.cleanUrl) return;
+  if (!state || !state.cleanUrl) {
+    console.error(
+      "[chappieworks:movie] deliverMovieHd: state/cleanUrl missing",
+      jobId,
+      "hasState",
+      !!state,
+    );
+    return;
+  }
   if (state.hdUrl) return; // already done
+  console.log(
+    "[chappieworks:movie] deliverMovieHd start",
+    jobId,
+    "→",
+    state.email,
+  );
 
   // Veo renders native 1080p with audio, so the clean clip IS the deliverable —
   // no upscale needed (and no fragile serverless-ffmpeg dependency). produceHd
@@ -134,11 +148,16 @@ export async function deliverMovieHd(
     hdPending: false,
   });
 
-  await sendCleanMovieEmail({
+  const sent = await sendCleanMovieEmail({
     to: state.email,
     jobId,
     prompt: state.prompt,
     cleanUrl: hdUrl,
     bypass: opts.bypass,
   });
+  console.log(
+    "[chappieworks:movie] deliverMovieHd email",
+    jobId,
+    sent.ok ? `sent id=${"id" in sent ? sent.id : ""}` : `FAILED ${sent.error}`,
+  );
 }
