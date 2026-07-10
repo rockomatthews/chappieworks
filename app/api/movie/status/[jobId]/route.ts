@@ -493,6 +493,23 @@ export async function GET(
     state.status === "failed" ||
     state.status === "awaiting_payment"
   ) {
+    // Self-healing delivery: if the buyer paid but the HD/email handoff never
+    // completed (the one-shot after() at the ready-transition can die silently
+    // on serverless), any status poll re-fires it. Idempotent — deliverMovieHd
+    // exits early once hdUrl is set.
+    if (state.status === "ready" && state.paid && !state.hdUrl) {
+      after(() =>
+        deliverMovieHd(jobId, {
+          bypass: state.stripeSessionId === "bypass",
+        }).catch((err) =>
+          console.error(
+            "[chappieworks:movie] retry hd delivery threw",
+            jobId,
+            err instanceof Error ? err.message : err,
+          ),
+        ),
+      );
+    }
     return NextResponse.json(publicView(state));
   }
 
