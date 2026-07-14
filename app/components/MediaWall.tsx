@@ -6,7 +6,7 @@ import { WallVideo, WallImage } from "./MediaWallClient";
 // permanent backbone so the wall never looks thin. Server component; the
 // listing revalidates with the page (see app/page.tsx revalidate).
 
-const MAX_VIDEOS = 12;
+const MAX_VIDEOS = 30;
 const MAX_IMAGES = 12;
 
 // Curated /movie reel (public/movie-reel/*.mp4) — always present.
@@ -23,12 +23,22 @@ type WallItem =
 async function collect(): Promise<WallItem[]> {
   const items: WallItem[] = [...REEL];
   try {
-    const [movies, shoots] = await Promise.all([
+    const [movies, shoots, curated] = await Promise.all([
       list({ prefix: "movies/", limit: 1000 }),
       list({ prefix: "photoshoots/", limit: 1000 }),
+      // Hand-picked clips Sire drops into the wall/ prefix directly.
+      list({ prefix: "wall/", limit: 1000 }),
     ]);
     for (const b of movies.blobs) {
       if (!b.pathname.endsWith("/clean.mp4")) continue;
+      items.push({
+        kind: "video",
+        src: b.url,
+        at: new Date(b.uploadedAt).getTime(),
+      });
+    }
+    for (const b of curated.blobs) {
+      if (!b.pathname.endsWith(".mp4")) continue;
       items.push({
         kind: "video",
         src: b.url,
