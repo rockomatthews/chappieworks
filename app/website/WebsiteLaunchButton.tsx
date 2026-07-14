@@ -61,7 +61,9 @@ export function WebsiteLaunchButton() {
     setError(null);
     const data = readBriefFromForm();
     if (!data) {
-      setError("Fill the brief above first (business name + email), then pay.");
+      setError(
+        "One step first: fill in the brief above (business name + email is enough) so Chappie knows what to build — then this button opens checkout right here. Already sent a brief? Your personal payment link is in the email we sent you.",
+      );
       document.getElementById("intake")?.scrollIntoView({ behavior: "smooth" });
       return;
     }
@@ -124,11 +126,14 @@ export function WebsiteLaunchButton() {
         disabled={busy}
         className="inline-flex items-center justify-center px-8 py-4 rounded-md bg-[var(--color-gold)] text-[var(--color-ink)] font-medium hover:opacity-90 transition disabled:opacity-60"
       >
-        {busy ? "Opening checkout…" : "Pay now & launch — $99 + $49/mo →"}
+        {busy ? "Opening checkout…" : "Pay now & launch — $99 →"}
       </button>
       {error && <p className="text-sm text-red-400 mt-2">{error}</p>}
       <p className="text-[11px] text-[var(--color-mute)] mt-2">
-        Uses the brief above. Secure checkout right on this page — no redirect.
+        Uses the brief above — fill it first, then checkout opens right here (no
+        redirect). Prefer email? Send the brief alone and your proposal email
+        arrives with a personal payment link. Either way: pay → Chappie builds →
+        you chat with the developer in your private dashboard.
       </p>
       {clientSecret && (
         <StripeCheckoutModal clientSecret={clientSecret} onClose={() => setClientSecret(null)} />
