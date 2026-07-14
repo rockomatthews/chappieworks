@@ -27,9 +27,16 @@ const nextConfig = {
   },
   images: {
     remotePatterns: [
+      // Fourthwall has moved product images between hosts before
+      // (cdn.fourthwall.com → imgproxy.fourthwall.dev broke /shop) —
+      // allow both apex domains wholesale.
       {
         protocol: "https",
-        hostname: "cdn.fourthwall.com",
+        hostname: "**.fourthwall.com",
+      },
+      {
+        protocol: "https",
+        hostname: "**.fourthwall.dev",
       },
     ],
   },
