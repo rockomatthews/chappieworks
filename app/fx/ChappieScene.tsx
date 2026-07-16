@@ -38,7 +38,14 @@ function Loader() {
 function ChappieRunner() {
   const group = useRef<THREE.Group>(null);
   const { scene, animations } = useGLTF("/models/chappie-anim.glb");
-  const { actions } = useAnimations(animations, group);
+  // Extra clips ship as tiny animation-only GLBs (same mixamorig skeleton, so
+  // the tracks bind straight onto the main model's bones).
+  const laugh = useGLTF("/models/chappie-laugh.glb");
+  const allClips = useMemo(
+    () => [...animations, ...laugh.animations],
+    [animations, laugh.animations],
+  );
+  const { actions } = useAnimations(allClips, group);
   const backTimer = useRef<number | undefined>(undefined);
 
   const { scale, offset } = useMemo(() => {
@@ -94,11 +101,21 @@ function ChappieRunner() {
         dur * 1000 - 250,
       );
     }
+    function onLaugh() {
+      const dur = actions.laugh?.getClip().duration ?? 3;
+      fadeTo("laugh", true);
+      backTimer.current = window.setTimeout(
+        () => fadeTo("idle"),
+        dur * 1000 - 250,
+      );
+    }
     window.addEventListener("chappie-run", onRun);
     window.addEventListener("chappie-dance", onDance);
+    window.addEventListener("chappie-laugh", onLaugh);
     return () => {
       window.removeEventListener("chappie-run", onRun);
       window.removeEventListener("chappie-dance", onDance);
+      window.removeEventListener("chappie-laugh", onLaugh);
       window.clearTimeout(backTimer.current);
     };
   }, [actions]);
@@ -135,9 +152,12 @@ function CameraRig() {
     };
     window.addEventListener("chappie-run", onRun);
     window.addEventListener("chappie-dance", onDance);
+    // laugh reads best face-on, same as dance
+    window.addEventListener("chappie-laugh", onDance);
     return () => {
       window.removeEventListener("chappie-run", onRun);
       window.removeEventListener("chappie-dance", onDance);
+      window.removeEventListener("chappie-laugh", onDance);
       window.clearTimeout(timer.current);
     };
   }, []);
@@ -215,3 +235,4 @@ export default function ChappieScene() {
 }
 
 useGLTF.preload("/models/chappie-anim.glb");
+useGLTF.preload("/models/chappie-laugh.glb");
