@@ -10,6 +10,8 @@ import {
 } from "./fx/ShowcaseClient";
 import ChappieHero from "./fx/ChappieHero";
 import { MediaWall } from "./components/MediaWall";
+import { CapabilityBand } from "./components/CapabilityBand";
+import { BentoVideo } from "./components/BentoVideo";
 
 // The media wall lists fresh renders from blob — refresh every 5 minutes.
 export const revalidate = 300;
@@ -123,6 +125,9 @@ export default function Home() {
         </div>
       </div>
 
+      {/* ---------- CAPABILITY BAND — every frontier model ---------- */}
+      <CapabilityBand />
+
       {/* ---------- MEDIA WALL — everything the studio has rendered ---------- */}
       <section id="wall" className="px-6 py-24 sm:px-10">
         <div className="mx-auto max-w-6xl">
@@ -167,7 +172,7 @@ export default function Home() {
           </h2>
 
           {/* flagship */}
-          <TiltCard className="card rounded-2xl p-6 sm:p-10 ring-2 ring-[var(--color-gold)]">
+          <TiltCard className="card neon-tile rounded-2xl p-6 sm:p-10 ring-2 ring-[var(--color-gold)]">
             <Link href="/agents" className="flex flex-col gap-6 sm:flex-row sm:items-center">
               <div className="flex-1">
                 <p className="mono mb-2 text-xs uppercase tracking-widest text-[var(--color-gold)]">
@@ -198,93 +203,140 @@ export default function Home() {
             </Link>
           </TiltCard>
 
-          <div className="sx-reveal--stagger mt-5 grid gap-5 sm:grid-cols-2">
-            <TiltCard className="card rounded-2xl p-6 sm:p-8">
-              <Link href="/website" className="block">
-                <p className="mono mb-2 text-xs uppercase tracking-widest text-[var(--color-gold)]">
-                  Websites
+          {/* two big video-forward tiles */}
+          <div className="mt-5 grid gap-5 lg:grid-cols-2">
+            <Link
+              href="/movie"
+              className="card neon-tile group relative flex min-h-[300px] flex-col justify-end overflow-hidden rounded-2xl p-7"
+            >
+              <BentoVideo src="/movie-reel/1.mp4" />
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[var(--color-ink)] via-[var(--color-ink)]/40 to-transparent" />
+              <div className="relative">
+                <p className="mono mb-2 text-xs uppercase tracking-widest text-[var(--color-neon)]">
+                  Make a movie · live
                 </p>
-                <h3 className="mb-3 text-xl font-semibold sm:text-2xl">
-                  Chappie Site
+                <h3 className="mb-2 text-2xl font-semibold sm:text-3xl">
+                  Prompt → cinematic clip
                 </h3>
-                <p className="mb-4 text-base leading-relaxed text-[var(--color-paper)]/85">
-                  A website you can chat with. The studio builds it in 48 hours
-                  — the same shader, 3D and motion work as this page — then you
-                  edit it by talking to Chappie in your private dashboard.
+                <p className="mb-3 max-w-md text-sm leading-relaxed text-[var(--color-paper)]/85">
+                  A beginning image and a prompt. Seedance 2.0 renders a 1080p
+                  clip with native audio, straight to your inbox.
                 </p>
-                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
+                <div className="flex items-center gap-4 text-sm">
                   <span className="font-semibold text-[var(--color-gold)]">
-                    $99 launch
+                    $14.99 / 5s · $24.99 / 10s
                   </span>
-                  <span className="mono text-[var(--color-mute)]">
-                    5 free edits, then $25 each
+                  <span className="text-[var(--color-gold)] transition group-hover:translate-x-1">
+                    Make one →
                   </span>
                 </div>
+              </div>
+            </Link>
+
+            <Link
+              href="/photoshoot"
+              className="card neon-tile group relative flex min-h-[300px] flex-col justify-end overflow-hidden rounded-2xl p-7"
+            >
+              <div
+                className="pointer-events-none absolute inset-0 opacity-70 transition duration-500 group-hover:opacity-90"
+                style={{
+                  background:
+                    "radial-gradient(120% 90% at 80% 10%, rgba(201,164,55,0.35), transparent 55%), radial-gradient(120% 90% at 10% 100%, rgba(194,255,61,0.18), transparent 55%)",
+                }}
+              />
+              <div className="relative">
+                <p className="mono mb-2 text-xs uppercase tracking-widest text-[var(--color-neon)]">
+                  Brand visuals · minutes
+                </p>
+                <h3 className="mb-2 text-2xl font-semibold sm:text-3xl">
+                  On-brand images, on demand
+                </h3>
+                <p className="mb-3 max-w-md text-sm leading-relaxed text-[var(--color-paper)]/85">
+                  A 30-second brief → three brand-aligned 2K images on the page.
+                  $49 unlocks the 10-image Brand Aesthetic Pack.
+                </p>
+                <div className="flex items-center gap-4 text-sm">
+                  <span className="font-semibold text-[var(--color-gold)]">
+                    Free 3-image preview · $49 pack
+                  </span>
+                  <span className="text-[var(--color-gold)] transition group-hover:translate-x-1">
+                    Get previews →
+                  </span>
+                </div>
+              </div>
+            </Link>
+          </div>
+
+          {/* compact tiles: subscriptions + audits */}
+          <div
+            id="audits"
+            className="sx-reveal--stagger mt-5 grid scroll-mt-20 gap-4 sm:grid-cols-2 lg:grid-cols-4"
+          >
+            <TiltCard className="card neon-tile flex rounded-2xl p-6">
+              <Link href="/website" className="flex flex-1 flex-col">
+                <h4 className="mb-1 text-lg font-semibold">Chappie Site</h4>
+                <p className="mono mb-3 text-xs text-[var(--color-gold)]">
+                  $99 · 5 free edits then $25
+                </p>
+                <p className="mb-5 flex-1 text-sm leading-relaxed text-[var(--color-paper)]/80">
+                  A website you can chat with. Built in 48 hours, edited by
+                  talking to Chappie in your dashboard.
+                </p>
+                <span className="text-xs text-[var(--color-gold)]">Brief it →</span>
               </Link>
             </TiltCard>
 
-            <TiltCard className="card rounded-2xl p-6 sm:p-8">
-              <Link href="/brief/ai-agency" className="block">
-                <p className="mono mb-2 text-xs uppercase tracking-widest text-[var(--color-gold)]">
-                  Daily subscription
+            <TiltCard className="card neon-tile flex rounded-2xl p-6">
+              <Link href="/brief/ai-agency" className="flex flex-1 flex-col">
+                <h4 className="mb-1 text-lg font-semibold">AI Agency Brief</h4>
+                <p className="mono mb-3 text-xs text-[var(--color-gold)]">
+                  $29–$59 / mo · week free
                 </p>
-                <h3 className="mb-3 text-xl font-semibold sm:text-2xl">
-                  The AI Agency Brief
-                </h3>
-                <p className="mb-4 text-base leading-relaxed text-[var(--color-paper)]/85">
+                <p className="mb-5 flex-1 text-sm leading-relaxed text-[var(--color-paper)]/80">
                   Three things that moved in the AI agency world today, in your
-                  inbox by 6am MDT. Researched and sent by an autonomous bot —
-                  no human edits.
+                  inbox by 6am. Autonomous, no human edits.
                 </p>
-                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
-                  <span className="font-semibold text-[var(--color-gold)]">
-                    $29–$59 / mo
-                  </span>
-                  <span className="mono text-[var(--color-mute)]">
-                    First week free
-                  </span>
-                </div>
+                <span className="text-xs text-[var(--color-gold)]">Read today&rsquo;s →</span>
               </Link>
             </TiltCard>
+
+            {PROJECT_SKUS.filter(
+              (a) => a.slug === "seo-fix" || a.slug === "ads-audit",
+            ).map((a) => (
+              <TiltCard key={a.slug} className="card neon-tile flex rounded-2xl p-6">
+                <Link href={`/${a.slug}`} className="flex flex-1 flex-col">
+                  <h4 className="mb-1 text-lg font-semibold">{a.name}</h4>
+                  <p className="mono mb-3 text-xs text-[var(--color-gold)]">
+                    {a.price}
+                  </p>
+                  <p className="mb-5 flex-1 text-sm leading-relaxed text-[var(--color-paper)]/80">
+                    {a.blurb}
+                  </p>
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="mono text-[var(--color-mute)]">
+                      {a.turnaround}
+                    </span>
+                    <span className="text-[var(--color-gold)]">Start →</span>
+                  </div>
+                </Link>
+              </TiltCard>
+            ))}
           </div>
 
-          <div id="audits" className="mt-12 scroll-mt-20">
-            <div className="sx-reveal--stagger grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {PROJECT_SKUS.map((a) => (
-                <TiltCard key={a.slug} className="card flex rounded-2xl p-6">
-                  <Link href={`/${a.slug}`} className="flex flex-1 flex-col">
-                    <h4 className="mb-3 text-lg font-semibold">{a.name}</h4>
-                    <p className="mono mb-3 text-xs text-[var(--color-gold)]">
-                      {a.price}
-                    </p>
-                    <p className="mb-5 flex-1 text-sm leading-relaxed text-[var(--color-paper)]/80">
-                      {a.blurb}
-                    </p>
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="mono text-[var(--color-mute)]">
-                        {a.turnaround}
-                      </span>
-                      <span className="text-[var(--color-gold)]">Start →</span>
-                    </div>
-                  </Link>
-                </TiltCard>
-              ))}
-            </div>
-            <p className="mono mt-6 text-center text-xs text-[var(--color-mute)]">
-              Also:{" "}
-              <Link href="/shop" className="text-[var(--color-gold)] hover:underline">
-                shop merch
-              </Link>{" "}
-              ·{" "}
-              <Link href="/coin" className="text-[var(--color-gold)] hover:underline">
-                $CHAPPIE is live on Base
-              </Link>{" "}
-              ·{" "}
-              <Link href="/stake" className="text-[var(--color-gold)] hover:underline">
-                stake for the 25% member tier
-              </Link>
-            </p>
-          </div>
+          <p className="mono mt-6 text-center text-xs text-[var(--color-mute)]">
+            Also:{" "}
+            <Link href="/shop" className="text-[var(--color-gold)] hover:underline">
+              shop merch
+            </Link>{" "}
+            ·{" "}
+            <Link href="/coin" className="text-[var(--color-gold)] hover:underline">
+              $CHAPPIE is live on Base
+            </Link>{" "}
+            ·{" "}
+            <Link href="/stake" className="text-[var(--color-gold)] hover:underline">
+              stake for the 25% member tier
+            </Link>
+          </p>
         </div>
       </section>
 
