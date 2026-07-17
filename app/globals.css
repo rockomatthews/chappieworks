@@ -12,6 +12,9 @@
   --color-rust: #8b4a2b;
   --color-shadow: #232328;
   --color-mute: #6b6b73;
+  /* Neon pop — a cool electric lime that sits apart from the warm gold.
+     Used sparingly: hover accents, live/status pips, capability highlights. */
+  --color-neon: #c2ff3d;
 }
 
 html {
@@ -52,6 +55,36 @@ a { color: inherit; }
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Neon-edged hover: a thin electric outline + lift, borrowed from the
+   Higgsfield bento cards. Applied to interactive tiles. */
+.neon-tile {
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+}
+.neon-tile:hover {
+  border-color: rgba(194, 255, 61, 0.55);
+  box-shadow: 0 0 0 1px rgba(194, 255, 61, 0.25),
+    0 18px 50px -20px rgba(194, 255, 61, 0.35);
+  transform: translateY(-3px);
+}
+
+/* Marquee-style scrolling capability band. */
+@keyframes cw-band {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.cw-band-track {
+  display: flex;
+  width: max-content;
+  animation: cw-band 32s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cw-band-track { animation: none; }
+}
+
+.neon-pip {
+  box-shadow: 0 0 8px 1px rgba(194, 255, 61, 0.8);
 }
 
 button, a[role="button"], .btn {
