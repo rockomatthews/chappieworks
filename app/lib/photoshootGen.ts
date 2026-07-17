@@ -1,4 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
+import { higgsfieldEnabled, higgsfieldImage } from "./higgsfield";
 
 // Image backend: Google Nano Banana (Gemini 2.5 Flash Image) via fal.ai. Excels
 // at brand-consistent compositing from reference images — the customer's real
@@ -284,6 +285,23 @@ export async function generateImage(
   size: ImageSize,
   referenceUrls?: string[],
 ): Promise<string> {
+  // PILOT: when IMAGE_BACKEND=higgsfield, try the unified Higgsfield API first
+  // and fall back to fal on any error, so a bad key/param never breaks the flow.
+  if (higgsfieldEnabled()) {
+    try {
+      return await higgsfieldImage({
+        prompt,
+        aspectRatio: aspectFor(size),
+        referenceUrls,
+      });
+    } catch (err) {
+      console.error(
+        "[chappieworks:photoshoot] higgsfield failed — falling back to fal",
+        err instanceof Error ? err.message : err,
+      );
+    }
+  }
+
   const key = process.env.FAL_KEY;
   if (!key) throw new Error("FAL_KEY not set");
 
