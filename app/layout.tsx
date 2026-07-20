@@ -34,6 +34,11 @@ export const metadata: Metadata = {
     shortcut: "/chappieworks-logo.png",
     apple: "/chappieworks-logo.png",
   },
+  // Domain-ownership verification for talentapp.
+  other: {
+    "talentapp:project_verification":
+      "3218bc59cb74d5e160481242b0db5d7c7312ce5ba24e2c4df308cbbea0caeaf687febbd6e682d298a70bed6ad2ae1f117142e7d4f737b1f0d1c414c659b48612",
+  },
 };
 
 export const viewport: Viewport = {
