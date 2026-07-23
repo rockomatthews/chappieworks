@@ -422,25 +422,27 @@ async function finalizeReady(
     allowOverwrite: true,
   });
 
+  // PREVIEW-FIRST: burn the watermark on EVERY mode (not just extensions) —
+  // the free preview is what the buyer sees, and paying is what removes it.
+  // If the burn fails we fall back to the clean clip rather than showing
+  // nothing; the paywall still gates the download.
   let previewUrl = cleanBlob.url;
-  if (state.mode === "video") {
-    try {
-      const watermarked = await burnWatermark(cleanBuffer);
-      const previewBlob = await put(PREVIEW_KEY(jobId), watermarked, {
-        access: "public",
-        contentType: "video/mp4",
-        addRandomSuffix: false,
-        allowOverwrite: true,
-      });
-      previewUrl = previewBlob.url;
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "unknown";
-      console.error(
-        "[chappieworks:watermark] burn failed, falling back to clean",
-        jobId,
-        message,
-      );
-    }
+  try {
+    const watermarked = await burnWatermark(cleanBuffer);
+    const previewBlob = await put(PREVIEW_KEY(jobId), watermarked, {
+      access: "public",
+      contentType: "video/mp4",
+      addRandomSuffix: false,
+      allowOverwrite: true,
+    });
+    previewUrl = previewBlob.url;
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "unknown";
+    console.error(
+      "[chappieworks:watermark] burn failed, falling back to clean",
+      jobId,
+      message,
+    );
   }
 
   const ready: MovieState = {
@@ -452,7 +454,7 @@ async function finalizeReady(
   };
   await writeState(ready);
   console.log(
-    "[chappieworks:movie] job ready",
+    "[chappieworks:movie] preview ready",
     jobId,
     "mode",
     state.mode ?? "text",
@@ -460,9 +462,8 @@ async function finalizeReady(
     ready.durationSec,
   );
 
-  // Pay-first flow: the buyer already paid before this render started, so
-  // produce the HD deliverable + email it as soon as the clip lands. Runs
-  // after the response; idempotent inside deliverMovieHd.
+  // Only already-paid jobs (legacy pay-first, or a bypass) get the HD file +
+  // email here. Normal previews wait for checkout.
   if (ready.paid && !ready.hdUrl) {
     after(() =>
       deliverMovieHd(jobId).catch((err) =>
@@ -638,29 +639,25 @@ export async function GET(
         allowOverwrite: true,
       });
 
-      // For extension mode (user uploaded a video to extend), burn a real
-      // watermark on the new 10s so the preview clearly signals "buy to
-      // unlock." Paid users get the bare clean clip. For text/image mode,
-      // the client-side SVG overlay handles preview labeling.
+      // Preview-first: burn the watermark on every mode (Wan/Raw jobs finalize
+      // through this path). Paying removes it.
       let previewUrl = cleanBlob.url;
-      if (state.mode === "video") {
-        try {
-          const watermarked = await burnWatermark(cleanBuffer);
-          const previewBlob = await put(PREVIEW_KEY(jobId), watermarked, {
-            access: "public",
-            contentType: "video/mp4",
-            addRandomSuffix: false,
-            allowOverwrite: true,
-          });
-          previewUrl = previewBlob.url;
-        } catch (err) {
-          const message = err instanceof Error ? err.message : "unknown";
-          console.error(
-            "[chappieworks:watermark] burn failed, falling back to clean",
-            jobId,
-            message,
-          );
-        }
+      try {
+        const watermarked = await burnWatermark(cleanBuffer);
+        const previewBlob = await put(PREVIEW_KEY(jobId), watermarked, {
+          access: "public",
+          contentType: "video/mp4",
+          addRandomSuffix: false,
+          allowOverwrite: true,
+        });
+        previewUrl = previewBlob.url;
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "unknown";
+        console.error(
+          "[chappieworks:watermark] burn failed, falling back to clean",
+          jobId,
+          message,
+        );
       }
 
       const ready: MovieState = {

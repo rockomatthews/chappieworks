@@ -82,32 +82,6 @@ export default async function MovieSharePage({
             </div>
           )}
 
-          {state.status === "awaiting_payment" && !justPaid && !state.paid && (
-            <div
-              className="card rounded-xl p-6 sm:p-8"
-              style={{
-                background:
-                  "linear-gradient(135deg, rgba(201,164,55,0.1), rgba(201,164,55,0.02))",
-                border: "1px solid rgba(201,164,55,0.4)",
-              }}
-            >
-              <p className="text-xs mono text-[var(--color-gold)] uppercase tracking-widest mb-2">
-                Brief saved · not rendered yet
-              </p>
-              <h2 className="text-xl font-semibold mb-2">
-                {`Pay ${priceLabel} to start the render`}
-              </h2>
-              <p className="text-sm text-[var(--color-paper)]/85 mb-5 leading-relaxed">
-                Your prompt is saved. Pay and the render starts immediately —
-                clean 1080p MP4, no watermark, on this page and in your inbox.
-              </p>
-              <UnlockButton jobId={jobId} priceLabel={priceLabel} />
-              <p className="text-xs mono text-[var(--color-mute)] mt-3">
-                Secure checkout via Stripe. Apple Pay / Google Pay supported.
-              </p>
-            </div>
-          )}
-
           {isRendering && (
             <RenderingPoller
               jobId={jobId}

@@ -7,11 +7,11 @@ import { MovieReel } from "./MovieReel";
 export const metadata = {
   title: "Make a movie · instant AI video from a prompt — Chappie Works",
   description:
-    "Type a prompt. Get a 5-second cinematic clip in ~90 seconds. $14.99 per clip — clean 1080p HD MP4, no watermark, commercial rights yours.",
+    "Type a prompt. Get a 5-second cinematic clip in ~90 seconds. Preview free, watermarked. $14.99 unlocks the clean 1080p MP4 — commercial rights yours.",
   openGraph: {
     title: "Make a movie · instant AI video — Chappie Works",
     description:
-      "Prompt → 5s HD clip in ~90s. $14.99 per clip. Clean 1080p MP4, commercial rights yours.",
+      "Prompt → 5s HD clip in ~90s. Free watermarked preview. $14.99 unlocks the clean MP4.",
     url: "https://chappieworks.com/movie",
   },
 };
@@ -32,16 +32,16 @@ export default function MoviePage() {
           </div>
 
           <p className="text-xs mono text-[var(--color-gold)] mt-10 uppercase tracking-widest">
-            Movie · $14.99 per clip · Seedance 2.0
+            Movie · free preview · $14.99 to unlock
           </p>
           <h1 className="text-4xl sm:text-5xl font-semibold tracking-tight mt-3 mb-6 leading-[1.1]">
             Type a prompt. Get a cinematic clip in 90 seconds.
           </h1>
           <p className="text-base sm:text-lg text-[var(--color-paper)]/85 leading-relaxed">
-            Write the brief, pay $14.99, and the render starts immediately.
-            Clean 1080p HD MP4 with native audio — no watermark, commercial
-            rights yours — on this page and in your inbox, usually within a
-            couple of minutes.
+            Free preview. Watch your clip render right here on Seedance 2.0,
+            watermarked. If it&rsquo;s a keeper, $14.99 unlocks the clean 1080p
+            MP4 with native audio — commercial rights yours, emailed to you. If
+            it&rsquo;s not, write a better prompt and go again.
           </p>
 
           <div className="mt-10">
@@ -54,7 +54,7 @@ export default function MoviePage() {
                 },
                 {
                   speaker: "Chappie",
-                  text: "Which is exactly why it's pay-first now: you pay $14.99, the render starts, and the clean 1080p MP4 with native audio and commercial rights is yours. No watermarked teaser, no upsell. Length cap is a feature — 5s keeps cost predictable and forces the prompt to be tight. Still half what Pika and Runway charge for the same model class.",
+                  text: "Fair — the free preview costs us real money on every render. We eat that because nobody should pay for a clip they haven't seen. You watch it watermarked, and $14.99 buys the clean 1080p with native audio and commercial rights. Length cap is a feature — 5s keeps cost predictable and forces the prompt to be tight. Still half what Pika and Runway charge for the same model class.",
                 },
                 {
                   speaker: "Chappie",
@@ -79,9 +79,8 @@ export default function MoviePage() {
                 text-to-video. Add your email so we can send you the clean MP4.
               </li>
               <li>
-                Pay $14.99 (or $24.99 for 10s) with Stripe, right on the page.
-                The render starts the moment payment clears — nothing renders
-                before that, which is how the price stays this low.
+                Chappie renders it free and plays the watermarked preview
+                right here. Watch it as many times as you want.
               </li>
               <li>
                 Forge runs it on Seedance 2.0 — text and image inputs into one
@@ -90,9 +89,9 @@ export default function MoviePage() {
                 hold your result for 30 days.
               </li>
               <li>
-                Done: the clean 1080p MP4 plays inline, downloads from this
-                page, and lands in your inbox. No watermark, commercial rights
-                yours.
+                Like it? $14.99 (or $24.99 for 10s) unlocks the clean,
+                unwatermarked 1080p MP4 — on this page and in your inbox.
+                Commercial rights yours.
               </li>
             </ol>
           </div>
