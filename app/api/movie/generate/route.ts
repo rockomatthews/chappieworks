@@ -310,12 +310,28 @@ export async function POST(req: Request) {
     };
 
     if (tier === "raw") {
-      const wan = await wanSubmit({
-        prompt,
-        seconds,
-        startImageUrl,
-      });
-      state.replicateId = wan.predictionId;
+      try {
+        const wan = await wanSubmit({
+          prompt,
+          seconds,
+          startImageUrl,
+        });
+        state.replicateId = wan.predictionId;
+      } catch (err) {
+        // Never silently swap the buyer onto Standard — that's the exact
+        // dishonesty the engine toggle just stopped doing. Fail loudly with a
+        // useful instruction, and keep the real reason (billing, slug, etc.)
+        // server-side.
+        const message = err instanceof Error ? err.message : "unknown";
+        console.error("[chappieworks:movie] wan submit failed", message);
+        return NextResponse.json(
+          {
+            error:
+              "The Raw engine is temporarily unavailable. Switch to Standard and try again — same render, better quality, with audio.",
+          },
+          { status: 503 },
+        );
+      }
     } else {
       const sub = await seedanceSubmit({
         prompt,
