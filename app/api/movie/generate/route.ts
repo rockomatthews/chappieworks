@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { put } from "@vercel/blob";
-import { SEEDANCE_MODEL } from "../../../lib/seedance";
+import { seedanceSubmit, SEEDANCE_MODEL } from "../../../lib/seedance";
+import { wanSubmit, WAN_MODEL } from "../../../lib/wan";
 import { screenForAdult } from "../../../lib/moderation";
 import ffmpegPath from "ffmpeg-static";
 import ffmpeg from "fluent-ffmpeg";
@@ -276,13 +277,12 @@ export async function POST(req: Request) {
     }
   }
 
-  // All video runs on Seedance 2.0, and Seedance bills credits PER RENDER —
-  // so nothing is submitted until the buyer pays (pay-first). This route only
-  // validates + records the brief. We still screen adult content on every
-  // prompt BEFORE taking money (violence/gore/dark themes are fine — that's
-  // the point) so NSFW never reaches checkout or the backend, keeping
-  // Stripe/brand safe. `tier` is retained for the UI but doesn't change the
-  // backend.
+  // PREVIEW-FIRST (Sire, 2026-07-20: "no one will pay first"). The render runs
+  // free and returns a WATERMARKED preview; payment unlocks the clean file.
+  // Seedance bills per render, so every preview costs us — that's the deliberate
+  // trade for conversion. We still screen adult content on every prompt
+  // (violence/gore/dark themes are fine — that's the point) so NSFW never
+  // reaches the backend, keeping Stripe/brand safe.
   const screen = await screenForAdult(prompt, startImageUrl);
   if (screen.blocked) {
     return NextResponse.json({ error: screen.reason }, { status: 400 });
@@ -292,27 +292,47 @@ export async function POST(req: Request) {
     // Seedance durations are 5s/10s. Map our 5/10 directly.
     const seconds = duration >= 7 ? 10 : 5;
 
+    // Two real engines now (the toggle used to be cosmetic):
+    //   Standard → Seedance 2.0 (1080p + native audio, best quality)
+    //   Raw      → Wan on Replicate (open model, far fewer content filters)
     const state: MovieState = {
       jobId,
       prompt,
       email,
       createdAt: new Date().toISOString(),
-      status: "awaiting_payment",
+      status: "generating",
+      generationStartedAt: new Date().toISOString(),
       paid: false,
       durationSec: seconds,
       mode,
       startImageUrl,
       inputVideoUrl,
     };
+
+    if (tier === "raw") {
+      const wan = await wanSubmit({
+        prompt,
+        seconds,
+        startImageUrl,
+      });
+      state.replicateId = wan.predictionId;
+    } else {
+      const sub = await seedanceSubmit({
+        prompt,
+        duration: seconds,
+        aspectRatio: "16:9",
+        imageUrls: startImageUrl ? [startImageUrl] : undefined,
+      });
+      state.seedanceTaskId = sub.taskId;
+    }
+
     await writeState(state);
 
     console.log(
-      "[chappieworks:movie] brief recorded (awaiting payment)",
+      "[chappieworks:movie] preview render started",
       jobId,
-      "model",
-      SEEDANCE_MODEL,
-      "tier",
-      tier,
+      tier === "raw" ? `wan:${WAN_MODEL}` : `seedance:${SEEDANCE_MODEL}`,
+      state.replicateId ?? state.seedanceTaskId,
       "mode",
       mode,
       "seconds",
@@ -322,9 +342,9 @@ export async function POST(req: Request) {
     return NextResponse.json({ jobId });
   } catch (err) {
     const message = err instanceof Error ? err.message : "unknown";
-    console.error("[chappieworks:movie] record brief failed", message);
+    console.error("[chappieworks:movie] preview render failed", message);
     return NextResponse.json(
-      { error: `couldn't start: ${message}` },
+      { error: `couldn't start generation: ${message}` },
       { status: 502 },
     );
   }

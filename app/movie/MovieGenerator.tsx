@@ -67,7 +67,7 @@ const POLL_INTERVAL_MS = 4000;
 const MAX_POLL_DURATION_MS = 15 * 60 * 1000;
 
 const STATUS_COPY: Record<JobStatus["status"], string> = {
-  awaiting_payment: "Brief saved — complete checkout to start the render.",
+  awaiting_payment: "Queued — starting the render…",
   pending: "Queued — starting the render…",
   generating:
     "Forge is rendering your clip. Usually a couple of minutes — sometimes 5+ when the model's queue is busy. Leave and come back anytime; we hold your result.",
@@ -277,7 +277,7 @@ export function MovieGenerator() {
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       failValidation(
-        "Please add a valid email below — we email your clean HD MP4 there.",
+        "Please add a valid email below — we email the clean HD MP4 if you buy.",
       );
       return;
     }
@@ -324,10 +324,14 @@ export function MovieGenerator() {
         throw new Error(data.error ?? `request failed (${res.status})`);
       }
       const jobId = data.jobId;
-      // Pay-first: the brief is recorded server-side but nothing renders until
-      // checkout completes. Open payment immediately.
-      setJob({ jobId, status: "awaiting_payment", paid: false, mode });
-      await startCheckout(jobId);
+      // Preview-first: the render is already running. Poll until the
+      // watermarked preview lands, then the buy CTA unlocks the clean file.
+      setJob({ jobId, status: "generating", paid: false, mode });
+      pollStartRef.current = Date.now();
+      pollTimerRef.current = setTimeout(
+        () => void pollOnce(jobId),
+        POLL_INTERVAL_MS,
+      );
     } catch (err) {
       setJob(null);
       setError(err instanceof Error ? err.message : "Couldn't kick off render");
@@ -557,7 +561,7 @@ export function MovieGenerator() {
               >
                 <div className="font-medium">Standard</div>
                 <div className="text-[10px] mono text-[var(--color-mute)] mt-0.5">
-                  Kling · best quality, 1080p
+                  Seedance 2.0 · 1080p + audio
                 </div>
               </button>
               <button
@@ -577,9 +581,9 @@ export function MovieGenerator() {
             </div>
             {tier === "raw" && (
               <p className="text-[10px] mono text-[var(--color-mute)] mt-1.5 leading-relaxed">
-                Raw uses an open model with far fewer restrictions (e.g. cinematic
-                violence). Illegal content is still blocked. Quality varies more
-                than Standard.
+                Raw runs Wan, an open model with far fewer restrictions (e.g.
+                cinematic violence). Sexual/illegal content is still blocked.
+                Quality varies more than Standard, and there&rsquo;s no native audio.
               </p>
             )}
           </div>
@@ -604,7 +608,7 @@ export function MovieGenerator() {
               style={{ fontSize: "16px" }}
             />
             <p className="text-[10px] mono text-[var(--color-mute)] mt-1.5">
-              Your clean HD MP4 lands here when the render finishes. No spam.
+              We email the unwatermarked HD MP4 if you buy. No spam.
             </p>
           </div>
 
@@ -634,67 +638,15 @@ export function MovieGenerator() {
                 ? "Uploading & starting…"
                 : "Starting…"
               : mode === "video"
-                ? `Create my +10s extension — ${PRICE_10S} →`
-                : `Create my video — ${priceLabel} →`}
+                ? "Generate my +10s extension →"
+                : "Generate my free preview →"}
           </button>
 
           <p className="text-xs mono text-[var(--color-mute)] text-center">
-            {priceLabel} per clip, charged before the render. Clean 1080p MP4,
-            no watermark, emailed to you.
+            Free to preview — watch it render right here, watermarked. Like it?
+            {" "}{priceLabel} unlocks the clean 1080p MP4.
           </p>
         </form>
-      )}
-
-      {job && job.status === "awaiting_payment" && (
-        <div
-          ref={renderPanelRef}
-          className="card rounded-xl p-6 sm:p-8 ring-2 ring-[var(--color-gold)]/70 scroll-mt-24"
-          style={{
-            background:
-              "linear-gradient(135deg, rgba(201,164,55,0.1), rgba(201,164,55,0.02))",
-          }}
-        >
-          <p className="text-xs mono text-[var(--color-gold)] uppercase tracking-widest mb-2">
-            Brief saved · pay to render
-          </p>
-          <h3 className="text-xl font-semibold mb-2">
-            {`Create my ${job.durationSec === 10 ? "10s" : "5s"} video — ${readyPriceLabel}`}
-          </h3>
-          <p className="text-sm text-[var(--color-paper)]/85 mb-5 leading-relaxed">
-            Pay once and the render starts immediately. Clean 1080p MP4, no
-            watermark — on this page and in your inbox, usually within a couple
-            of minutes. Commercial rights yours.
-          </p>
-          <button
-            onClick={() => void startCheckout()}
-            disabled={checkoutLoading}
-            className="w-full sm:w-auto px-6 py-3 rounded-md bg-[var(--color-gold)] text-[var(--color-ink)] font-medium hover:opacity-90 transition disabled:opacity-50"
-          >
-            {checkoutLoading
-              ? "Opening checkout…"
-              : `Pay ${readyPriceLabel} & render →`}
-          </button>
-          <p className="text-xs mono text-[var(--color-mute)] mt-3">
-            Secure checkout via Stripe. Apple Pay / Google Pay supported.
-          </p>
-          {checkoutClientSecret && (
-            <StripeCheckoutModal
-              clientSecret={checkoutClientSecret}
-              onClose={() => setCheckoutClientSecret(null)}
-            />
-          )}
-          <button
-            onClick={() => {
-              setJob(null);
-              setError(null);
-              setCheckoutClientSecret(null);
-              stopPolling();
-            }}
-            className="block mt-5 text-sm text-[var(--color-paper)]/70 hover:text-[var(--color-gold)] underline underline-offset-4 transition"
-          >
-            ← Edit the prompt instead
-          </button>
-        </div>
       )}
 
       {isRendering && job && (
