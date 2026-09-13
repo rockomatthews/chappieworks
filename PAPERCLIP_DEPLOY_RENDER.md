@@ -2,7 +2,75 @@
 
 **Goal:** stand up a public `paperclip.chappieworks.com` so chappieworks.com/studio/queue can read live from it.
 
-**Status:** Phase 1 code is shipped (app/lib/paperclip.ts, queue page refactor, webhook handler). Backfill ran against your local Paperclip (11 projects, 65 issues). This doc is the deployment step that turns it on in production.
+**Status:** Phase 1 code is shipped (app/lib/paperclip.ts, queue page refactor, webhook handler). Backfill ran against your local Paperclip (11 projects, 70 issues). This doc is the deployment step that turns it on in production.
+
+---
+
+## ⚠ VERIFIED FACTS (2026-06-03) — read before following the steps below
+
+Pulled from the live local instance + the real Paperclip repo (`github.com/paperclipai/paperclip`, branch `master`). These **override** any guesses further down:
+
+- **Local install is DONE and healthy.** Paperclip runs at `http://localhost:3100` (data in `~/.paperclip/instances/default/`). The `Chappieworks` company exists (`2d9f539d-…`, prefix `CHA`, 70 issues), all 11 queue projects backfilled with `[queue:…][lead:…]` description tags. `app/lib/paperclip.ts` reads it correctly — verified: `/studio/queue` renders a **live read** when `PAPERCLIP_URL=http://localhost:3100` is set. The only thing missing is exposing it to Vercel.
+- **Deploy with Docker, not pnpm guesses.** The repo ships a `Dockerfile` (base `node:lts-trixie-slim`, multi-stage, `EXPOSE 3100`, entrypoint runs `server/dist/index.js` via tsx). On Render: **New → Web Service → Runtime: Docker**. Ignore the "Build/Start command" guesses in Step 1.
+- **Real env vars** (from `.env.example`): `DATABASE_URL` (postgres), `PORT=3100`, `SERVE_UI` (set `true` to serve the Paperclip web UI), `BETTER_AUTH_SECRET` (long random), optional `DISCORD_WEBHOOK_URL`. There is **no** `PAPERCLIP_DEPLOYMENT_MODE` and **no** `PAPERCLIP_API_KEY` — those lines below are fiction.
+- **AUTH MODEL IS THE REAL DECISION.** Production auth is [better-auth](https://better-auth.com) (sessions + agent API keys + short-lived run JWTs), **not** a static `X-API-Key` header. Locally it's open because loopback = trusted mode. So once it's public you must pick an access model for the read:
+  1. **Public read** — leave GET endpoints open (matches Sire's "public read-only queue" lean). Simplest; the reader works as-is with no key. Must confirm GETs are reachable un-authenticated in non-loopback mode, and that **writes stay gated** so randos can't create issues.
+  2. **Network gate** — put it behind Cloudflare Tunnel + Cloudflare Access (service token), an IP allowlist, or a thin reverse-proxy that checks a shared secret. The reader's `X-API-Key` header in `paperclip.ts` would change to whatever the gate expects.
+  - Either way, **`app/lib/paperclip.ts` likely needs an auth tweak** before prod — its current `X-API-Key` assumption won't match better-auth.
+- **Simpler alternative to Render — Option C (tunnel), now first-class.** Paperclip natively supports `--bind tailnet`. A **Tailscale Funnel** (or Cloudflare Tunnel) can expose the *existing* local instance — which already has all the real data — at a public HTTPS URL with no redeploy, no external Postgres, no data migration, and no divergence from the source of truth. Tradeoff: your machine must be up. Given the auth complexity above, this is worth comparing against the full Render deploy before committing.
+- **Data migration note:** the local embedded Postgres already holds everything (11 projects, 70 issues, issue counter at 70). For a Render deploy, `pg_dump` the local instance → restore into Render Postgres is cleaner than re-running the backfill (preserves CHA-* numbering). Re-running the backfill also requires the prod instance to accept un-authenticated writes, which the auth model may block.
+
+---
+
+---
+
+## ✅ EXECUTABLE RENDER STEPS (verified 2026-06-03 — supersedes Steps 1–6 below)
+
+**Architecture (verified from `doc/DOCKER.md`):** the Paperclip Docker image runs its **own embedded
+Postgres inside the container**, persisted to a volume at `/paperclip`. So you do **NOT** need a
+separate Render Postgres — just one Web Service + one persistent disk. (Step 2 below is obsolete.)
+
+1. **Repo → Render.** New → Web Service → connect `github.com/paperclipai/paperclip` (fork it to pin a
+   SHA you trust). **Runtime: Docker** (repo ships a Dockerfile, `EXPOSE 3100`). Region: Oregon.
+2. **Plan: Starter ($7/mo).** Never Free — it sleeps after 15 min idle and kills the live read.
+3. **Persistent disk** (critical): service → Disks → Add Disk, mount path **`/paperclip`**, 1–5 GB.
+   Without it, every deploy wipes the embedded DB.
+4. **Env vars:**
+   - `HOST=0.0.0.0`
+   - `PAPERCLIP_HOME=/paperclip`
+   - `PAPERCLIP_PUBLIC_URL=https://paperclip.chappieworks.com`
+   - `BETTER_AUTH_SECRET=` ← `openssl rand -hex 32`
+   - `PAPERCLIP_DEPLOYMENT_MODE=authenticated`
+   - `PAPERCLIP_DEPLOYMENT_EXPOSURE=public`
+   - `ANTHROPIC_API_KEY=` ← only if you want the *hosted* instance to run agents; not needed just to
+     serve the queue read.
+5. **Custom domain + DNS:** add `paperclip.chappieworks.com` in Render → CNAME it in DNS (proxy off
+   until the cert issues).
+6. **Bootstrap the admin:** via Render Shell, run the repo's CEO bootstrap (`pnpm paperclipai auth
+   bootstrap-ceo`) to claim the instance — this is how you later mint the reader token.
+7. **Migrate the studio data — two options:**
+   - **A (preserve CHA-* numbering):** `pg_dump` the local instance (embedded PG at
+     `127.0.0.1:54329`, user/db `paperclip`): `pg_dump -h 127.0.0.1 -p 54329 -U paperclip paperclip >
+     paperclip.sql`, then restore into the container's embedded PG via Render Shell. Cleanest fidelity.
+   - **B (fresh):** point `scripts/paperclip-backfill.py` `API=` at `https://paperclip.chappieworks.com/api`,
+     add the auth header, run it + `paperclip-set-statuses.py`. Needs the prod instance to accept
+     authenticated writes.
+8. **Mint the reader token + wire Vercel** (`chappieworks` env, Prod+Preview+Dev):
+   - `PAPERCLIP_URL=https://paperclip.chappieworks.com`
+   - `PAPERCLIP_API_KEY=<token from the bootstrapped instance>`
+   - `NEXT_PUBLIC_PAPERCLIP_URL=https://paperclip.chappieworks.com`
+   - `PAPERCLIP_WEBHOOK_SECRET=<random>` (for the webhook revalidate path)
+   - `PAPERCLIP_AUTH_HEADER` / `PAPERCLIP_AUTH_SCHEME` — set **only** if the instance wants something
+     other than `Authorization: Bearer <token>`. `app/lib/paperclip.ts` now defaults to that and reads
+     these env overrides, so prod auth can be matched **without a code change**.
+   - Redeploy.
+9. **Verify:** `/studio/queue` shows the "live read" copy + 11 projects; flip a status in Paperclip →
+   propagates within 60s (instant once the webhook hits `/api/paperclip/webhook`).
+
+**Two unknowns to confirm against the running instance (not blockers):**
+- Whether `PAPERCLIP_DEPLOYMENT_EXPOSURE=public` leaves GET endpoints open (no token needed) or still
+  wants a Bearer token. The reader handles both (`PAPERCLIP_API_KEY` is optional).
+- The exact command/UI to mint an external read token under better-auth.
 
 ---
 
